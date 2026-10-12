@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Implay Seller</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Implay Seller">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="theme-color" content="#0B0B0C">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-seller-v1.png">
+<link rel="apple-touch-icon" href="apple-touch-icon-seller-v1.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<style>
+:root{--fh:Unbounded,Inter,system-ui,sans-serif;--noite:#0B0B0C;--card:#17171A;--card2:#1F1F23;--linha:#2C2C31;--chalk:#F7F7F2;--cinza:#A3A3AB;--grafite:#55555C;--volt:#D4FF2F;--flash:#FF3FA4;--cobalt:#2B3BFF;--ok:#7CE38B;--warn:#FFB547;--bad:#FF5C6C}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--noite);color:var(--chalk);font-family:Inter,system-ui,sans-serif;font-size:15px;overflow-x:hidden}
+[hidden]{display:none!important}
+button,input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3{font-family:var(--fh);margin:0;letter-spacing:-.01em}
+.wrap{max-width:640px;margin:0 auto;padding:calc(12px + env(safe-area-inset-top)) 16px calc(90px + env(safe-area-inset-bottom))}
+.logo{font-family:var(--fh);font-weight:800;font-size:24px;color:var(--volt);text-shadow:3px 3px 0 var(--flash);position:relative;display:inline-block;line-height:1}
+.logo .sp{color:var(--flash);font-size:13px;position:absolute;left:28px;top:-8px;text-shadow:none}
+.live{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--flash);text-transform:uppercase}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.tabs{display:flex;gap:6px;margin-bottom:14px}
+.tabs button{flex:1;border:1px solid var(--linha);background:var(--card);border-radius:999px;padding:10px 6px;font-weight:700;min-height:44px;font-size:14px}
+.tabs button.on{background:var(--volt);color:#000;border-color:var(--volt)}
+.card{background:var(--card);border:1px solid var(--linha);border-radius:18px;padding:16px;margin-bottom:10px;min-width:0}
+.job .marca{font-family:var(--fh);font-weight:700;font-size:18px;overflow-wrap:anywhere}
+.job .quando{font-weight:600;margin-top:6px}
+.job .det{color:var(--cinza);font-size:13px;margin-top:4px;overflow-wrap:anywhere}
+.cache{font-family:var(--fh);font-weight:800;font-size:22px;color:var(--volt);margin-top:10px}
+.vagas{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.vaga{border:1px solid var(--linha);border-radius:14px;padding:10px;font-size:13px;min-width:0}
+.vaga b{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--cinza);margin-bottom:6px}
+.btn{border:1px solid var(--linha);background:var(--card2);border-radius:999px;padding:12px 16px;font-weight:700;min-height:44px;cursor:pointer;width:100%}
+.btn.p{background:var(--volt);color:#000;border-color:var(--volt)}
+.btn.f{background:var(--flash);color:#fff;border-color:var(--flash)}
+.btn.d{background:transparent;color:var(--bad);border-color:#5d1a24}
+.btn:disabled{opacity:.4}
+.tag{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:3px 8px;margin:4px 4px 0 0;background:var(--card2);border:1px solid var(--linha)}
+.tag.v{background:var(--volt);color:#000;border-color:var(--volt)}.tag.f{background:var(--flash);color:#fff;border-color:var(--flash)}.tag.o{background:#12301a;color:var(--ok);border-color:#1d4a29}.tag.w{background:#3a2a0b;color:var(--warn);border-color:#5a4110}
+.muted{color:var(--cinza)}.small{font-size:12px}
+.fld{margin-top:14px}
+.fld label{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cinza);margin-bottom:6px}
+.fld input,.fld textarea{width:100%;background:var(--card);border:1px solid var(--linha);border-radius:12px;padding:12px;min-height:46px;font-size:16px}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg button{border:1px solid var(--linha);background:var(--card);border-radius:999px;padding:10px 14px;min-height:44px;font-weight:600;cursor:pointer}
+.seg button.on{background:var(--volt);color:#000;border-color:var(--volt)}
+.banner{background:var(--flash);color:#fff;border-radius:18px;padding:16px;margin-bottom:12px}
+.warnbox{background:#3a2a0b;border:1px solid #5a4110;color:var(--warn);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
+.okbox{background:#12301a;border:1px solid #1d4a29;color:var(--ok);border-radius:12px;padding:10px 12px;font-size:13px;margin-top:10px}
+.empty{color:var(--cinza);text-align:center;padding:30px 10px;border:1px dashed var(--linha);border-radius:16px}
+.termo{background:var(--card);border:1px solid var(--linha);border-radius:16px;padding:16px;font-size:14px;line-height:1.55;max-height:52vh;overflow-y:auto}
+.termo ol{padding-left:18px;margin:8px 0}
+.ev{border-left:2px solid var(--linha);padding:4px 0 10px 12px;font-size:13px}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:50;display:flex;align-items:flex-end;justify-content:center}
+.sheet .in{background:var(--noite);border:1px solid var(--linha);border-radius:22px 22px 0 0;width:100%;max-width:640px;padding:18px 16px calc(24px + env(safe-area-inset-bottom));max-height:90vh;overflow-y:auto}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--volt);color:#000;font-weight:700;border-radius:999px;padding:12px 18px;z-index:99;max-width:90vw;text-align:center}
+.toast.err{background:var(--bad);color:#fff}
+.foot{margin-top:24px;font-size:13px;color:var(--cinza);border-top:1px solid var(--linha);padding-top:14px}
+.row{display:flex;gap:8px}.row>*{flex:1}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="sheet" class="sheet" hidden><div class="in" id="sheetIn"></div></div>
+<div id="toast" class="toast" hidden></div>
+<script>
+"use strict";
+const SB_URL="https://agdqlnaedojcgivwluty.supabase.co";
+const SB_KEY="sb_publishable_PKGxxrfpduzI7xY1_DWQyQ_cnJA9isP";
+const db=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:"implay-seller-auth"}});
+const TERMO_VERSAO="v1-2026-10";
+const ESTUDIO="Estúdio Implay · Av. Paulista, 2206, 16º andar · São Paulo";
+const S={me:null,tab:"mural",mural:[],meus:[],hist:[]};
+function $(s){return document.querySelector(s)}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function brl(v){return (Number(v)||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
+const DL=["domingo","segunda","terça","quarta","quinta","sexta","sábado"],ML=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+function dExt(d){d=new Date(d);return DL[d.getDay()]+", "+d.getDate()+" de "+ML[d.getMonth()]}
+function hm(d){d=new Date(d);return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")}
+function horas(a,b){const h=(new Date(b)-new Date(a))/36e5;return String(Math.round(h*10)/10).replace(".",",")+" h"}
+function toast(m,err){const t=$("#toast");t.textContent=m;t.className="toast"+(err?" err":"");t.hidden=false;clearTimeout(toast._t);toast._t=setTimeout(()=>t.hidden=true,err?4500:2400)}
+function local(j){return j.local_tipo==="estudio"?ESTUDIO+(j.espaco?" · espaço "+j.espaco:""):j.local_tipo==="cliente"?(j.local_endereco||"Local do cliente"):"Online"}
+function erro(e){const m=(e&&e.message)||"";return /fetch|network/i.test(m)?"Sem conexão. Tente de novo.":m}
+function openSheet(h){$("#sheetIn").innerHTML=h;$("#sheet").hidden=false}
+function closeSheet(){$("#sheet").hidden=true;$("#sheetIn").innerHTML=""}
+
+/* ---------- login ---------- */
+function renderLogin(msg,modo){
+  $("#app").innerHTML=`<div class="wrap" style="max-width:420px;margin-top:8vh"><div style="text-align:center;margin-bottom:20px"><span class="logo">implay<span class="sp">✦</span></span><div class="live" style="margin-top:12px">● app do seller</div></div>
+  <form class="card" id="lf"><h3 style="font-size:18px">${modo==="criar"?"Criar minha conta":"Entrar"}</h3>
+  <div class="fld"><label>E-mail</label><input type="email" name="email" required autocomplete="username"></div>
+  <div class="fld"><label>Senha ${modo==="criar"?"(mínimo 6)":""}</label><input type="password" name="senha" required minlength="6" autocomplete="${modo==="criar"?"new-password":"current-password"}"></div>
+  ${msg?`<div class="warnbox">${esc(msg)}</div>`:""}
+  <button class="btn p" style="margin-top:16px">${modo==="criar"?"Criar conta":"Entrar"}</button>
+  <button type="button" class="btn" style="margin-top:8px" id="alt">${modo==="criar"?"Já tenho conta":"Criar conta nova"}</button></form>
+  <p class="small muted" style="text-align:center">Aqui você vê os jobs de live da Implay e escolhe os que quiser fazer.</p></div>`;
+  $("#alt").onclick=()=>renderLogin("",modo==="criar"?"":"criar");
+  $("#lf").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);const email=f.get("email"),password=f.get("senha");
+    const r=modo==="criar"?await db.auth.signUp({email,password}):await db.auth.signInWithPassword({email,password});
+    if(r.error)return renderLogin(/Invalid/.test(r.error.message)?"E-mail ou senha errados.":/registered/.test(r.error.message)?"Este e-mail já tem conta. Toque em 'Já tenho conta'.":r.error.message,modo);
+    boot()};
+}
+async function boot(){
+  const {data:{session}}=await db.auth.getSession();if(!session)return renderLogin();
+  S.email=session.user.email;
+  const {data:me,error}=await db.rpc("imp_entrar",{p_app:"seller"});
+  if(error)return renderLogin("Erro: "+erro(error));
+  S.me=me&&me.id?me:null;
+  if(!S.me)return renderCadastro();
+  if(S.me.status==="pendente")return renderPendente();
+  if(S.me.status!=="ativo")return renderMsg("Seu acesso está inativo. Fale com a Implay.");
+  if(!S.me.termo_aceito_em)return renderTermo();
+  await load();render();
+}
+function renderMsg(t){$("#app").innerHTML=`<div class="wrap"><div class="card"><p>${t}</p><button class="btn" data-act="sair">Sair</button></div></div>`}
+function renderCadastro(){const m=S.me||{};
+  $("#app").innerHTML=`<div class="wrap"><div class="top"><span class="logo">implay<span class="sp">✦</span></span></div>
+  <form class="card" id="cf"><h3 style="font-size:18px">Seu cadastro</h3><p class="small muted">Preencha uma vez. A equipe da Implay aprova e você já pode escolher jobs.</p>
+  <div class="fld"><label>Nome completo</label><input name="nome" required value="${esc(m.nome||"")}"></div>
+  <div class="fld"><label>WhatsApp</label><input name="tel" type="tel" required value="${esc(m.telefone||"")}"></div>
+  <div class="fld"><label>Cidade</label><input name="cidade" value="${esc(m.cidade||"")}"></div>
+  <div class="fld"><label>Como você presta serviço</label><input type="hidden" name="vinculo" value="${esc(m.vinculo||"")}"><div class="seg" data-seg="vinculo">${[["mei","MEI"],["pj","PJ (empresa)"],["freelancer","Autônomo / freelancer"]].map(([v,l])=>`<button type="button" data-v="${v}" class="${m.vinculo===v?"on":""}">${l}</button>`).join("")}</div></div>
+  <div class="fld"><label>CNPJ ou MEI (se tiver)</label><input name="cnpj" inputmode="numeric" value="${esc(m.cnpj||"")}"></div>
+  <div class="fld"><label>Chave Pix</label><input name="pix" value="${esc(m.pix||"")}"></div>
+  <div class="row"><div class="fld"><label>Instagram</label><input name="instagram" value="${esc(m.instagram||"")}" placeholder="@"></div><div class="fld"><label>TikTok</label><input name="tiktok" value="${esc(m.tiktok||"")}" placeholder="@"></div></div>
+  <div class="fld"><label>Nichos que você domina</label><input name="nicho" value="${esc(m.nicho||"")}" placeholder="beleza, alimentos, pet…"></div>
+  <button class="btn p" style="margin-top:16px">${S.me?"Salvar":"Enviar cadastro"}</button>${S.me?`<button type="button" class="btn" style="margin-top:8px" data-act="voltar">Voltar</button>`:""}</form>
+  <div class="foot">Conectado como ${esc(S.email)} · <a href="#" data-act="sair" style="color:var(--cinza)">Sair</a></div></div>`;
+  $("#cf").onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));if(!f.vinculo)return toast("Escolha como você presta serviço",true);
+    const {error}=await db.rpc("imp_cadastro_seller",{p_nome:f.nome,p_tel:f.tel,p_cidade:f.cidade,p_vinculo:f.vinculo,p_cnpj:f.cnpj,p_pix:f.pix,p_instagram:f.instagram,p_tiktok:f.tiktok,p_nicho:f.nicho});
+    if(error)return toast(erro(error),true);toast("Cadastro salvo");boot()};
+}
+function renderPendente(){$("#app").innerHTML=`<div class="wrap"><div class="top"><span class="logo">implay<span class="sp">✦</span></span></div><div class="card"><h3 style="font-size:18px">Cadastro recebido ✦</h3><p class="muted">A equipe da Implay vai aprovar seu cadastro. Depois disso, os jobs aparecem aqui.</p><button class="btn" data-act="recarregar">Atualizar</button><button class="btn" style="margin-top:8px" data-act="editar">Editar meus dados</button></div><div class="foot">${esc(S.email)} · <a href="#" data-act="sair" style="color:var(--cinza)">Sair</a></div></div>`}
+function renderTermo(){
+  $("#app").innerHTML=`<div class="wrap"><div class="top"><span class="logo">implay<span class="sp">✦</span></span></div><h2 style="font-size:20px;margin-bottom:12px">Termo de prestação de serviço autônomo</h2>
+  <div class="termo"><p>Eu, <b>${esc(S.me.nome)}</b>, declaro que presto serviços à IMP DIGITAL LTDA (Implay), CNPJ 44.189.776/0001-77, como profissional autônomo, de forma independente, e que:</p>
+  <ol><li>Escolho livremente, por este app, os jobs que quero fazer. Não sou obrigado a aceitar nenhum job nem a cumprir número mínimo de jobs.</li>
+  <li>Posso cancelar um job que escolhi a qualquer momento. Cancelar com pelo menos 24 horas de antecedência não traz nenhum prejuízo; cancelamentos depois disso apenas ficam registrados.</li>
+  <li>Não tenho horário fixo, escala, controle de ponto nem local fixo de trabalho. Cada job informa antes o local, o horário e o valor.</li>
+  <li>Não tenho exclusividade: posso prestar serviço para outras empresas, inclusive concorrentes, quando quiser.</li>
+  <li>Executo o serviço com minha técnica e autonomia, seguindo apenas as informações do produto e da marca necessárias para a live.</li>
+  <li>Recebo por job realizado. Quando aplicável, emito nota fiscal (MEI/PJ) diretamente para quem me paga, inclusive para a marca cliente.</li>
+  <li>Sou responsável pelos meus tributos e contribuições como autônomo.</li>
+  <li>Sei que minhas escolhas, cancelamentos e jobs ficam registrados neste app, com data e hora, e posso consultá-los em "Meu histórico".</li></ol>
+  <p class="small muted">Versão ${TERMO_VERSAO}. Este termo não substitui o contrato de prestação de serviço, quando houver.</p></div>
+  <button class="btn p" style="margin-top:14px" data-act="aceitar">Li e aceito</button><button class="btn" style="margin-top:8px" data-act="sair">Agora não (sair)</button></div>`}
+
+/* ---------- dados ---------- */
+async function load(){
+  const [a,b]=await Promise.all([db.rpc("imp_mural"),db.rpc("imp_meus_jobs")]);
+  if(a.error||b.error){toast(erro(a.error||b.error),true)}
+  S.mural=a.data||[];S.meus=b.data||[];
+}
+async function refresh(){if(!S.me||S.me.status!=="ativo"||!S.me.termo_aceito_em)return;await load();if($("#sheet").hidden)render()}
+
+/* ---------- telas ---------- */
+function render(){
+  const conv=S.meus.filter(j=>j.status==="aberto"&&j.minha_vaga==="substituto"&&j.principal_livre&&new Date(j.inicio)>new Date());
+  const prox=S.meus.filter(j=>j.status==="aberto"&&new Date(j.fim)>new Date());
+  $("#app").innerHTML=`<div class="wrap"><div class="top"><div><span class="logo">implay<span class="sp">✦</span></span><div class="live" style="margin-top:8px">● app do seller</div></div><div class="small muted" style="text-align:right">${esc(S.me.nome)}</div></div>
+  <div class="tabs">${[["mural","Mural de jobs"],["meus","Meus jobs"+(prox.length?" ("+prox.length+")":"")],["perfil","Perfil"]].map(([k,l])=>`<button data-act="tab" data-v="${k}" class="${S.tab===k?"on":""}">${l}</button>`).join("")}</div>
+  ${conv.map(j=>`<div class="banner"><b>A vaga de principal abriu.</b><br>${esc(j.marca)} · ${dExt(j.inicio)}, ${hm(j.inicio)}. Quer assumir? (você decide)<button class="btn" style="margin-top:10px;background:#fff;color:#000" data-act="pegar" data-id="${j.id}" data-v="principal">Quero ser o principal</button></div>`).join("")}
+  ${S.tab==="mural"?mural():S.tab==="meus"?meus():perfil()}
+  <div class="foot">Conectado como ${esc(S.email)} · <a href="#" data-act="sair" style="color:var(--cinza)">Sair desta conta</a></div></div>`;
+}
+function vaga(j,tipo){const livre=tipo==="principal"?j.principal_livre:j.substituto_livre;const minha=j.minha_vaga===tipo;
+  return `<div class="vaga"><b>${tipo==="principal"?"Principal":"Substituto"}</b>${minha?`<span class="tag v">é você</span>`:livre?(j.minha_vaga?`<span class="tag">livre</span>`:`<button class="btn ${tipo==="principal"?"p":""}" style="padding:10px" data-act="pegar" data-id="${j.id}" data-v="${tipo}">Quero</button>`):`<span class="tag">preenchida</span>`}</div>`}
+function mural(){
+  if(!S.mural.length)return `<div class="empty">Nenhum job aberto agora. Volte mais tarde ✦</div>`;
+  return `<p class="small muted" style="margin-top:0">Escolha só o que quiser fazer. O primeiro que pegar fica com a vaga. O substituto entra se o principal não puder.</p>`+S.mural.map(j=>`<div class="card job">
+   <div class="marca">${esc(j.marca||"Live")}</div>${j.produto?`<div class="det">${esc(j.produto)}</div>`:""}
+   <div class="quando">${dExt(j.inicio)} · ${hm(j.inicio)}–${hm(j.fim)} (${horas(j.inicio,j.fim)})</div>
+   <div class="det">📍 ${esc(local(j))}</div>${j.requisitos?`<div class="det">${esc(j.requisitos)}</div>`:""}
+   ${j.valor_seller?`<div class="cache">${brl(j.valor_seller)}</div>`:`<div class="det">Valor a combinar</div>`}
+   <div class="vagas">${vaga(j,"principal")}${vaga(j,"substituto")}</div></div>`).join("");
+}
+function meus(){
+  const now=new Date();const prox=S.meus.filter(j=>j.status==="aberto"&&new Date(j.fim)>now).reverse();const pass=S.meus.filter(j=>!(j.status==="aberto"&&new Date(j.fim)>now));
+  return (prox.length?prox.map(j=>`<div class="card job"><div class="marca">${esc(j.marca||"Live")}</div>
+   <div class="quando">${dExt(j.inicio)} · ${hm(j.inicio)}–${hm(j.fim)}</div><div class="det">📍 ${esc(local(j))}</div>
+   <span class="tag ${j.minha_vaga==="principal"?"v":"f"}">${j.minha_vaga}</span>${j.valor_seller?`<span class="tag">${brl(j.valor_seller)}</span>`:""}
+   <button class="btn d" style="margin-top:12px" data-act="cancelar" data-id="${j.id}">Cancelar minha participação</button></div>`).join(""):`<div class="empty">Você ainda não escolheu nenhum job. Veja o Mural.</div>`)
+   +(pass.length?`<h3 style="font-size:15px;margin:20px 0 10px">Anteriores</h3>`+pass.map(j=>`<div class="card job" style="opacity:.8"><b>${esc(j.marca||"")}</b> · ${dExt(j.inicio)}<br><span class="tag ${j.status==="realizado"?"o":""}">${j.status==="aberto"?"passou":j.status}</span><span class="tag">${j.minha_vaga}</span></div>`).join(""):"");
+}
+const EV={escolheu_principal:"Você escolheu ser principal",escolheu_substituto:"Você escolheu ser substituto",substituto_assumiu_principal:"Você assumiu como principal",cancelou:"Você cancelou",
+  convite_assumir_principal:"Convite para assumir como principal",termo_aceito:"Você aceitou o termo",cadastro_seller:"Você fez seu cadastro",perfil_atualizado:"Você atualizou seu perfil",
+  empresa_definiu_principal:"A empresa te colocou como principal",empresa_definiu_substituto:"A empresa te colocou como substituto",empresa_removeu_principal:"A empresa te tirou do principal",empresa_removeu_substituto:"A empresa te tirou do substituto"};
+function perfil(){const m=S.me;
+  return `<div class="card"><b>${esc(m.nome)}</b><div class="small muted">${esc(m.email)} · ${esc(m.telefone||"")}</div><div class="small muted">${esc(m.vinculo||"")}${m.cnpj?" · "+esc(m.cnpj):""}${m.pix?" · Pix "+esc(m.pix):""}</div>
+  <div class="okbox">Termo aceito em ${new Date(m.termo_aceito_em).toLocaleString("pt-BR")}</div><button class="btn" style="margin-top:12px" data-act="editar">Editar meus dados</button></div>
+  <h3 style="font-size:15px;margin:18px 0 10px">Meu histórico</h3><div id="hist"><button class="btn" data-act="hist">Ver meu histórico</button></div>`}
+
+/* ---------- ações ---------- */
+document.addEventListener("click",async e=>{
+  const sb=e.target.closest("[data-seg] button");if(sb){const g=sb.parentElement;g.querySelectorAll("button").forEach(b=>b.classList.remove("on"));sb.classList.add("on");g.previousElementSibling.value=sb.dataset.v;return}
+  if(e.target===$("#sheet"))return closeSheet();
+  const a=e.target.closest("[data-act]");if(!a)return;if(a.tagName==="A")e.preventDefault();const id=a.dataset.id,v=a.dataset.v;
+  switch(a.dataset.act){
+    case"sair":await db.auth.signOut();S.me=null;renderLogin();break;
+    case"tab":S.tab=v;render();break;
+    case"recarregar":boot();break;
+    case"editar":renderCadastro();break;
+    case"voltar":boot();break;
+    case"aceitar":{const {error}=await db.rpc("imp_aceitar_termo",{p_versao:TERMO_VERSAO});if(error)return toast(erro(error),true);toast("Pronto! Bem-vindo(a) ✦");boot();break}
+    case"pegar":{a.disabled=true;const {error}=await db.rpc("imp_pegar",{p_job:id,p_vaga:v});if(error){toast(erro(error),true);await refresh();return}
+      toast(v==="principal"?"Vaga de principal é sua ✦":"Você é o substituto ✦");S.tab="meus";await refresh();break}
+    case"cancelar":{const j=S.meus.find(x=>x.id===id);const perto=new Date(j.inicio)-new Date()<24*36e5;
+      openSheet(`<h3 style="font-size:18px">Cancelar ${esc(j.marca||"")}?</h3><p class="muted">${dExt(j.inicio)} · ${hm(j.inicio)}</p>
+      ${perto?`<div class="warnbox">Faltam menos de 24 horas. Você pode cancelar, mas fica registrado como cancelamento em cima da hora.</div>`:`<div class="okbox">Mais de 24 horas antes: cancelamento sem prejuízo.</div>`}
+      <div class="fld"><label>Motivo (opcional)</label><textarea id="motivo"></textarea></div>
+      <button class="btn d" style="margin-top:14px" data-act="cancelarOk" data-id="${id}">Cancelar participação</button><button class="btn" style="margin-top:8px" data-act="fechar">Voltar</button>`);break}
+    case"cancelarOk":{if(!a.dataset.armed){a.dataset.armed=1;a.textContent="Toque de novo para confirmar";return}
+      const {data,error}=await db.rpc("imp_cancelar",{p_job:id,p_motivo:($("#motivo")||{}).value||""});if(error)return toast(erro(error),true);
+      closeSheet();toast(data==="no_prazo"?"Cancelado, sem prejuízo":"Cancelado (registrado como em cima da hora)");await refresh();break}
+    case"fechar":closeSheet();break;
+    case"hist":{const {data,error}=await db.rpc("imp_meu_historico");if(error)return toast(erro(error),true);
+      $("#hist").innerHTML=(data||[]).map(e=>{const d=e.detalhe||{};let t=EV[e.tipo]||e.tipo;if(e.tipo==="cancelou")t+=d.prazo==="no_prazo"?" (no prazo)":" (menos de 24h antes)";
+        return `<div class="ev"><span class="small muted">${new Date(e.em).toLocaleString("pt-BR")}</span><br><b>${esc(t)}</b>${e.marca?` · ${esc(e.marca)}, ${dExt(e.inicio)}`:""}</div>`}).join("")||`<div class="muted small">Sem registros.</div>`;break}
+  }
+});
+document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh()});
+setInterval(refresh,60000);
+boot();
+</script>
+</body>
+</html>
