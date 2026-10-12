@@ -37,12 +37,40 @@ h1,h2,h3,.uh{font-family:var(--fh);letter-spacing:-.01em;margin:0}
 .nav button{flex:0 0 auto;border:1px solid var(--linha);background:var(--card);border-radius:999px;padding:10px 14px;font-weight:600;font-size:14px;min-height:44px}
 .nav button.on{background:var(--volt);color:#000;border-color:var(--volt)}
 .nav .badge{background:var(--flash);color:#fff;border-radius:999px;font-size:11px;padding:1px 6px;margin-left:6px}
+/* quadro lateral */
+.side{position:fixed;top:0;bottom:0;left:0;width:248px;background:#0F0F11;border-right:1px solid var(--linha);padding:calc(18px + var(--safe-t)) 12px calc(18px + var(--safe-b));overflow-y:auto;z-index:40;display:flex;flex-direction:column}
+.sbrand{padding:6px 10px 18px;border-bottom:1px solid var(--linha);margin-bottom:8px}
+.sgrp{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--grafite);padding:16px 10px 6px}
+.sitem{display:flex;align-items:center;gap:10px;width:100%;border:0;background:transparent;border-radius:12px;padding:10px;min-height:44px;font-weight:600;font-size:15px;text-align:left;cursor:pointer;color:var(--chalk);position:relative}
+.sitem:hover{background:var(--card)}
+.sitem.on{background:var(--card2)}
+.sitem.on::before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:3px;border-radius:3px;background:var(--volt)}
+.sic{width:18px;text-align:center;color:var(--cinza)}.sitem.on .sic{color:var(--volt)}
+.slab{flex:1}
+.sbad{background:var(--volt);color:#000;border-radius:999px;font-size:11px;font-weight:700;padding:2px 7px}
+.sbad.f{background:var(--flash);color:#fff}
+.sfoot{margin-top:auto;padding:16px 10px 0;border-top:1px solid var(--linha);font-size:13px;color:var(--cinza);line-height:1.7}
+.scrim{display:none}
+.mtop{display:none}
+.ptit{font-size:26px;margin:4px 0 18px}
+.mfoot{display:none}
+@media(min-width:900px){.shell .wrap{margin-left:248px;max-width:none;padding-left:32px;padding-right:32px}}
+@media(max-width:899px){
+ .side{transform:translateX(-100%);transition:transform .2s;box-shadow:0 0 40px rgba(0,0,0,.6)}
+ .shell.open .side{transform:none}
+ .shell.open .scrim{display:block;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:39}
+ .mtop{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+ .burger{border:1px solid var(--linha);background:var(--card);border-radius:12px;width:44px;height:44px;font-size:20px;cursor:pointer}
+ .mtit{margin-left:auto;font-weight:700;font-size:14px;color:var(--cinza)}
+ .ptit{font-size:22px}
+ .mfoot{display:block}
+}
 /* cards */
 .grid{display:grid;gap:10px}
 .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media(min-width:760px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}.two{grid-template-columns:1fr 1fr}}
 .card{background:var(--card);border:1px solid var(--linha);border-radius:18px;padding:14px;min-width:0}
-.kpi .n{font-family:var(--fh);font-weight:700;font-size:20px;margin-top:6px;word-break:break-word}
+.kpi .n{font-family:var(--fh);font-weight:700;font-size:clamp(15px,4.4vw,20px);margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .kpi .l{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cinza)}
 .kpi.cob{background:var(--cobalt);border-color:var(--cobalt)}
 .kpi.cob .l{color:#dfe2ff}
@@ -184,7 +212,7 @@ const ESPACOS=[...Array.from({length:11},(_,i)=>"E"+(i+1)),...Array.from({length
 const ESPACO_NOME={E:"Economy",P:"Premium",B:"Business",C:"Cabine"};
 const ESTUDIO="Estúdio Implay · Av. Paulista, 2206, 16º andar";
 const CAT_ENT=[["aporte","Aporte Tae & Dani"],["fixo_cliente","Fixo do cliente"],["variavel_cliente","% sobre vendas"],["aluguel_espaco","Aluguel do espaço"],["rendimento","Rendimento / juros"],["outra_entrada","Outra entrada"]];
-const CAT_SAI=[["seller","Cachê de seller","variavel"],["aluguel_imovel","Aluguel do imóvel","fixa"],["condominio_iptu","Condomínio / IPTU","fixa"],["obra","Obra","variavel"],["equipamentos","Equipamentos","variavel"],["salarios","Salários CLT","fixa"],["comissao","Comissão CLT","variavel"],["impostos","Impostos","variavel"],["contador","Contador","fixa"],["marketing","Marketing","variavel"],["limpeza","Limpeza","fixa"],["devolucao_aporte","Devolução de aporte","variavel"],["outra_saida","Outra saída","variavel"]];
+const CAT_SAI=[["seller","Cachê de seller","variavel"],["aluguel_imovel","Aluguel do imóvel","fixa"],["condominio_iptu","Condomínio / IPTU","fixa"],["obra","Obra","variavel"],["equipamentos","Equipamentos","variavel"],["salarios","Salários CLT","fixa"],["comissao","Comissão CLT","variavel"],["impostos","Impostos","variavel"],["contador","Contador","fixa"],["marketing","Marketing","variavel"],["limpeza","Limpeza","fixa"],["contas","Energia / água / internet","fixa"],["seguro","Seguro","fixa"],["taxas","Taxas, registros e certificados","variavel"],["caucao","Caução do aluguel","variavel"],["live_custos","Custos de live (viagem, transporte)","variavel"],["caixinha","Caixinha","variavel"],["devolucao_aporte","Devolução de aporte","variavel"],["outra_saida","Outra saída","variavel"]];
 const CAT_NOME=Object.fromEntries([...CAT_ENT,...CAT_SAI].map(c=>[c[0],c[1]]));
 const PACOTES=["Essencial","Crescimento","Escala","Marca + afiliados","Live de lançamento","Aluguel do espaço"];
 const S={me:null,tab:"painel",membros:[],clientes:[],propostas:[],jobs:[],fin:[],amostras:[],
@@ -265,17 +293,31 @@ async function boot(){
 }
 
 /* ---------- layout ---------- */
-const TABS=[["painel","Painel"],["agenda","Agenda"],["jobs","Jobs"],["propostas","Propostas"],["clientes","Clientes"],["fin","Financeiro"],["amostras","Amostras"],["equipe","Equipe"]];
+const MENU=[["Operação",[["painel","Painel","◱"],["agenda","Agenda","▦"],["jobs","Jobs","≡"],["amostras","Amostras","◇"]]],
+  ["Comercial",[["propostas","Propostas e contratos","▭"],["clientes","Clientes / marcas","◈"]]],
+  ["Gestão",[["fin","Financeiro","◆"],["equipe","Equipe e sellers","◉"]]]];
+const TAB_NOME=Object.fromEntries(MENU.flatMap(g=>g[1]).map(x=>[x[0],x[1]]));
+function badges(){const now=new Date();return {
+  agenda:S.jobs.filter(j=>j.status==="aberto"&&new Date(j.inicio)>now&&new Date(j.inicio)<new Date(Date.now()+7*864e5)).length,
+  jobs:S.jobs.filter(j=>j.status==="aberto"&&new Date(j.inicio)>now&&!j.principal_id).length,
+  fin:isSocio()?S.fin.filter(f=>f.reembolso==="solicitado"&&f.status==="ativo").length:0,
+  equipe:isSocio()?S.membros.filter(m=>m.status==="pendente").length:0}}
 function render(){
-  const pend=S.membros.filter(m=>m.status==="pendente").length;
-  const reemb=S.fin.filter(f=>f.reembolso==="solicitado"&&f.status==="ativo").length;
-  $("#app").innerHTML=`<div class="wrap">
-   <div class="top"><div><span class="logo">implay<span class="sp">✦</span></span><div class="live" style="margin-top:8px">● gestão · live commerce</div></div>
-   <div class="who">${esc(S.me.nome)}<br><span class="tag ${isSocio()?"v":""}">${isSocio()?"sócio":"equipe"}</span></div></div>
-   <div class="nav">${TABS.map(([k,l])=>`<button data-act="tab" data-v="${k}" class="${S.tab===k?"on":""}">${l}${k==="equipe"&&pend&&isSocio()?`<span class="badge">${pend}</span>`:""}${k==="fin"&&reemb&&isSocio()?`<span class="badge">${reemb}</span>`:""}</button>`).join("")}</div>
-   <main id="main">${VIEWS[S.tab]()}</main>
-   <div class="foot">Conectado como ${esc(S.email)} · <a href="#" data-act="backup" style="color:var(--volt)">Copiar backup</a> · <a href="#" data-act="sair" style="color:var(--cinza)">Sair desta conta</a></div>
-  </div>`;
+  const b=badges();
+  $("#app").innerHTML=`<div class="shell">
+   <aside class="side" id="side">
+    <div class="sbrand"><span class="logo">implay<span class="sp">✦</span></span><div class="live" style="margin-top:10px">gestão · live commerce</div></div>
+    ${MENU.map(([g,items])=>`<div class="sgrp">${g}</div>${items.map(([k,l,ic])=>`<button class="sitem ${S.tab===k?"on":""}" data-act="tab" data-v="${k}"><span class="sic">${ic}</span><span class="slab">${l}</span>${b[k]?`<span class="sbad ${k==="fin"||k==="equipe"?"f":""}">${b[k]}</span>`:""}</button>`).join("")}`).join("")}
+    <div class="sfoot"><b>${esc(S.me.nome)}</b> <span class="tag ${isSocio()?"v":""}">${isSocio()?"sócio":"equipe"}</span><br><span class="small">${esc(S.email)}</span><br>
+    <a href="#" data-act="backup" style="color:var(--volt)">Copiar backup</a> · <a href="#" data-act="sair" style="color:var(--cinza)">Sair</a></div>
+   </aside>
+   <div class="scrim" data-act="sideClose"></div>
+   <div class="wrap">
+    <div class="mtop"><button class="burger" data-act="sideOpen" aria-label="Menu">☰</button><span class="logo" style="font-size:22px">implay<span class="sp">✦</span></span><span class="mtit">${esc(TAB_NOME[S.tab]||"")}</span></div>
+    <h1 class="ptit">${esc(TAB_NOME[S.tab]||"")}</h1>
+    <main id="main">${VIEWS[S.tab]()}</main>
+    <div class="foot mfoot">Conectado como ${esc(S.email)} · <a href="#" data-act="backup" style="color:var(--volt)">Copiar backup</a> · <a href="#" data-act="sair" style="color:var(--cinza)">Sair desta conta</a></div>
+   </div></div>`;
 }
 
 /* ================= PAINEL ================= */
@@ -362,7 +404,7 @@ VIEWS.jobs=()=>{
   if(S.jobsF==="vagas")l=l.filter(j=>j.status==="aberto"&&new Date(j.inicio)>now&&!j.principal_id);
   if(S.jobsF==="passados")l=l.filter(j=>j.status==="realizado"||(j.status==="aberto"&&new Date(j.fim)<=now)).reverse();
   if(S.jobsF==="cancelados")l=l.filter(j=>j.status==="cancelado").reverse();
-  return `<div class="sec" style="margin-top:0"><h2>Jobs</h2><button class="btn p sm" data-act="novoJob">+ Novo job</button></div>
+  return `<div class="sec" style="margin-top:0"><span></span><button class="btn p sm" data-act="novoJob">+ Novo job</button></div>
   <div class="pills">${[["proximos","Próximos"],["vagas","Vagas abertas"],["passados","Realizados / passados"],["cancelados","Cancelados"],["todos","Todos"]].map(([k,l])=>`<button data-act="jobsF" data-v="${k}" class="${S.jobsF===k?"on":""}">${l}</button>`).join("")}</div>
   ${l.length?l.map(jobItem).join(""):`<div class="empty">Nada por aqui.</div>`}`;
 };
@@ -443,7 +485,7 @@ async function showHist(jobId){
 const PST={rascunho:["rascunho",""],enviada:["enviada","c"],aceita:["contrato","v"],recusada:["recusada","x"],cancelada:["cancelada","x"]};
 VIEWS.propostas=()=>{
   let l=S.propostas;if(S.propF==="contratos")l=l.filter(p=>p.status==="aceita");if(S.propF==="abertas")l=l.filter(p=>["rascunho","enviada"].includes(p.status));
-  return `<div class="sec" style="margin-top:0"><h2>Propostas e contratos</h2><button class="btn p sm" data-act="propNova">+ Nova proposta</button></div>
+  return `<div class="sec" style="margin-top:0"><span></span><button class="btn p sm" data-act="propNova">+ Nova proposta</button></div>
   <div class="pills">${[["todas","Todas"],["abertas","Em negociação"],["contratos","Contratos"]].map(([k,t])=>`<button data-act="propF" data-v="${k}" class="${S.propF===k?"on":""}">${t}</button>`).join("")}</div>
   ${l.length?l.map(p=>`<div class="item" data-act="prop" data-id="${p.id}"><div class="b"><div class="t">${esc(p.marca)} <span class="muted small">${p.contrato_numero?esc(p.contrato_numero):pn(p.numero)}</span></div>
    <div class="s">${esc(p.pacote||"")}${p.valor_fixo?" · "+brl(p.valor_fixo)+"/mês":""}${p.perc_variavel?" + "+numIn(p.perc_variavel)+"%":""}${p.primeira_live?" · 1ª live "+dCurta(p.primeira_live):""}</div>
@@ -561,7 +603,7 @@ function fitDoc(){const w=Math.min(window.innerWidth-16,1123),k=w/1123;document.
 window.addEventListener("resize",()=>{if(!$("#doc").hidden)fitDoc()});
 
 /* ================= CLIENTES ================= */
-VIEWS.clientes=()=>`<div class="sec" style="margin-top:0"><h2>Clientes / marcas</h2><button class="btn p sm" data-act="cliNovo">+ Novo cliente</button></div>
+VIEWS.clientes=()=>`<div class="sec" style="margin-top:0"><span></span><button class="btn p sm" data-act="cliNovo">+ Novo cliente</button></div>
   ${S.clientes.length?S.clientes.filter(c=>c.status!=="cancelado").map(c=>`<div class="item" data-act="cli" data-id="${c.id}"><div class="b"><div class="t">${esc(c.marca)}</div><div class="s">${esc(c.empresa||"")}${c.cnpj?" · "+esc(c.cnpj):""}${c.contato_nome?" · "+esc(c.contato_nome):""}</div>
   <span class="tag">${S.propostas.filter(p=>p.cliente_id===c.id).length} propostas</span><span class="tag">${S.jobs.filter(j=>j.cliente_id===c.id).length} jobs</span></div></div>`).join(""):`<div class="empty">Nenhum cliente ainda.</div>`}`;
 function openCli(id){const c=id?S.clientes.find(x=>x.id===id):{};
@@ -582,10 +624,13 @@ function finItem(f){
 VIEWS.fin=()=>{
   const sub=S.finSub;
   const subs=`<div class="pills">${[["lanc","Lançamentos"],["reemb","Reembolsos"],...(isSocio()?[["aporte","Aporte"]]:[])].map(([k,t])=>`<button data-act="finSub" data-v="${k}" class="${sub===k?"on":""}">${t}</button>`).join("")}</div>`;
-  const head=`<div class="sec" style="margin-top:0"><h2>Financeiro</h2><div class="row"><button class="btn sm" data-act="finNovo" data-tipo="saida" data-proprio="1">Paguei do meu bolso</button><button class="btn p sm" data-act="finNovo">+ Lançar</button></div></div>`+subs;
+  const head=`<div class="sec" style="margin-top:0"><span></span><div class="row"><button class="btn sm" data-act="finNovo" data-tipo="saida" data-proprio="1">Paguei do meu bolso</button><button class="btn p sm" data-act="finNovo">+ Lançar</button></div></div>`+subs;
   const ativos=S.fin.filter(f=>f.status==="ativo");
   if(sub==="reemb"){const l=ativos.filter(f=>f.reembolso!=="nao");
-    return head+(l.length?l.map(finItem).join(""):`<div class="empty">Nenhum reembolso. Pagou algo da empresa com seu dinheiro? Toque em "Paguei do meu bolso".</div>`)}
+    const pess={};l.filter(f=>["solicitado","aprovado"].includes(f.reembolso)).forEach(f=>{const k=f.reembolso_para||"?";pess[k]=pess[k]||{sol:0,apr:0,n:0};pess[k][f.reembolso==="aprovado"?"apr":"sol"]+=Number(f.valor)||0;pess[k].n++});
+    const pagos=soma(l.filter(f=>f.reembolso==="pago"));
+    const resumo=Object.keys(pess).length?`<div class="grid kpis" style="margin-bottom:14px">${Object.entries(pess).map(([k,v])=>`<div class="card kpi ${k===S.me.id?"vol":""}"><div class="l">A devolver para ${esc(nome(k)||"(sem nome)")}</div><div class="n">${brl(v.sol+v.apr)}</div><div class="small" style="margin-top:6px">${v.n} itens · aprovado ${brl(v.apr)}</div></div>`).join("")}<div class="card kpi"><div class="l">Já reembolsado</div><div class="n">${brl(pagos)}</div></div></div>`:"";
+    return head+resumo+(l.length?l.map(finItem).join(""):`<div class="empty">Nenhum reembolso. Pagou algo da empresa com seu dinheiro? Toque em "Paguei do meu bolso".</div>`)}
   if(sub==="aporte"){const a=aporteInfo();
     return head+`<div class="grid kpis"><div class="card kpi vol"><div class="l">Aportado</div><div class="n">${brl(a.tot)}</div></div><div class="card kpi"><div class="l">Devolvido</div><div class="n">${brl(a.dv)}</div></div><div class="card kpi cob"><div class="l">Saldo a devolver</div><div class="n">${brl(a.saldo)}</div></div><div class="card kpi"><div class="l">Estimado no acordo</div><div class="n">R$ 300.000</div></div></div>
     <div class="hint" style="margin:10px 0">Pelo acordo de sócios, cada aporte deve ser devolvido em até 18 meses a partir do desembolso, com correção monetária (sem juros), antes de qualquer distribuição de lucros. A correção não é calculada aqui.</div>
@@ -651,7 +696,7 @@ async function saveFin(id){
 VIEWS.amostras=()=>{
   const at=S.amostras.filter(a=>a.status!=="cancelado");const saldo={};
   at.forEach(a=>{const k=(a.marca||"")+"|"+a.produto;saldo[k]=saldo[k]||{marca:a.marca,produto:a.produto,ent:0,sai:0};saldo[k][a.movimento==="entrada"?"ent":"sai"]+=a.qtd});
-  const head=`<div class="sec" style="margin-top:0"><h2>Amostras</h2><div class="row"><button class="btn sm" data-act="amNova" data-v="saida">− Saída</button><button class="btn p sm" data-act="amNova" data-v="entrada">+ Chegou</button></div></div>
+  const head=`<div class="sec" style="margin-top:0"><span></span><div class="row"><button class="btn sm" data-act="amNova" data-v="saida">− Saída</button><button class="btn p sm" data-act="amNova" data-v="entrada">+ Chegou</button></div></div>
   <div class="pills"><button data-act="amF" data-v="saldo" class="${S.amF==="saldo"?"on":""}">Estoque</button><button data-act="amF" data-v="mov" class="${S.amF==="mov"?"on":""}">Movimentos</button></div>`;
   if(S.amF==="saldo"){const l=Object.values(saldo);return head+(l.length?l.map(s=>`<div class="item"><div class="b"><div class="t">${esc(s.produto)}</div><div class="s">${esc(s.marca||"")} · chegaram ${s.ent} · saíram ${s.sai}</div></div><div class="r" style="font-family:var(--fh);font-size:20px;color:${s.ent-s.sai>0?"var(--volt)":"var(--cinza)"}">${s.ent-s.sai}</div></div>`).join(""):`<div class="empty">Nenhuma amostra registrada.</div>`)}
   return head+(at.length?at.map(a=>`<div class="item" data-act="am" data-id="${a.id}"><div class="b"><div class="t">${a.movimento==="entrada"?"Chegou":"Saiu"}: ${a.qtd} × ${esc(a.produto)}</div><div class="s">${esc(a.marca||"")} · ${dCurta(a.data)}${a.para?" · para "+esc(a.para):""}</div></div></div>`).join(""):`<div class="empty">Nenhum movimento.</div>`);
@@ -672,7 +717,7 @@ const VINC={socio:"sócio",clt:"CLT",freelancer:"freelancer",pj:"PJ",mei:"MEI"};
 VIEWS.equipe=()=>{
   let l=S.membros;const f=S.eqF;
   if(f==="socios")l=l.filter(m=>m.papel==="socio");if(f==="equipe")l=l.filter(m=>m.papel==="basico");if(f==="sellers")l=l.filter(m=>m.papel==="seller"&&m.status==="ativo");if(f==="pendentes")l=l.filter(m=>m.status==="pendente");
-  return `<div class="sec" style="margin-top:0"><h2>Equipe e sellers</h2>${isSocio()?`<button class="btn p sm" data-act="membroNovo">+ Cadastrar</button>`:""}</div>
+  return `<div class="sec" style="margin-top:0"><span></span>${isSocio()?`<button class="btn p sm" data-act="membroNovo">+ Cadastrar</button>`:""}</div>
   <div class="pills">${[["todos","Todos"],["socios","Sócios"],["equipe","Equipe"],["sellers","Sellers"],["pendentes","Aguardando aprovação"]].map(([k,t])=>`<button data-act="eqF" data-v="${k}" class="${f===k?"on":""}">${t}</button>`).join("")}</div>
   <div class="hint" style="margin-bottom:10px">Sellers se cadastram pelo app do seller: <b>brunotae.github.io/implay/seller/</b></div>
   ${l.map(m=>`<div class="item" data-act="membro" data-id="${m.id}"><div class="b"><div class="t">${esc(m.nome)}</div><div class="s">${esc(m.email)}${m.telefone?" · "+esc(m.telefone):""}</div>
@@ -729,6 +774,8 @@ document.addEventListener("click",async e=>{
   if(a.tagName==="A")e.preventDefault();
   try{switch(act){
     case"tab":S.tab=val;render();window.scrollTo(0,0);break;
+    case"sideOpen":$(".shell").classList.add("open");break;
+    case"sideClose":$(".shell").classList.remove("open");break;
     case"fechar":closeSheet();break;
     case"sair":await db.auth.signOut();S.me=null;renderLogin();break;
     case"backup":{const t=JSON.stringify({membros:S.membros,clientes:S.clientes,propostas:S.propostas,jobs:S.jobs,fin:S.fin,amostras:S.amostras},null,1);try{await navigator.clipboard.writeText(t);toast("Backup copiado")}catch(_){toast("Não consegui copiar",true)}break}
