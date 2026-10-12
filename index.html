@@ -341,7 +341,7 @@ function dateFld(name,label,val,req){return `<div class="fld"><label>${label}</l
 function fld(name,label,val,type="text",extra=""){return `<div class="fld"><label>${label}</label><input type="${type}" name="${name}" value="${esc(val??"")}" ${extra}></div>`}
 function moneyFld(name,label,val){return `<div class="fld"><label>${label}</label><input inputmode="decimal" name="${name}" value="${esc(numIn(val))}" placeholder="0,00"></div>`}
 function area(name,label,val){return `<div class="fld"><label>${label}</label><textarea name="${name}">${esc(val??"")}</textarea></div>`}
-function formData(){const o={};new FormData($("#sheetIn form")).forEach((v,k)=>o[k]=typeof v==="string"?v.trim():v);return o}
+function formData(){const o={};new FormData($("#sheetIn form")).forEach((v,k)=>o[k]=typeof v==="string"?v.trim():v);if(o.cliente_id==="__novo__")o.cliente_id="";return o}
 function openSheet(html){$("#sheetIn").innerHTML=html;$("#sheet").hidden=false;$("#sheetIn").scrollTop=0}
 function closeSheet(){$("#sheet").hidden=true;$("#sheetIn").innerHTML=""}
 function armed(btn){if(btn.dataset.armed){return true}btn.dataset.armed="1";const t=btn.textContent;btn.textContent="Toque de novo para confirmar";setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent=t}},4000);return false}
@@ -439,6 +439,13 @@ function jobItem(j){const open=!j.principal_id&&j.status==="aberto";
   <div class="s">${dCurta(j.inicio)} · ${hm(j.inicio)}–${hm(j.fim)} · ${j.local_tipo==="estudio"?(j.espaco?"Estúdio "+j.espaco:"Estúdio"):j.local_tipo==="cliente"?"Local do cliente":"Online"}${j.produto?" · "+esc(j.produto):""}</div>
   <div>${j.status==="realizado"?`<span class="tag o">realizado</span>`:j.status==="cancelado"?`<span class="tag x">cancelado</span>`:open?`<span class="tag f">vaga aberta</span>`:`<span class="tag">A: ${esc(nome(j.principal_id))}</span>`}${j.substituto_id?`<span class="tag">B: ${esc(nome(j.substituto_id))}</span>`:j.status==="aberto"?`<span class="tag">B: livre</span>`:""}${j.modalidade==="aluguel"?`<span class="tag c">aluguel</span>`:""}${j.publicado&&j.status==="aberto"?"":j.status==="aberto"?`<span class="tag w">fora do mural</span>`:""}</div></div>
   <div class="r">${j.valor_seller?brl(j.valor_seller):""}</div></div>`}
+function cliOpts(sel){return `<option value="">— escolher —</option><option value="__novo__">+ Cadastrar novo cliente…</option>${S.clientes.filter(c=>c.status!=="cancelado").map(c=>`<option value="${c.id}" ${c.id===sel?"selected":""}>${esc(c.marca)}${c.empresa?" · "+esc(c.empresa):""}</option>`).join("")}`}
+function cliSel(sel,label){return `<div class="fld"><label style="display:flex;justify-content:space-between;align-items:center">${label}<button type="button" class="btn sm" style="min-height:28px;padding:4px 10px;font-size:11.5px;letter-spacing:0;text-transform:none" data-act="ncAbrir">+ Novo cliente</button></label><select name="cliente_id">${cliOpts(sel)}</select>
+ <div class="newcli card" hidden style="margin-top:8px;background:var(--card2)"><div class="lab">Novo cliente</div>
+ <div class="cols2 t2"><div class="fld" style="margin-top:6px"><label>Marca *</label><input id="nc_marca" placeholder="ex.: Doritos"></div><div class="fld" style="margin-top:6px"><label>Empresa</label><input id="nc_empresa" placeholder="ex.: PepsiCo"></div></div>
+ <div class="cols2 t2"><div class="fld"><label>Contato</label><input id="nc_contato"></div><div class="fld"><label>Telefone</label><input id="nc_tel" type="tel"></div></div>
+ <div class="row" style="margin-top:10px"><button type="button" class="btn p sm" data-act="ncSalvar">Salvar cliente</button><button type="button" class="btn sm" data-act="ncFechar">Cancelar</button></div>
+ <div class="hint">CNPJ, e-mail e endereço podem ser completados depois em Clientes.</div></div></div>`}
 function sellerOpts(sel){return `<option value="">— ninguém —</option>`+S.membros.filter(m=>m.status==="ativo"&&(m.papel==="seller"||m.vinculo==="clt")).map(m=>`<option value="${m.id}" ${m.id===sel?"selected":""}>${esc(m.nome)} (${esc(m.vinculo)})</option>`).join("")}
 function openJob(id,preset={}){
   const j=id?S.jobs.find(x=>x.id===id):Object.assign({modalidade:"servico",local_tipo:"estudio",seller_pago_por:"cliente",publicado:true,status:"aberto"},preset);
@@ -447,7 +454,7 @@ function openJob(id,preset={}){
   openSheet(`<form onsubmit="return false"><h3>${id?esc(j.marca||"Job")+" · "+jn(j.numero):"Novo job"}</h3>
    ${id?`<div>${j.status==="realizado"?`<span class="tag o">realizado</span>`:j.status==="cancelado"?`<span class="tag x">cancelado</span>`:`<span class="tag v">aberto</span>`}</div>`:""}
    <div class="fld"><label>Contrato</label><select name="proposta_id" data-act-change="jobContrato"><option value="">— sem contrato —</option>${contratos.map(p=>`<option value="${p.id}" ${p.id===j.proposta_id?"selected":""}>${esc(p.contrato_numero||pn(p.numero))} · ${esc(p.marca)}</option>`).join("")}</select><div class="hint">Liga o job às condições de venda da proposta aceita.</div></div>
-   <div class="cols2"><div class="fld"><label>Cliente</label><select name="cliente_id"><option value="">—</option>${S.clientes.map(c=>`<option value="${c.id}" ${c.id===j.cliente_id?"selected":""}>${esc(c.marca)}</option>`).join("")}</select></div>${fld("marca","Marca",j.marca)}</div>
+   ${cliSel(j.cliente_id,"Cliente")}${fld("marca","Marca",j.marca)}
    ${fld("produto","Produto / tema da live",j.produto)}
    <div class="fld"><label>Modalidade</label>${seg("modalidade",[["servico","Serviço completo"],["aluguel","Só aluguel do espaço"]],j.modalidade)}</div>
    <div class="fld"><label>Local</label>${seg("local_tipo",[["estudio","Estúdio Paulista"],["cliente","Local do cliente"],["online","Online"]],j.local_tipo)}</div>
@@ -520,7 +527,7 @@ function openProp(id){
     pagamento:"Boleto ou Pix, todo dia 10 do mês",contato1:"Larissa Amarante · (21) 96938-8998",contato2:"Caio Riccio · (21) 96590-7894"};
   openSheet(`<form onsubmit="return false"><h3>${id?esc(p.marca)+" · "+(p.contrato_numero||pn(p.numero)):"Nova proposta"}</h3>
    <div class="hint">Preencha só o que muda. O botão "Gerar proposta" monta o documento no padrão Implay.</div>
-   <div class="fld"><label>Cliente</label><select name="cliente_id"><option value="">— escolher —</option>${S.clientes.map(c=>`<option value="${c.id}" ${c.id===p.cliente_id?"selected":""}>${esc(c.marca)}${c.empresa?" · "+esc(c.empresa):""}</option>`).join("")}</select><div class="hint">Cliente novo? Cadastre antes em Clientes.</div></div>
+   ${cliSel(p.cliente_id,"Cliente")}
    <div class="cols2">${fld("marca","Marca (aparece na proposta)",p.marca,"text","required")}${fld("mes_ref","Mês da proposta",p.mes_ref)}</div>
    ${fld("objetivo","Objetivo",p.objetivo,"text",'placeholder="ex.: criar recorrência de vendas no perfil da marca no TikTok Shop"')}
    <div class="fld"><label>Modalidade</label>${seg("modalidade",[["servico","Serviço completo"],["aluguel","Só aluguel do espaço"]],p.modalidade)}</div>
@@ -690,7 +697,7 @@ function openAm(id,mov){const a=id?S.amostras.find(x=>x.id===id):{movimento:mov|
   const produtos=[...new Set(S.amostras.map(x=>x.produto))];
   openSheet(`<form onsubmit="return false"><h3>${a.movimento==="entrada"?"Chegada de amostras":"Saída de amostras"}</h3>
    <div class="fld"><label>Movimento</label>${seg("movimento",[["entrada","Chegou (entrada)"],["saida","Saiu (para influencer, live etc.)"]],a.movimento)}</div>
-   <div class="fld"><label>Marca</label><select name="cliente_id"><option value="">—</option>${S.clientes.map(c=>`<option value="${c.id}" ${c.id===a.cliente_id?"selected":""}>${esc(c.marca)}</option>`).join("")}</select></div>
+   ${cliSel(a.cliente_id,"Marca")}
    <div class="fld"><label>Produto</label><input name="produto" value="${esc(a.produto||"")}" list="prods" required><datalist id="prods">${produtos.map(p=>`<option value="${esc(p)}">`).join("")}</datalist></div>
    <div class="fld"><label>Quantidade</label><div class="row"><button type="button" class="btn" data-act="qtd" data-v="-1">−</button><input name="qtd" inputmode="numeric" value="${a.qtd}" style="width:90px;text-align:center"><button type="button" class="btn" data-act="qtd" data-v="1">+</button><button type="button" class="btn sm" data-act="qtd" data-v="10">+10</button><button type="button" class="btn sm" data-act="qtd" data-v="100">+100</button></div></div>
    <div data-show="movimento=saida">${fld("para","Para quem (influencer / destino)",a.para)}</div>
@@ -1037,6 +1044,12 @@ document.addEventListener("click",async e=>{
     case"docPrint":window.print();break;
     case"docClose":$("#doc").hidden=true;$("#doc").innerHTML="";render();break;
     case"csv":{const d=$("#doc");const b=new Blob(["﻿"+d.dataset.csv],{type:"text/csv"});const u=URL.createObjectURL(b);const l=document.createElement("a");l.href=u;l.download=d.dataset.csvName;document.body.appendChild(l);l.click();l.remove();break}
+    case"ncAbrir":{const b=a.closest(".fld").querySelector(".newcli");b.hidden=false;b.querySelector("#nc_marca").focus();break}
+    case"ncFechar":{const f=a.closest(".fld");f.querySelector(".newcli").hidden=true;const sl=f.querySelector("select");if(sl.value==="__novo__")sl.value="";break}
+    case"ncSalvar":{const f=a.closest(".fld");const g=id=>f.querySelector(id).value.trim();const marca=g("#nc_marca");if(!marca)return toast("Preencha a marca",true);
+      const novo=await run(db.from("imp_clientes").insert({marca,empresa:g("#nc_empresa")||null,contato_nome:g("#nc_contato")||null,contato_tel:g("#nc_tel")||null}).select().single(),"Cliente "+marca+" cadastrado");
+      S.clientes.push(novo);S.clientes.sort((x,y)=>x.marca.localeCompare(y.marca));const sl=f.querySelector("select");sl.innerHTML=cliOpts(novo.id);sl.value=novo.id;f.querySelector(".newcli").hidden=true;
+      const mk=$("#sheetIn [name=marca]");if(mk&&!mk.value)mk.value=marca;break}
     case"cliNovo":openCli(null);break;
     case"cli":openCli(id);break;
     case"cliSalvar":{const f=formData();if(!f.marca)return toast("Preencha a marca",true);const row={marca:f.marca,empresa:f.empresa||null,cnpj:f.cnpj||null,contato_nome:f.contato_nome||null,contato_tel:f.contato_tel||null,contato_email:f.contato_email||null,endereco:f.endereco||null,obs:f.obs||null};
@@ -1076,6 +1089,7 @@ document.addEventListener("change",e=>{
   const t=e.target;
   if(t.matches("[data-ext]")){const h=$(`[data-ext-for="${t.name}"]`);if(h)h.textContent=t.value?"→ "+dExt(t.value):""}
   if(t.name==="proposta_id"&&t.closest("#sheetIn")&&$("#sheetIn [name=modalidade]")&&$("#sheetIn [name=local_tipo]")){const p=S.propostas.find(x=>x.id===t.value);if(p){$("#sheetIn [name=cliente_id]").value=p.cliente_id||"";$("#sheetIn [name=marca]").value=p.marca||""}}
+  if(t.name==="cliente_id"&&t.value==="__novo__"){const b=t.closest(".fld").querySelector(".newcli");b.hidden=false;b.querySelector("#nc_marca").focus();return}
   if(t.name==="cliente_id"&&t.closest("#sheetIn")){const c=S.clientes.find(x=>x.id===t.value);const mk=$("#sheetIn [name=marca]");if(c&&mk&&!mk.value)mk.value=c.marca;const le=$("#sheetIn [name=local_endereco]");if(c&&le&&!le.value)le.value=c.endereco||""}
   if(t.matches("[data-foto]")&&t.files[0]){compress(t.files[0]).then(u=>$("#fotoPrev").innerHTML=`<img class="thumb" src="${u}">`)}
 });
