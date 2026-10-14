@@ -276,7 +276,6 @@ table.t th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:
 .pg .rec{outline:4px solid var(--volt)}
 .pg .small{font-size:13px;color:var(--cinza)}
 @media print{
-  @page{size:A4 landscape;margin:0}
   body>*:not(#doc){display:none!important}
   #doc{position:static;background:none;overflow:visible}
   #doc .bar,#doc .sp30{display:none}
@@ -284,6 +283,90 @@ table.t th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:
   .pgw{width:auto!important;height:auto!important;overflow:visible}
   .pg{margin:0;transform:none!important;width:297mm;height:209mm;-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
+/* ===== v3: compacto ===== */
+html,body{font-size:13px}
+.content{padding:18px 24px calc(50px + var(--safe-b));gap:18px}
+.panel{padding:13px 14px;border-radius:14px}
+.panel h3{font-size:12.5px;margin-bottom:10px}
+.pagehead{margin-bottom:12px}.pagehead h1{font-size:18px}
+.sec{margin:16px 0 8px}.sec h2{font-size:13px}
+table.tb td{padding:9px 12px;font-size:12.5px}table.tb th{padding:10px 12px;font-size:10px}
+.tblw{border-radius:14px}
+.chips button,.pills button{padding:5px 11px;min-height:30px;font-size:12px}
+.tool .q input,.tool select{min-height:34px;padding-top:6px;padding-bottom:6px;font-size:12.5px}
+.tool .q svg{top:9px}
+.btn{min-height:36px;padding:8px 14px;font-size:12.5px}.btn.sm{min-height:30px;padding:5px 11px;font-size:12px}
+.sitem{min-height:42px;padding:6px 12px}.sitem .sl b{font-size:13px}.sitem .sl small{font-size:10.5px}
+.sgrp{padding:12px 12px 4px}
+.welcome{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.welcome .kick{font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--cinza);text-transform:uppercase}
+.welcome h1{font-size:20px;margin-top:6px}
+.mks{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin-bottom:14px}
+.mks.six{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media(min-width:1700px){.mks.six{grid-template-columns:repeat(6,minmax(0,1fr))}}
+@media(max-width:1100px){.mks.six{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.mks.six,.mks{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.mk{background:var(--card);border:1px solid var(--linha);border-radius:12px;padding:10px 12px;min-width:0}
+.mk .l{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--cinza);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk .n{font-family:var(--fh);font-weight:700;font-size:16px;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk .s{font-size:10.5px;color:var(--cinza);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk.v{background:var(--volt);border-color:var(--volt);color:#000}.mk.v .l,.mk.v .s{color:#2a3300}
+.mk.c{background:var(--cobalt);border-color:var(--cobalt)}.mk.c .l,.mk.c .s{color:#dfe2ff}
+.mk.f{border-color:rgba(255,63,164,.5)}.mk.f .n{color:#ff7cc0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.grid3{display:grid;grid-template-columns:1.1fr 1.2fr 1fr;gap:12px}
+@media(max-width:1000px){.grid3{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.grid2,.grid3{grid-template-columns:1fr}}
+.bars{gap:7px}.bars .bl{grid-template-columns:minmax(70px,130px) minmax(0,1fr) 92px;font-size:11.5px}
+.bars .bl span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bars .bt{height:7px}
+.cchart{display:flex;align-items:flex-end;gap:8px;height:150px;padding-top:6px}
+.cc{flex:1;display:flex;flex-direction:column;align-items:center;min-width:0;height:100%}
+.ccb{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:3px;border-bottom:1px solid var(--linha2)}
+.ccb i{display:block;width:42%;max-width:26px;border-radius:5px 5px 0 0;background:var(--volt);min-height:2px}
+.ccb i.b{background:var(--flash)}
+.ccl{font-size:10.5px;color:var(--cinza);margin-top:5px;text-transform:uppercase;letter-spacing:.06em}
+.ccv{font-size:10px;font-weight:700;white-space:nowrap}
+i.lg{display:inline-block;width:9px;height:9px;border-radius:3px;margin:0 3px 0 8px;vertical-align:-1px}i.lg.a{background:var(--volt)}i.lg.b{background:var(--flash)}
+.fbar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.fb{background:var(--card2);border:1px solid var(--linha);border-radius:10px;padding:8px;cursor:pointer;text-align:center}
+.fb b{display:block;font-family:var(--fh);font-size:17px}.fb span{font-size:10px;color:var(--cinza)}
+.floor.sm{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}.floor.sm .b{padding:5px 2px;font-size:10px;border-radius:7px}
+.kanban{display:grid;grid-template-columns:repeat(6,minmax(170px,1fr));gap:10px;overflow-x:auto;padding-bottom:6px}
+.kcol{background:var(--bg2);border:1px solid var(--linha);border-radius:14px;padding:10px;display:flex;flex-direction:column;gap:6px;min-height:200px}
+.kh{display:flex;justify-content:space-between;align-items:center;font-size:12px}.kh span{background:var(--card2);border-radius:99px;padding:1px 8px;font-weight:700;font-size:11px}
+.kd{font-size:10.5px;color:var(--cinza);margin-bottom:4px}
+.kc{background:var(--card);border:1px solid var(--linha);border-radius:10px;padding:8px 10px;cursor:pointer}.kc:hover{border-color:var(--volt)}
+.kc .t{font-weight:700;font-size:12.5px}.kc .s{font-size:10.5px;color:var(--cinza);margin-top:2px}
+.kempty{color:var(--grafite);text-align:center;padding:10px}.kt{margin-top:auto;font-size:11px;color:var(--cinza);text-align:right;font-weight:700}
+.kcol:nth-child(3),.kcol:nth-child(4){border-color:rgba(212,255,47,.35)}.kcol:nth-child(5){border-color:rgba(255,63,164,.45)}
+.steps8{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px}
+@media(max-width:1000px){.steps8{grid-template-columns:repeat(4,minmax(0,1fr))}}@media(max-width:560px){.steps8{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.s8{background:var(--card);border:1px solid var(--linha);border-radius:12px;padding:10px}
+.s8 b{display:inline-flex;width:22px;height:22px;border-radius:99px;background:var(--volt);color:#000;align-items:center;justify-content:center;font-size:11px}
+.s8 .t{font-weight:700;margin-top:6px;font-size:12.5px}.s8 .d{font-size:10.5px;color:var(--cinza);margin-top:3px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.pcard{background:var(--card);border:1px solid var(--linha);border-radius:14px;padding:14px;cursor:pointer;text-align:center}.pcard:hover{border-color:var(--linha2)}
+.pcard .av{width:46px;height:46px;border-radius:99px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-weight:800;font-size:15px}
+.pcard .t{font-weight:700}.pcard .s{font-size:11px;color:var(--cinza);margin-top:2px}
+.pst{display:flex;justify-content:center;gap:12px;margin-top:10px;padding-top:10px;border-top:1px solid var(--linha)}
+.pst span{font-size:10px;color:var(--cinza);display:flex;flex-direction:column}.pst b{font-size:13px;color:var(--chalk)}
+.demobar{margin:12px 24px 0;background:var(--flash);color:#fff;border-radius:12px;padding:8px 14px;font-weight:700;font-size:12px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+@media(max-width:899px){.demobar{margin:10px 14px 0}}
+/* documento de contrato */
+.ctr{background:#fff;color:#16161a;max-width:820px;margin:16px auto;padding:46px 56px;border-radius:6px;font-family:Inter,system-ui,sans-serif;font-size:12.5px;line-height:1.6}
+.ctr .chead{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #16161a;padding-bottom:10px;font-size:11px;color:#555}
+.ctr .clogo{font-family:var(--fh);font-weight:800;font-size:22px;color:#16161a}
+.ctr .minuta{margin:14px 0 0;display:inline-block;background:#FFE7F3;color:#B0005E;font-weight:700;font-size:10.5px;letter-spacing:.08em;padding:4px 10px;border-radius:99px}
+.ctr h1{font-family:var(--fh);font-size:18px;line-height:1.3;margin:14px 0 4px;color:#16161a}
+.ctr h2{font-family:Inter,system-ui,sans-serif;font-size:12.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin:18px 0 6px;color:#16161a}
+.ctr p{margin:6px 0}.ctr ul{margin:6px 0;padding-left:20px}.ctr .num{color:#555;font-size:11.5px}
+.ctr .ph{background:#FFF3B0;padding:0 4px;border-radius:3px}
+.ctr .assin{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-top:46px;font-size:11.5px;text-align:center}
+.ctr .assin .ln{border-top:1px solid #16161a;margin-bottom:6px}
+.ctr .local{margin-top:30px;text-align:center}
+.rprint{padding:16px;max-width:1200px;margin:0 auto}
+@media print{.ctr{margin:0;padding:0;max-width:none;border-radius:0;box-shadow:none}.ctr h2{break-after:avoid}.rprint{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:var(--noite)}}
 </style>
 </head>
 <body>
@@ -993,7 +1076,7 @@ document.addEventListener("change",e=>{const t=e.target;if(t.dataset.fsel){const
 document.addEventListener("click",e=>{if(!e.target.closest(".gsearch")&&$("#gres"))$("#gres").hidden=true;
   const a=e.target.closest("[data-act]");if(!a)return;const v=a.dataset.v;
   switch(a.dataset.act){
-    case"fchip":{const k=a.dataset.f;if(k==="finSub")S.finSub=v;else if(k==="finTipo")S.f.fin.tipo=v;else if(k==="amV")S.f.am.v=v;else S.f[k].st=v;render();break}
+    case"fchip":{const k=a.dataset.f;if(k==="finSub")S.finSub=v;else if(k==="finTipo")S.f.fin.tipo=v;else if(k==="amV")S.f.am.v=v;else if(k==="rpTab"){S.rp.tab=v;if(v==="autonomia"&&!S.ev)loadEv()}else if(k==="ctr")S.f.ctr.tipo=v;else S.f[k].st=v;render();break}
     case"flimpa":Object.assign(S.f[v],{q:"",cli:"",sel:"",loc:"",mod:""});render();break;
     case"goJobs":S.tab="jobs";S.f.jobs.st=v;render();break;
     case"goProp":S.tab="propostas";S.f.prop.st=v;render();break;
@@ -1003,6 +1086,277 @@ document.addEventListener("click",e=>{if(!e.target.closest(".gsearch")&&$("#gres
       else{const l=S.finSub==="reemb"?finFiltrar(S.fin.filter(x=>x.status==="ativo"&&x.reembolso!=="nao")):finFiltrar(finPeriodo());csvDownload("implay_financeiro.csv",[["Data","Tipo","Categoria","Natureza","Descrição","Contraparte","Valor","Pago em","Vencimento","Forma","NF","Pago por","Reembolso","Reembolso para"],...l.map(x=>[x.pago_em||x.vencimento,x.tipo,CAT_NOME[x.categoria]||x.categoria,x.natureza,x.descricao,x.contraparte,String(x.valor).replace(".",","),x.pago_em,x.vencimento,x.forma,x.nf_numero,x.pago_por,x.reembolso,nome(x.reembolso_para)])])}break;
   }
 },true);
+
+/* ================= v3: funil, contratos, relatórios, quem é quem, demonstração ================= */
+const EMPRESA={razao:"IMP DIGITAL LTDA",fantasia:"IMPlay",cnpj:"44.189.776/0001-77",sede:"Av. Prefeito Sylvio Picanço, 463, sala 709, Charitas, Niterói/RJ, CEP 24.360-030",estudio:"Av. Paulista, 2206, 16º andar, conjuntos 161/162, Bela Vista, São Paulo/SP, CEP 01310-926"};
+IC.funnel='<path d="M3 4h18l-7 8v6l-4 2v-8z"/>';IC.pen='<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13 7l4 4"/>';IC.chart='<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>';IC.id='<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2.5"/><path d="M5.5 16a3.5 3.5 0 0 1 7 0M15 10h4M15 14h3"/>';
+MENU.length=0;MENU.push(
+ ["Operação",[["painel","Painel","Visão geral","home"],["agenda","Agenda","Lives e espaços","cal"],["jobs","Jobs","Lives e sellers","live"],["amostras","Amostras","Estoque das marcas","box"]]],
+ ["Comercial",[["funil","Funil","Do lead ao contrato","funnel"],["propostas","Propostas","Gerador de propostas","doc"],["contratos","Contratos","Clientes e sellers","pen"],["clientes","Clientes","Marcas e empresas","brand"]]],
+ ["Gestão",[["relatorios","Relatórios","Vendas, resultado, sellers","chart"],["fin","Financeiro","Caixa, aporte, reembolso","wallet"],["equipe","Equipe","Quem é quem","users"]]]);
+Object.assign(TAB_NOME,{funil:"Funil comercial",contratos:"Contratos",relatorios:"Relatórios",equipe:"Equipe · quem é quem"});
+Object.assign(TAB_SUB,{funil:"Cada cliente em uma etapa: do primeiro contato até a operação e a renovação",contratos:"Gere o contrato com o cliente e com cada seller a partir dos dados do sistema",relatorios:"O que foi vendido, quem vendeu, quanto entrou e quanto sobrou"});
+HEADACT.funil=()=>`<button class="btn p sm" data-act="propNova">+ Nova proposta</button>`;
+HEADACT.relatorios=()=>`<button class="btn sm" data-act="rpCsv">${ic("dl")} CSV</button><button class="btn sm" data-act="rpPrint">Imprimir / PDF</button>`;
+S.rp={tab:"vendas",per:"mes"};S.f.ctr={q:"",tipo:"clientes"};
+
+/* ---------- utilidades de período ---------- */
+function rangeOf(per){const n=new Date();let a,b=new Date(n.getFullYear(),n.getMonth()+1,1);
+  if(per==="mes")a=new Date(n.getFullYear(),n.getMonth(),1);
+  else if(per==="mesant"){a=new Date(n.getFullYear(),n.getMonth()-1,1);b=new Date(n.getFullYear(),n.getMonth(),1)}
+  else if(per==="tri")a=new Date(n.getFullYear(),n.getMonth()-2,1);
+  else if(per==="ano")a=new Date(n.getFullYear(),0,1);
+  else a=new Date(2000,0,1);return [a,b]}
+const PER_LAB={mes:"Este mês",mesant:"Mês passado",tri:"Últimos 3 meses",ano:"Este ano",tudo:"Tudo"};
+function inR(d,[a,b]){if(!d)return false;d=typeof d==="string"&&d.length===10?parseYmd(d):new Date(d);return d>=a&&d<b}
+function hrs(j){return Math.max(0,(new Date(j.fim_real||j.fim)-new Date(j.inicio_real||j.inicio))/36e5)}
+function nf(n,d=0){return (Number(n)||0).toLocaleString("pt-BR",{maximumFractionDigits:d,minimumFractionDigits:d})}
+function brlK(v){v=Number(v)||0;return Math.abs(v)>=1e6?"R$ "+nf(v/1e6,1)+" mi":Math.abs(v)>=1e4?"R$ "+nf(v/1e3,1)+" mil":brl(v)}
+function bars(arr,fmt=brl,color){const mx=Math.max(1,...arr.map(x=>Math.abs(x[1])));return `<div class="bars">${arr.map(([l,v,sub])=>`<div class="bl"><span title="${esc(l)}">${esc(l)}</span><span class="bt"><i style="width:${Math.max(2,Math.abs(v)/mx*100)}%;${color?"background:"+color:""}"></i></span><span>${fmt(v)}${sub?`<small class="muted" style="display:block;font-weight:500">${sub}</small>`:""}</span></div>`).join("")||`<div class="muted small">Sem dados no período.</div>`}</div>`}
+function colsChart(arr,fmt=brlK){const mx=Math.max(1,...arr.map(x=>Math.max(Math.abs(x[1]),Math.abs(x[2]||0))));
+  return `<div class="cchart">${arr.map(([l,v,v2])=>`<div class="cc"><div class="ccb"><i class="a" style="height:${Math.abs(v)/mx*100}%" title="${fmt(v)}"></i>${v2!==undefined?`<i class="b" style="height:${Math.abs(v2)/mx*100}%" title="${fmt(v2)}"></i>`:""}</div><div class="ccl">${esc(l)}</div><div class="ccv">${fmt(v)}</div></div>`).join("")}</div>`}
+function mini(l,v,sub,cls=""){return `<div class="mk ${cls}"><div class="l">${l}</div><div class="n">${v}</div>${sub?`<div class="s">${sub}</div>`:""}</div>`}
+function lastMonths(n){const out=[];const d=new Date();d.setDate(1);for(let i=n-1;i>=0;i--){const x=new Date(d.getFullYear(),d.getMonth()-i,1);out.push([monthKey(x),MS[x.getMonth()]])}return out}
+
+/* ---------- etapas do negócio ---------- */
+const FUNIL=[["lead","Lead / rascunho","Primeiro contato, proposta em montagem"],["enviada","Proposta enviada","Aguardando retorno da marca"],["contrato","Contrato fechado","Aceita, antes da 1ª live"],["operacao","Em operação","Lives acontecendo"],["renovar","Renovar","Contrato vence em até 30 dias"],["encerrado","Encerrado / perdido","Recusada, cancelada ou vencida"]];
+function etapaProp(p){const hoje=new Date(new Date().toDateString());
+  if(["recusada","cancelada"].includes(p.status))return "encerrado";
+  if(p.status==="rascunho")return "lead";if(p.status==="enviada")return "enviada";
+  const fim=p.contrato_fim?parseYmd(p.contrato_fim):null;if(fim&&fim<hoje)return "encerrado";
+  if(fim&&(fim-hoje)/864e5<=30)return "renovar";
+  const js=S.jobs.filter(j=>j.proposta_id===p.id&&j.status!=="cancelado");if(js.some(j=>new Date(j.inicio)<=new Date()))return "operacao";return "contrato"}
+VIEWS.funil=()=>{const g={};FUNIL.forEach(f=>g[f[0]]=[]);S.propostas.forEach(p=>g[etapaProp(p)].push(p));
+  const tot=k=>soma(g[k].map(p=>({valor:p.valor_fixo})));
+  const conv=S.propostas.filter(p=>p.status!=="rascunho").length?Math.round(S.propostas.filter(p=>p.status==="aceita").length/S.propostas.filter(p=>p.status!=="rascunho").length*100):0;
+  return `<div class="mks">${mini("Propostas no funil",S.propostas.filter(p=>["rascunho","enviada"].includes(p.status)).length)}${mini("Valor em negociação",brlK(tot("lead")+tot("enviada"))+"/mês")}${mini("Contratos ativos",g.contrato.length+g.operacao.length+g.renovar.length,"","v")}${mini("Receita fixa contratada",brlK(tot("contrato")+tot("operacao")+tot("renovar"))+"/mês")}${mini("Taxa de conversão",conv+"%","aceitas ÷ enviadas")}${mini("Para renovar",g.renovar.length,"vencem em 30 dias",g.renovar.length?"f":"")}</div>
+  <div class="kanban">${FUNIL.map(([k,l,d])=>`<div class="kcol"><div class="kh"><b>${l}</b><span>${g[k].length}</span></div><div class="kd">${d}</div>
+   ${g[k].map(p=>`<div class="kc" data-act="prop" data-id="${p.id}"><div class="t">${esc(p.marca)}</div><div class="s">${esc(p.pacote||"")}${p.valor_fixo?" · "+brlK(p.valor_fixo)+"/mês":""}</div><div class="s">${p.contrato_numero?esc(p.contrato_numero):pn(p.numero)}${p.contrato_fim?" · até "+dCurta(p.contrato_fim):p.primeira_live?" · 1ª live "+dCurta(p.primeira_live):""}</div></div>`).join("")||`<div class="kempty">—</div>`}
+   <div class="kt">${brlK(tot(k))}/mês</div></div>`).join("")}</div>
+  <div class="sec"><h2>Etapas de cada live</h2></div>
+  <div class="steps8">${[["1","Proposta","Marca, pacote, valores e % gerados no padrão Implay"],["2","Contrato","Gerado do sistema e assinado pela marca"],["3","Job publicado","Data, horário, espaço, cachê no mural"],["4","Seller escolhe","Principal e substituto pelo app, com histórico"],["5","Live no ar","Início e fim reais, GMV e pedidos"],["6","Fatura","Fixo + % sobre vendas; seller fatura direto"],["7","Recebido","Baixa no financeiro"],["8","Relatório","Vendas, ranking e resultado"]].map(([n,t,d])=>`<div class="s8"><b>${n}</b><div class="t">${t}</div><div class="d">${d}</div></div>`).join("")}</div>`};
+
+/* ---------- contratos ---------- */
+VIEWS.contratos=()=>{const f=S.f.ctr;
+  const cli=S.propostas.filter(p=>p.status==="aceita"&&has(f.q,p.marca,p.contrato_numero,cliNome(p.cliente_id)));
+  const sel=S.membros.filter(m=>(m.papel==="seller"||["freelancer","pj","mei"].includes(m.vinculo))&&m.status!=="inativo"&&has(f.q,m.nome,m.email,m.cnpj));
+  const hoje=new Date(new Date().toDateString());
+  return chips("ctr",[["clientes","Contratos com clientes",cli.length],["sellers","Contratos com sellers",sel.length]],f.tipo)+`<div class="tool">${qbox("ctr","Buscar marca, nº, seller…")}</div>
+  <div class="hint" style="margin:-4px 0 12px">Os contratos saem preenchidos com os dados do sistema (cliente, pacote, valores, vigência, seller, CNPJ). São minutas: revisem com o jurídico (Dr. Lenilson) antes de assinar.</div>
+  <div id="lst">${f.tipo==="clientes"?tbl([["Contrato"],["Pacote"],["Valor"],["Vigência"],["Lives"],["Ação"]],cli.map(p=>{const fim=p.contrato_fim?parseYmd(p.contrato_fim):null;const js=S.jobs.filter(j=>j.proposta_id===p.id&&j.status!=="cancelado");
+    return `<tr data-act="prop" data-id="${p.id}"><td class="m0"><div class="t">${esc(p.marca)}</div><div class="s">${esc(p.contrato_numero||"")} · ${esc(cliNome(p.cliente_id)||"")}</div></td><td data-l="Pacote">${esc(p.pacote||"—")}</td><td data-l="Valor" class="r">${p.valor_fixo?brl(p.valor_fixo)+"/mês":"—"}${p.perc_variavel?`<div class="s">+ ${numIn(p.perc_variavel)}%</div>`:""}</td>
+    <td data-l="Vigência">${dCurta(p.contrato_inicio)} → ${dCurta(p.contrato_fim)}${fim&&fim<hoje?` <span class="tag x">vencido</span>`:fim&&(fim-hoje)/864e5<=30?` <span class="tag w">renovar</span>`:""}</td><td data-l="Lives">${js.length}</td><td data-l="Ação"><button class="btn p sm" data-act="ctrCli" data-id="${p.id}">Gerar contrato</button></td></tr>`}),"Nenhum contrato ainda. Marque uma proposta como Aceita para ela virar contrato.")
+   :tbl([["Seller"],["Vínculo"],["CNPJ / MEI"],["Termo no app"],["Lives"],["Ação"]],sel.map(m=>`<tr data-act="membro" data-id="${m.id}"><td class="m0"><div class="t">${esc(m.nome)}</div><div class="s">${esc(m.email)}</div></td><td data-l="Vínculo">${VINC[m.vinculo]||m.vinculo}</td><td data-l="CNPJ">${esc(m.cnpj||"—")}</td><td data-l="Termo">${m.termo_aceito_em?`<span class="tag o">aceito ${dCurta(m.termo_aceito_em)}</span>`:`<span class="tag x">pendente</span>`}</td><td data-l="Lives">${S.jobs.filter(j=>j.principal_id===m.id).length}</td><td data-l="Ação"><button class="btn p sm" data-act="ctrSel" data-id="${m.id}">Gerar contrato</button></td></tr>`),"Nenhum seller cadastrado.")}</div>`};
+LISTS.ctr=()=>{const h=VIEWS.contratos();const i=h.indexOf('<div id="lst">');return h.slice(i+14,h.lastIndexOf("</div>"))};
+function _(x,ph){return x?esc(x):`<span class="ph">${esc(ph)}</span>`}
+function docShell(title,body){return `<div class="ctr"><div class="chead"><span class="clogo">implay</span><span>${EMPRESA.razao} · CNPJ ${EMPRESA.cnpj}</span></div><div class="minuta">MINUTA · revisar com o jurídico antes de assinar</div><h1>${title}</h1>${body}</div>`}
+function assin(a,b){return `<div class="assin"><div><div class="ln"></div><b>${a[0]}</b><br>${a[1]}</div><div><div class="ln"></div><b>${b[0]}</b><br>${b[1]}</div></div><div class="assin"><div><div class="ln"></div>Testemunha 1<br>Nome / CPF</div><div><div class="ln"></div>Testemunha 2<br>Nome / CPF</div></div><p class="local">São Paulo, ____ de ______________ de ______.</p>`}
+function ctrCliente(p){const c=S.clientes.find(x=>x.id===p.cliente_id)||{};const perc=p.perc_variavel?numIn(p.perc_variavel)+"%":"___%";
+  const lives={Essencial:"10 (dez) lives de 4 (quatro) horas por mês",Crescimento:"15 (quinze) lives de 4 (quatro) horas por mês",Escala:"20 (vinte) lives de 4 (quatro) horas por mês"}[p.pacote]||esc(p.pacote||"conforme proposta");
+  const aluguel=p.modalidade==="aluguel"||p.pacote==="Aluguel do espaço";
+  let n=0;const cl=(t,x)=>`<h2>Cláusula ${++n} · ${t}</h2>${x}`;
+  return docShell(aluguel?"Contrato de locação de estúdio para transmissões ao vivo":"Contrato de prestação de serviços de live commerce",
+  `<p class="num">Contrato nº ${_(p.contrato_numero,"C-0000")} · Proposta ${pn(p.numero)}</p>
+  ${cl("Partes",`<p><b>CONTRATADA:</b> ${EMPRESA.razao} ("IMPLAY"), inscrita no CNPJ sob nº ${EMPRESA.cnpj}, com sede na ${EMPRESA.sede}, e estúdio na ${EMPRESA.estudio}.</p>
+   <p><b>CONTRATANTE:</b> ${_(c.empresa,"razão social da marca")}, inscrita no CNPJ sob nº ${_(c.cnpj,"00.000.000/0000-00")}, com sede na ${_(c.endereco,"endereço completo")}, titular da marca <b>${esc(p.marca)}</b>, neste ato representada por ${_(c.contato_nome,"nome do representante")}.</p>`)}
+  ${cl("Objeto",aluguel?`<p>Locação de espaço no estúdio da IMPLAY, com estrutura de áudio, vídeo, iluminação e internet, para transmissões ao vivo realizadas pela CONTRATANTE.</p>`:`<p>Prestação, pela IMPLAY, de serviços de operação de vendas ao vivo (live commerce) no perfil da CONTRATANTE no TikTok Shop, compreendendo ${lives}, no estúdio da IMPLAY ou em local indicado pela CONTRATANTE, com os produtos: ${_(p.produtos,"SKUs ou categorias")}.</p>
+   <p>Estão incluídos: estúdio com áudio e vídeo, apresentadores treinados, roteiro e ofertas, operação da plataforma (produtos fixados, flash sales e cupons), resumo de cada live em até 24 horas, calendário mensal com o TikTok e cadastro de SKUs novos.${p.complementos?" Complementos: "+esc(p.complementos)+".":""}</p>`)}
+  ${cl("Preço",aluguel?`<p>A CONTRATANTE pagará à IMPLAY ${p.valor_fixo?brl(p.valor_fixo):"R$ ______"} pela locação, conforme a proposta aceita.</p>`:`<p>Pelos serviços, a CONTRATANTE pagará à IMPLAY: (a) remuneração fixa de <b>${p.valor_fixo?brl(p.valor_fixo):"R$ ______"} por mês</b>; e (b) remuneração variável de <b>${perc}</b> sobre o valor das vendas realizadas durante as lives (GMV), excluídos pedidos cancelados ou devolvidos, apurado mensalmente pelo relatório oficial do TikTok Shop.</p>`)}
+  ${cl("Pagamento e notas fiscais",`<p>Forma e data: ${_(p.pagamento,"forma e data de pagamento")}. A IMPLAY emitirá nota fiscal exclusivamente sobre a sua remuneração.</p><p>O cachê dos apresentadores poderá ser faturado diretamente pelos profissionais à CONTRATANTE, mediante nota fiscal própria, sem passar pelo caixa da IMPLAY. Atraso sujeita o valor a multa de 2% e juros de 1% ao mês.</p>`)}
+  ${cl("Obrigações da IMPLAY",`<ul><li>Executar as lives no calendário combinado, com equipe treinada e estrutura técnica adequada;</li><li>Seguir as informações de produto, preços e ofertas aprovadas pela CONTRATANTE;</li><li>Enviar resumo de cada live e relatório mensal de resultados;</li><li>Zelar pela marca e pelos produtos recebidos.</li></ul>`)}
+  ${cl("Obrigações da CONTRATANTE",`<ul><li>Enviar produtos e amostras com antecedência;</li><li>Manter a loja no TikTok Shop configurada, com estoque, logística e atendimento ao cliente;</li><li>Aprovar preços, ofertas e cupons;</li><li>Arcar com a verba de mídia (GMV Max), comissão de afiliados, fretes e envios.</li></ul>`)}
+  ${cl("Vigência",`<p>Este contrato vigora de <b>${p.contrato_inicio?dExt(p.contrato_inicio)+" de "+p.contrato_inicio.slice(0,4):"____"}</b> a <b>${p.contrato_fim?dExt(p.contrato_fim)+" de "+p.contrato_fim.slice(0,4):"____"}</b> (${p.vigencia_meses||3} meses), renovável por acordo escrito.</p>`)}
+  ${cl("Rescisão",`<p>Qualquer parte pode rescindir mediante aviso prévio escrito de 30 dias. A falta de pagamento por mais de 15 dias permite à IMPLAY suspender as lives até a regularização.</p>`)}
+  ${cl("Imagem, conteúdo e confidencialidade",`<p>A CONTRATANTE autoriza a IMPLAY a usar sua marca e resultados agregados em portfólio. Dados comerciais, preços e estratégias são confidenciais. As partes tratarão dados pessoais conforme a Lei nº 13.709/2018 (LGPD).</p>`)}
+  ${cl("Independência",`<p>Não há vínculo empregatício entre a CONTRATANTE e os profissionais da IMPLAY, nem entre as partes, que atuam de forma independente.</p>`)}
+  ${cl("Foro",`<p>Fica eleito o foro da Comarca de São Paulo/SP.</p>`)}
+  ${assin([EMPRESA.razao,"CONTRATADA"],[esc(c.empresa||p.marca),"CONTRATANTE"])}`)}
+function ctrSeller(m){let n=0;const cl=(t,x)=>`<h2>Cláusula ${++n} · ${t}</h2>${x}`;
+  return docShell("Contrato de prestação de serviços autônomos de apresentação ao vivo (live seller)",
+  `<p class="num">Prestador: ${esc(m.nome)} · ${VINC[m.vinculo]||m.vinculo}</p>
+  ${cl("Partes",`<p><b>CONTRATANTE:</b> ${EMPRESA.razao} ("IMPLAY"), CNPJ ${EMPRESA.cnpj}, com sede na ${EMPRESA.sede}.</p><p><b>PRESTADOR:</b> ${esc(m.nome)}${m.cnpj?", inscrito no CNPJ/MEI sob nº "+esc(m.cnpj):", CPF nº <span class='ph'>___.___.___-__</span>"}, e-mail ${esc(m.email)}${m.telefone?", telefone "+esc(m.telefone):""}${m.cidade?", com domicílio em "+esc(m.cidade):""}.</p>`)}
+  ${cl("Objeto",`<p>Prestação de serviços autônomos e eventuais de apresentação e venda em transmissões ao vivo (lives) de marcas atendidas pela IMPLAY, em cada job que o PRESTADOR escolher.</p>`)}
+  ${cl("Livre escolha dos jobs",`<p>Os jobs são publicados no aplicativo da IMPLAY com data, horário, duração, local e valor. O PRESTADOR escolhe livremente se e quais jobs quer realizar, como principal ou substituto. Não há obrigação de aceitar jobs, número mínimo, escala, horário fixo ou controle de ponto.</p>`)}
+  ${cl("Cancelamento",`<p>O PRESTADOR pode cancelar sua participação a qualquer momento pelo aplicativo. Cancelamentos com pelo menos 24 horas de antecedência não geram qualquer consequência; os demais apenas ficam registrados.</p>`)}
+  ${cl("Autonomia e ausência de vínculo",`<p>O PRESTADOR executa o serviço com técnica própria e autonomia, sem subordinação, sem exclusividade e podendo prestar serviços a terceiros, inclusive concorrentes. Este contrato não gera vínculo empregatício. As orientações recebidas limitam-se às informações de produto, preço e marca necessárias à live.</p>`)}
+  ${cl("Remuneração e nota fiscal",`<p>O PRESTADOR recebe por job realizado, no valor publicado no aplicativo antes da escolha. Quando aplicável, emite nota fiscal própria (MEI/PJ) diretamente a quem efetuar o pagamento, inclusive à marca cliente. O PRESTADOR é responsável por seus tributos e contribuições.</p>`)}
+  ${cl("Imagem",`<p>O PRESTADOR autoriza o uso de sua imagem e voz nas lives realizadas e em seus cortes, exclusivamente para divulgação das marcas e da IMPLAY, pelo prazo deste contrato e de 12 meses após o seu término.</p>`)}
+  ${cl("Confidencialidade",`<p>Preços, ofertas, dados de clientes e informações comerciais obtidas nos jobs são confidenciais.</p>`)}
+  ${cl("Registros",`<p>As escolhas, cancelamentos e jobs realizados ficam registrados no aplicativo com data e hora, sem possibilidade de edição, e podem ser consultados pelo PRESTADOR.${m.termo_aceito_em?` O PRESTADOR aceitou o termo de prestação autônoma no aplicativo em ${new Date(m.termo_aceito_em).toLocaleString("pt-BR")} (${esc(m.termo_versao||"")}).`:""}</p>`)}
+  ${cl("Vigência e rescisão",`<p>Prazo indeterminado, podendo qualquer parte encerrá-lo a qualquer tempo, por escrito, sem multa, respeitados os jobs já escolhidos.</p>`)}
+  ${cl("Foro",`<p>Fica eleito o foro da Comarca de São Paulo/SP.</p>`)}
+  ${assin([EMPRESA.razao,"CONTRATANTE"],[esc(m.nome),"PRESTADOR"])}`)}
+function showCtr(html,orient){setPage(orient||"portrait");const d=$("#doc");d.innerHTML=`<div class="bar"><button class="btn p" data-act="docPrint">Salvar PDF / Imprimir</button><button class="btn" data-act="docClose">Fechar</button></div>${html}<div class="sp30" style="height:30px"></div>`;d.hidden=false;d.scrollTop=0}
+function setPage(o){let st=$("#pgsize");if(!st){st=document.createElement("style");st.id="pgsize";document.head.appendChild(st)}st.textContent=`@media print{@page{size:A4 ${o};margin:${o==="landscape"?"0":"16mm 16mm 18mm"}}}`}
+
+/* ---------- relatórios ---------- */
+function rpData(){const R=rangeOf(S.rp.per);
+  const lives=S.jobs.filter(j=>j.status==="realizado"&&inR(j.inicio,R));
+  const fin=S.fin.filter(x=>x.status==="ativo"&&inR(x.pago_em,R));
+  return {R,lives,fin}}
+const RPT=[["vendas","Vendas (GMV)"],["marcas","Por marca"],["sellers","Por seller"],["resultado","Resultado"],["estudio","Ocupação do estúdio"],["autonomia","Autonomia dos sellers"]];
+VIEWS.relatorios=()=>{const {R,lives,fin}=rpData();const t=S.rp.tab;
+  const head=chips("rpTab",RPT,t)+`<div class="tool"><select data-rper class="on">${Object.entries(PER_LAB).map(([k,l])=>`<option value="${k}" ${S.rp.per===k?"selected":""}>${l}</option>`).join("")}</select><span class="muted small">${dCurta(R[0])} ${R[0].getFullYear()} → ${dCurta(new Date(R[1]-864e5))} ${new Date(R[1]-864e5).getFullYear()}</span></div>`;
+  const gmv=lives.reduce((s,j)=>s+(Number(j.gmv)||0),0),h=lives.reduce((s,j)=>s+hrs(j),0),ped=lives.reduce((s,j)=>s+(Number(j.pedidos)||0),0);
+  if(t==="vendas"){
+    const comis=lives.reduce((s,j)=>{const p=S.propostas.find(x=>x.id===j.proposta_id);return s+(Number(j.gmv)||0)*((p&&Number(p.perc_variavel))||0)/100},0);
+    const mes=lastMonths(6).map(([k,l])=>[l,S.jobs.filter(j=>j.status==="realizado"&&monthKey(new Date(j.inicio))===k).reduce((s,j)=>s+(Number(j.gmv)||0),0)]);
+    const top=lives.slice().sort((a,b)=>(b.gmv||0)-(a.gmv||0)).slice(0,8);
+    const dow=[0,0,0,0,0,0,0];lives.forEach(j=>dow[new Date(j.inicio).getDay()]+=Number(j.gmv)||0);
+    const hb={};lives.forEach(j=>{const k=String(new Date(j.inicio).getHours()).padStart(2,"0")+"h";hb[k]=(hb[k]||0)+(Number(j.gmv)||0)});
+    return head+`<div class="mks">${mini("GMV vendido",brlK(gmv),"","v")}${mini("Lives realizadas",lives.length)}${mini("Horas no ar",nf(h,1)+" h")}${mini("GMV por hora",brlK(h?gmv/h:0))}${mini("Pedidos",nf(ped))}${mini("Ticket médio",brl(ped?gmv/ped:0))}${mini("Comissão variável",brlK(comis),"% do contrato × GMV","c")}</div>
+    <div class="grid2"><div class="panel"><h3>GMV por mês <span class="muted small">últimos 6 meses</span></h3>${colsChart(mes)}</div>
+    <div class="panel"><h3>GMV por dia da semana</h3>${bars([1,2,3,4,5,6,0].map(i=>[DL[i],dow[i]]))}</div></div>
+    <div class="grid2"><div class="panel"><h3>Melhores horários</h3>${bars(Object.entries(hb).sort(),brl,"var(--cobalt)")}</div>
+    <div class="panel"><h3>Top lives do período</h3>${top.map(j=>`<div class="pend" data-act="job" data-id="${j.id}"><span><b style="font-family:Inter,sans-serif;font-size:12.5px">${esc(j.marca||"")}</b> · ${dCurta(j.inicio)} · ${esc(nome(j.principal_id)||"—")}</span><b>${brl(j.gmv)}</b></div>`).join("")||`<div class="muted small">Sem lives realizadas com GMV no período.</div>`}</div></div>`}
+  if(t==="marcas"){const g={};lives.forEach(j=>{const k=j.marca||cliNome(j.cliente_id)||"—";g[k]=g[k]||{n:0,gmv:0,h:0,ped:0};g[k].n++;g[k].gmv+=Number(j.gmv)||0;g[k].h+=hrs(j);g[k].ped+=Number(j.pedidos)||0});
+    const rec={};fin.filter(x=>x.tipo==="entrada"&&x.categoria!=="aporte").forEach(x=>{const j=S.jobs.find(y=>y.id===x.job_id);const p=S.propostas.find(y=>y.id===x.proposta_id);const k=(j&&j.marca)||(p&&p.marca)||x.contraparte||"—";rec[k]=(rec[k]||0)+(Number(x.valor)||0)});
+    const ks=[...new Set([...Object.keys(g),...Object.keys(rec)])].sort((a,b)=>((g[b]||{}).gmv||0)-((g[a]||{}).gmv||0));
+    S._csv=[["Marca","Lives","Horas","GMV","GMV/h","Pedidos","Recebido pela Implay"],...ks.map(k=>{const x=g[k]||{n:0,gmv:0,h:0,ped:0};return [k,x.n,nf(x.h,1),nf(x.gmv,2),nf(x.h?x.gmv/x.h:0,2),x.ped,nf(rec[k]||0,2)]})];
+    return head+`<div class="grid2"><div class="panel"><h3>GMV por marca</h3>${bars(ks.map(k=>[k,(g[k]||{}).gmv||0]))}</div><div class="panel"><h3>Recebido pela Implay por marca</h3>${bars(ks.map(k=>[k,rec[k]||0]),brl,"var(--volt)")}</div></div>`
+    +tbl([["Marca"],["Lives","r"],["Horas","r"],["GMV","r"],["GMV/hora","r"],["Pedidos","r"],["Recebido","r"]],ks.map(k=>{const x=g[k]||{n:0,gmv:0,h:0,ped:0};return `<tr><td class="m0"><div class="t">${esc(k)}</div></td><td data-l="Lives" class="r">${x.n}</td><td data-l="Horas" class="r">${nf(x.h,1)}</td><td data-l="GMV" class="r">${brl(x.gmv)}</td><td data-l="GMV/h" class="r">${brl(x.h?x.gmv/x.h:0)}</td><td data-l="Pedidos" class="r">${nf(x.ped)}</td><td data-l="Recebido" class="r">${brl(rec[k]||0)}</td></tr>`}))}
+  if(t==="sellers"){const g={};lives.filter(j=>j.principal_id).forEach(j=>{const k=j.principal_id;g[k]=g[k]||{n:0,gmv:0,h:0,ped:0,cache:0,marcas:new Set()};g[k].n++;g[k].gmv+=Number(j.gmv)||0;g[k].h+=hrs(j);g[k].ped+=Number(j.pedidos)||0;g[k].cache+=Number(j.valor_seller)||0;g[k].marcas.add(j.marca)});
+    const ks=Object.keys(g).sort((a,b)=>g[b].gmv-g[a].gmv);
+    S._csv=[["Seller","Vínculo","Lives","Horas","GMV","GMV/h","Pedidos","Cachês","Marcas"],...ks.map(k=>{const x=g[k],m=S.membros.find(y=>y.id===k)||{};return [m.nome||"—",m.vinculo||"",x.n,nf(x.h,1),nf(x.gmv,2),nf(x.h?x.gmv/x.h:0,2),x.ped,nf(x.cache,2),[...x.marcas].join(", ")]})];
+    return head+`<div class="grid2"><div class="panel"><h3>Ranking por GMV</h3>${bars(ks.slice(0,10).map(k=>[nome(k)||"—",g[k].gmv,g[k].n+" lives"]))}</div><div class="panel"><h3>GMV por hora no ar</h3>${bars(ks.slice(0,10).map(k=>[nome(k)||"—",g[k].h?g[k].gmv/g[k].h:0]),brl,"var(--cobalt)")}</div></div>`
+    +tbl([["#"],["Seller"],["Lives","r"],["Horas","r"],["GMV","r"],["GMV/hora","r"],["Pedidos","r"],["Cachês","r"],["Marcas"]],ks.map((k,i)=>{const x=g[k],m=S.membros.find(y=>y.id===k)||{};return `<tr data-act="membro" data-id="${k}"><td data-l="#">${i+1}º</td><td class="m0"><div class="t">${esc(m.nome||"—")}</div><div class="s">${VINC[m.vinculo]||""}</div></td><td data-l="Lives" class="r">${x.n}</td><td data-l="Horas" class="r">${nf(x.h,1)}</td><td data-l="GMV" class="r">${brl(x.gmv)}</td><td data-l="GMV/h" class="r">${brl(x.h?x.gmv/x.h:0)}</td><td data-l="Pedidos" class="r">${nf(x.ped)}</td><td data-l="Cachês" class="r">${brl(x.cache)}</td><td data-l="Marcas">${esc([...x.marcas].join(", "))}</td></tr>`}),"Sem lives realizadas no período.")}
+  if(t==="resultado"){const rec=fin.filter(x=>x.tipo==="entrada"&&x.categoria!=="aporte"),ap=fin.filter(x=>x.categoria==="aporte"),des=fin.filter(x=>x.tipo==="saida"&&x.categoria!=="devolucao_aporte"),fx=des.filter(x=>x.natureza==="fixa"),vr=des.filter(x=>x.natureza!=="fixa");
+    const res=soma(rec)-soma(des);const mes=lastMonths(6).map(([k,l])=>{const r=S.fin.filter(x=>x.status==="ativo"&&x.pago_em&&x.pago_em.slice(0,7)===k);return [l,soma(r.filter(x=>x.tipo==="entrada"&&x.categoria!=="aporte")),soma(r.filter(x=>x.tipo==="saida"&&x.categoria!=="devolucao_aporte"))]});
+    const gc={};des.forEach(x=>gc[x.categoria]=(gc[x.categoria]||0)+(Number(x.valor)||0));const gr={};rec.forEach(x=>gr[x.categoria]=(gr[x.categoria]||0)+(Number(x.valor)||0));
+    S._csv=[["Mês","Receita","Despesas","Resultado"],...mes.map(m=>[m[0],nf(m[1],2),nf(m[2],2),nf(m[1]-m[2],2)])];
+    return head+`<div class="mks">${mini("Receita",brlK(soma(rec)),"sem aportes","v")}${mini("Despesas fixas",brlK(soma(fx)))}${mini("Despesas variáveis",brlK(soma(vr)))}${mini("Resultado",brlK(res),"",res>=0?"":"f")}${mini("Margem",soma(rec)?Math.round(res/soma(rec)*100)+"%":"—")}${mini("Aportes no período",brlK(soma(ap)),"","c")}</div>
+    <div class="panel"><h3>Receita × despesas por mês <span class="muted small"><i class="lg a"></i>receita <i class="lg b"></i>despesas</span></h3>${colsChart(mes.map(m=>[m[0],m[1],m[2]]))}</div>
+    <div class="grid2"><div class="panel"><h3>Receita por tipo</h3>${bars(Object.entries(gr).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[CAT_NOME[k]||k,v]),brl,"var(--volt)")}</div><div class="panel"><h3>Despesas por categoria</h3>${bars(Object.entries(gc).sort((a,b)=>b[1]-a[1]).map(([k,v])=>[CAT_NOME[k]||k,v]))}</div></div>
+    <div class="hint">Receita = entradas recebidas, sem aportes. Despesas = saídas pagas, sem devolução de aporte. Cachês pagos direto pelo cliente ao seller não entram no caixa.</div>`}
+  if(t==="estudio"){const js=S.jobs.filter(j=>j.status!=="cancelado"&&j.local_tipo==="estudio"&&inR(j.inicio,R));const dias=Math.max(1,Math.round((Math.min(R[1],new Date(Date.now()+864e5))-R[0])/864e5));const cap=12*dias;
+    const g={};ESPACOS.forEach(e=>g[e]=0);js.forEach(j=>{if(j.espaco)g[j.espaco]+=hrs(j)});const tot=Object.values(g).reduce((a,b)=>a+b,0);
+    const tipo={Economy:0,Premium:0,Business:0,Cabine:0};Object.entries(g).forEach(([e,v])=>tipo[ESPACO_NOME[e[0]]]+=v);
+    const aluguel=js.filter(j=>j.modalidade==="aluguel").length;
+    S._csv=[["Espaço","Horas reservadas","Ocupação % (12h/dia)"],...ESPACOS.map(e=>[e,nf(g[e],1),nf(g[e]/cap*100,1)])];
+    return head+`<div class="mks">${mini("Horas reservadas",nf(tot,1)+" h","","v")}${mini("Ocupação média",nf(tot/(cap*20)*100,1)+"%","base 12 h/dia × 20 espaços")}${mini("Lives no estúdio",js.length)}${mini("Só aluguel",aluguel,"","c")}${mini("Dias no período",dias)}</div>
+    <div class="grid2"><div class="panel"><h3>Ocupação por espaço <span class="muted small">% de 12 h/dia</span></h3>${bars(ESPACOS.map(e=>[e,g[e]/cap*100]),v=>nf(v,1)+"%")}</div><div class="panel"><h3>Horas por tipo de espaço</h3>${bars(Object.entries(tipo).map(([k,v])=>[k,v]),v=>nf(v,1)+" h","var(--cobalt)")}
+    <div class="lab" style="margin-top:16px">Mapa do estúdio</div><div class="floor">${ESPACOS.map(e=>{const p=g[e]/cap;return `<div class="b ${p>.5?"on":p>.15?"v":""}" title="${nf(p*100,1)}%">${e}</div>`}).join("")}</div><div class="floorlg"><span><i style="background:var(--flash)"></i>&gt;50%</span><span><i style="background:var(--volt)"></i>15–50%</span><span><i style="background:var(--card2)"></i>&lt;15%</span></div></div></div>`}
+  if(t==="autonomia"){if(!S.ev)return head+`<div class="empty">Carregando histórico…</div>`;
+    const ev=S.ev.filter(e=>inR(e.em,R));const g={};
+    ev.forEach(e=>{if(!e.membro_id)return;const k=e.membro_id;g[k]=g[k]||{esc:0,canc:0,cima:0,emp:0};if(/^escolheu|substituto_assumiu/.test(e.tipo))g[k].esc++;if(e.tipo==="cancelou"){g[k].canc++;if(e.detalhe&&e.detalhe.prazo!=="no_prazo")g[k].cima++}if(/^empresa_definiu/.test(e.tipo))g[k].emp++});
+    const pub=S.jobs.filter(j=>j.publicado&&inR(j.inicio,R)).length;const ks=Object.keys(g);const te=ks.reduce((s,k)=>s+g[k].esc,0),tm=ks.reduce((s,k)=>s+g[k].emp,0);
+    S._csv=[["Seller","Escolhas próprias","Cancelamentos","Em cima da hora","Definidos pela empresa","% autonomia"],...ks.map(k=>[nome(k),g[k].esc,g[k].canc,g[k].cima,g[k].emp,nf(g[k].esc+g[k].emp?g[k].esc/(g[k].esc+g[k].emp)*100:100,0)])];
+    return head+`<div class="mks">${mini("Jobs publicados",pub)}${mini("Escolhas pelos sellers",te,"","v")}${mini("Definidos pela empresa",tm,"deve ficar perto de zero",tm?"f":"")}${mini("Cancelamentos livres",ks.reduce((s,k)=>s+g[k].canc,0))}${mini("% autonomia",te+tm?Math.round(te/(te+tm)*100)+"%":"100%","escolhas ÷ total","c")}</div>
+    <div class="hint" style="margin-bottom:12px">Este relatório mostra que os jobs foram escolhidos pelos próprios sellers. É a prova de autonomia que protege a Implay contra vínculo CLT. Para um seller, use Equipe → seller → Relatório de autonomia (PDF).</div>`
+    +tbl([["Seller"],["Escolhas próprias","r"],["Cancelamentos","r"],["Em cima da hora","r"],["Pela empresa","r"],["% autonomia","r"]],ks.map(k=>`<tr data-act="membro" data-id="${k}"><td class="m0"><div class="t">${esc(nome(k)||"—")}</div></td><td data-l="Escolhas" class="r">${g[k].esc}</td><td data-l="Cancel." class="r">${g[k].canc}</td><td data-l="Em cima" class="r">${g[k].cima}</td><td data-l="Empresa" class="r">${g[k].emp}</td><td data-l="%" class="r">${nf(g[k].esc+g[k].emp?g[k].esc/(g[k].esc+g[k].emp)*100:100,0)}%</td></tr>`),"Sem eventos no período.")}
+  return head};
+async function loadEv(){if(S.demo)return;const {data}=await db.from("imp_eventos").select("*").order("em",{ascending:true});S.ev=data||[];if(S.tab==="relatorios")render()}
+
+/* ---------- quem é quem ---------- */
+const _eqOld=VIEWS.equipe;
+VIEWS.equipe=()=>{const v=S.f.eq.view||"cards";const tg=`<div class="chips" style="margin-bottom:8px"><button data-act="eqView" data-v="cards" class="${v==="cards"?"on":""}">Quem é quem</button><button data-act="eqView" data-v="lista" class="${v==="lista"?"on":""}">Lista completa</button></div>`;
+  if(v==="lista")return tg+_eqOld();
+  const R=rangeOf("tri");const card=m=>{const js=S.jobs.filter(j=>j.principal_id===m.id&&j.status==="realizado");const gm=js.reduce((s,j)=>s+(Number(j.gmv)||0),0);const prox=S.jobs.filter(j=>(j.principal_id===m.id||j.substituto_id===m.id)&&j.status==="aberto"&&new Date(j.inicio)>new Date()).length;
+    const cor=m.papel==="socio"?"var(--volt)":m.papel==="seller"?"var(--flash)":"var(--cobalt)";
+    return `<div class="pcard" data-act="membro" data-id="${m.id}"><div class="av" style="background:${cor};color:${m.papel==="socio"?"#000":"#fff"}">${esc(iniciais(m.nome))}</div><div class="t">${esc(m.nome)}</div><div class="s">${m.papel==="socio"?"Sócio":m.papel==="basico"?"Equipe":"Seller"} · ${VINC[m.vinculo]||m.vinculo}</div>${m.obs?`<div class="s">${esc(m.obs.slice(0,60))}</div>`:""}
+    ${m.papel!=="socio"?`<div class="pst"><span><b>${js.length}</b>lives</span><span><b>${brlK(gm)}</b>GMV</span><span><b>${prox}</b>próx.</span></div>`:`<div class="pst"><span><b>${S.propostas.filter(p=>m.user_id&&p.created_by===m.user_id).length}</b>propostas</span><span><b>${S.fin.filter(f=>f.reembolso_para===m.id&&["solicitado","aprovado"].includes(f.reembolso)).length}</b>reemb.</span></div>`}
+    <div class="s" style="margin-top:6px">${esc(m.telefone||m.email)}</div>${m.status!=="ativo"?`<span class="tag w">${m.status}</span>`:""}</div>`};
+  const grp=(t,l)=>l.length?`<div class="sec"><h2>${t} <span class="muted small">${l.length}</span></h2></div><div class="pgrid">${l.map(card).join("")}</div>`:"";
+  const M=S.membros.filter(m=>has(S.f.eq.q,m.nome,m.email,m.cidade,m.nicho));
+  return tg+`<div class="tool">${qbox("eq","Buscar pessoa…")}</div><div class="hint" style="margin:-4px 0 4px">Link para sellers se cadastrarem: <b>brunotae.github.io/implay/seller/</b></div>`+grp("Sócios",M.filter(m=>m.papel==="socio"))+grp("Equipe (CLT)",M.filter(m=>m.papel==="basico"))+grp("Sellers",M.filter(m=>m.papel==="seller"&&m.status==="ativo"))+grp("Aguardando aprovação",M.filter(m=>m.status==="pendente"))};
+
+/* ---------- painel compacto ---------- */
+VIEWS.painel=()=>{const now=new Date(),mesK=monthKey(now);const R=rangeOf("mes");
+  const lm=S.jobs.filter(j=>j.status==="realizado"&&inR(j.inicio,R));const gmv=lm.reduce((s,j)=>s+(Number(j.gmv)||0),0);
+  const fin=S.fin.filter(x=>x.status==="ativo"&&inR(x.pago_em,R));const rec=soma(fin.filter(x=>x.tipo==="entrada"&&x.categoria!=="aporte")),des=soma(fin.filter(x=>x.tipo==="saida"&&x.categoria!=="devolucao_aporte"));
+  const ativos=S.propostas.filter(p=>["contrato","operacao","renovar"].includes(etapaProp(p)));
+  const vagas=S.jobs.filter(j=>j.status==="aberto"&&new Date(j.inicio)>now&&!j.principal_id);
+  const fun={};FUNIL.forEach(f=>fun[f[0]]=0);S.propostas.forEach(p=>fun[etapaProp(p)]++);
+  const occ=new Set(S.jobs.filter(j=>j.status!=="cancelado"&&j.local_tipo==="estudio"&&j.espaco&&sameDay(new Date(j.inicio),now)).map(j=>j.espaco));
+  const occNow=new Set(S.jobs.filter(j=>j.status!=="cancelado"&&j.local_tipo==="estudio"&&j.espaco&&new Date(j.inicio)<=now&&new Date(j.fim)>now).map(j=>j.espaco));
+  const st=S.f.painel.st,fimSem=new Date(Date.now()+7*864e5);let l=S.jobs.filter(j=>j.status!=="cancelado");
+  const cnt={hoje:l.filter(j=>sameDay(new Date(j.inicio),now)).length,semana:l.filter(j=>new Date(j.fim)>now&&new Date(j.inicio)<fimSem).length,vagas:vagas.length};
+  if(st==="hoje")l=l.filter(j=>sameDay(new Date(j.inicio),now));else if(st==="vagas")l=vagas;else l=l.filter(j=>new Date(j.fim)>now&&new Date(j.inicio)<fimSem);
+  const gm={};lm.forEach(j=>{const k=j.marca||"—";gm[k]=(gm[k]||0)+(Number(j.gmv)||0)});const gs={};lm.forEach(j=>{if(j.principal_id)gs[j.principal_id]=(gs[j.principal_id]||0)+(Number(j.gmv)||0)});
+  const mes=lastMonths(6).map(([k,lb])=>[lb,S.jobs.filter(j=>j.status==="realizado"&&monthKey(new Date(j.inicio))===k).reduce((s,j)=>s+(Number(j.gmv)||0),0)]);
+  return `<div class="welcome"><div><div class="kick">● ${hojeTxt()} · Implay Studio Paulista</div><h1>Olá, ${esc(S.me.nome)} <span style="color:var(--volt)">✦</span></h1></div><div class="row"><button class="btn p sm" data-act="novoJob">+ Novo job</button><button class="btn sm" data-act="propNova">+ Proposta</button><button class="btn sm" data-act="tab" data-v="relatorios">Relatórios</button></div></div>
+  <div class="mks six">${mini("GMV do mês",brlK(gmv),lm.length+" lives realizadas","v")}${mini("Receita do mês",brlK(rec),"sem aportes")}${mini("Resultado do mês",brlK(rec-des),"receita − despesas",rec-des<0?"f":"")}${mini("Contratos ativos",ativos.length,brlK(soma(ativos.map(p=>({valor:p.valor_fixo}))))+"/mês fixo","c")}${mini("Lives em 7 dias",cnt.semana,cnt.hoje+" hoje")}${mini("Vagas abertas",vagas.length,"sem seller",vagas.length?"f":"")}</div>
+  <div class="grid3">
+   <div class="panel"><h3>Funil comercial <a data-act="tab" data-v="funil">abrir ›</a></h3><div class="fbar">${FUNIL.map(([k,lb])=>`<div class="fb" data-act="tab" data-v="funil"><b>${fun[k]}</b><span>${lb.split(" /")[0]}</span></div>`).join("")}</div></div>
+   <div class="panel"><h3>GMV · 6 meses <a data-act="tab" data-v="relatorios">relatório ›</a></h3>${colsChart(mes).replace(/<div class="ccv">[^<]*<\/div>/g,"")}</div>
+   <div class="panel"><h3>Estúdio agora <span class="muted small">${occNow.size} no ar · ${occ.size} hoje</span></h3><div class="floor sm">${ESPACOS.map(e=>`<div class="b ${occNow.has(e)?"on":occ.has(e)?"v":""}">${e}</div>`).join("")}</div></div>
+  </div>
+  <div class="sec"><h2>Próximas lives</h2><button class="btn sm" data-act="tab" data-v="jobs">Todos os jobs ›</button></div>
+  ${chips("painel",[["hoje","Hoje",cnt.hoje],["semana","7 dias",cnt.semana],["vagas","Vagas abertas",cnt.vagas]],st)}
+  ${tbl(JCOLS.filter(c=>c[0]!=="Etapa"),l.slice(0,8).map(j=>jobRow(j).replace(/<td data-l="Etapa"[\s\S]*?<\/td>/,"")),"Nenhuma live neste filtro.")}
+  <div class="grid2" style="margin-top:14px"><div class="panel"><h3>Top marcas do mês <a data-act="rpGo" data-v="marcas">ver ›</a></h3>${bars(Object.entries(gm).sort((a,b)=>b[1]-a[1]).slice(0,5),brlK)}</div><div class="panel"><h3>Top sellers do mês <a data-act="rpGo" data-v="sellers">ver ›</a></h3>${bars(Object.entries(gs).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,v])=>[nome(k),v]),brlK,"var(--cobalt)")}</div></div>`};
+
+/* ---------- modo demonstração (dados fictícios, nada é salvo) ---------- */
+function demoData(){let sd=7;const rnd=()=>(sd=(sd*9301+49297)%233280)/233280;const pick=a=>a[Math.floor(rnd()*a.length)];const uid=()=>"d"+Math.floor(rnd()*1e12).toString(36)+Math.floor(rnd()*1e6);
+  const now=new Date();const D=(d,h=0,m=0)=>{const x=new Date(now);x.setHours(h,m,0,0);x.setDate(x.getDate()+d);return x};
+  const meId=S.me.id;
+  const M=[{id:meId,user_id:S.me.user_id,email:S.email,nome:S.me.nome,papel:"socio",vinculo:"socio",status:"ativo",obs:"Administração e finanças",created_at:D(-120).toISOString()},
+   ...[["Dani","Investimento e estratégia"],["Caio","Comercial e creators"],["Larissa","Comercial e operação de live"],["Pedro","Operação e gestão"],["Thiago","Operação e gestão"]].map(([n,o])=>({id:uid(),email:n.toLowerCase()+"@demo",nome:n,papel:"socio",vinculo:"socio",status:"ativo",obs:o,created_at:D(-120).toISOString()})),
+   ...[["Marina Costa","clt"],["Rafael Lima","clt"]].map(([n,v])=>({id:uid(),email:n.split(" ")[0].toLowerCase()+"@demo",nome:n,papel:"basico",vinculo:v,status:"ativo",telefone:"(11) 9"+Math.floor(rnd()*9e7+1e7),obs:"Operador de live",created_at:D(-90).toISOString()}))];
+  const sellersN=["Bruna Alves","Camila Rocha","Duda Martins","Gabi Souza","Isa Ferreira","Julia Nunes","Lara Gomes","Nina Prado","Paula Reis","Rebeca Lins","Sofia Melo","Vivi Castro"];
+  const sel=sellersN.map((n,i)=>({id:uid(),email:n.split(" ")[0].toLowerCase()+i+"@demo",nome:n,papel:"seller",vinculo:pick(["mei","mei","pj","freelancer"]),status:"ativo",cidade:"São Paulo",telefone:"(11) 9"+Math.floor(rnd()*9e7+1e7),cnpj:"00.000.000/0001-"+String(10+i),nicho:pick(["beleza","alimentos","pet","saúde"]),termo_aceito_em:D(-60+i).toISOString(),termo_versao:"v1-2026-10",created_at:D(-70+i).toISOString()}));
+  sel.push({id:uid(),email:"nova@demo",nome:"Tati Moreira",papel:"seller",vinculo:"mei",status:"pendente",created_at:D(-1).toISOString()});
+  M.push(...sel);
+  const C=[["Crocante Snacks","Crocante Alimentos S.A."],["Lumi Skin","Lumi Cosméticos Ltda"],["PetVida","PetVida Comércio Ltda"],["NutriMax","NutriMax Suplementos"],["Bloom Beauty","Bloom Beleza Ltda"],["Café Serra","Serra Cafés Especiais"],["Glow K","Glow K Importadora"],["FitBar","FitBar Alimentos"]].map(([m,e],i)=>({id:uid(),marca:m,empresa:e,cnpj:"11.111.111/0001-"+String(20+i),contato_nome:pick(["Ana","Carlos","Fernanda","Ricardo","Luiza"]),contato_tel:"(11) 3"+Math.floor(rnd()*9e6+1e6),endereco:"Av. Brigadeiro Faria Lima, "+(1000+i*111)+", São Paulo/SP",status:"ativo",created_at:D(-100).toISOString()}));
+  const pr=[];const mk=(c,st,pac,fx,pc,ini,mes)=>{const n=pr.length+1;const p={id:uid(),numero:n,cliente_id:c.id,marca:c.marca,mes_ref:"Outubro de 2026",objetivo:"Criar recorrência de vendas no TikTok Shop",modalidade:pac==="Aluguel do espaço"?"aluguel":"servico",pacote:pac,produtos:"Linha principal",valor_fixo:fx,perc_variavel:pc,preco_essencial:fx*.75,preco_crescimento:fx,preco_escala:fx*1.3,vigencia_meses:mes,validade_dias:10,pagamento:"Boleto, todo dia 10",status:st,primeira_live:ini?ymd(ini):null,created_at:D(-95).toISOString()};
+    if(st==="aceita"){const f=new Date(ini);f.setMonth(f.getMonth()+mes);f.setDate(f.getDate()-1);p.contrato_inicio=ymd(ini);p.contrato_fim=ymd(f);p.contrato_numero="C-"+String(n).padStart(4,"0")}pr.push(p);return p};
+  const P=[mk(C[0],"aceita","Crescimento",25000,5,D(-95),6),mk(C[1],"aceita","Escala",32000,4,D(-80),6),mk(C[2],"aceita","Essencial",18000,5,D(-75),3),mk(C[3],"aceita","Crescimento",24000,5,D(-40),3),mk(C[4],"aceita","Aluguel do espaço",6000,0,D(-30),3),
+    mk(C[5],"enviada","Crescimento",22000,5,D(12),3),mk(C[6],"enviada","Escala",30000,4,D(20),6),mk(C[7],"rascunho","Essencial",16000,5,null,3),mk(C[2],"recusada","Escala",28000,5,null,3)];
+  const ativ=P.filter(p=>p.status==="aceita");const J=[];const EV=[];let jn_=0;
+  for(let d=-100;d<=21;d++){const day=D(d);if(day.getDay()===0)continue;
+    ativ.forEach(p=>{if(parseYmd(p.contrato_inicio)>day||parseYmd(p.contrato_fim)<day)return;const freq=p.pacote==="Escala"?.8:p.pacote==="Crescimento"?.6:p.pacote==="Aluguel do espaço"?.25:.45;if(rnd()>freq)return;
+      const h=pick([10,14,15,19,19,20]);const dur=p.modalidade==="aluguel"?pick([2,3]):4;const ini=D(d,h),fim=D(d,h+dur);const past=fim<now;
+      const sp=pick(sel.slice(0,12)),sb=rnd()>.4?pick(sel.slice(0,12)):null;const espaco=p.modalidade==="aluguel"?pick(["B1","B2","C1"]):pick(ESPACOS.slice(0,17));
+      const base={Crescimento:2800,Escala:3800,Essencial:2000}[p.pacote]||0;const gmv=p.modalidade==="aluguel"?null:Math.round(base*dur*(.5+rnd()*1.2)*(1+(sellersN.indexOf(sp.nome)%4)*.12));
+      const j={id:uid(),numero:++jn_,proposta_id:p.id,cliente_id:p.cliente_id,marca:p.marca,produto:p.produtos,modalidade:p.modalidade,local_tipo:rnd()>.9?"cliente":"estudio",espaco,inicio:ini.toISOString(),fim:fim.toISOString(),valor_seller:p.modalidade==="aluguel"?null:dur*90,seller_pago_por:rnd()>.3?"cliente":"implay",publicado:true,
+        principal_id:p.modalidade==="aluguel"?null:(past||rnd()>.3?sp.id:null),substituto_id:p.modalidade==="aluguel"?null:(sb&&sb.id!==sp.id&&(past||rnd()>.5)?sb.id:null),status:past?(rnd()>.04?"realizado":"cancelado"):"aberto",gmv:past?gmv:null,pedidos:past&&gmv?Math.round(gmv/(70+rnd()*60)):null,created_at:D(d-10).toISOString()};
+      if(j.local_tipo==="cliente"){j.espaco=null;j.local_endereco="Loja da marca"}J.push(j);
+      EV.push({job_id:j.id,tipo:"job_publicado",em:D(d-10).toISOString()});if(j.principal_id)EV.push({job_id:j.id,membro_id:j.principal_id,tipo:"escolheu_principal",em:D(d-8).toISOString()});if(j.substituto_id)EV.push({job_id:j.id,membro_id:j.substituto_id,tipo:"escolheu_substituto",em:D(d-7).toISOString()});
+      if(rnd()>.85){const c=pick(sel.slice(0,12));EV.push({job_id:j.id,membro_id:c.id,tipo:"cancelou",detalhe:{prazo:rnd()>.25?"no_prazo":"em_cima_da_hora"},em:D(d-3).toISOString()})}})}
+  const F=[];const fe=(o)=>F.push(Object.assign({id:uid(),status:"ativo",reembolso:"nao",pago_por:"empresa",created_at:now.toISOString()},o));
+  fe({tipo:"entrada",categoria:"aporte",valor:120000,pago_em:ymd(D(-110)),descricao:"Aporte Tae & Dani",contraparte:"Tae & Dani"});fe({tipo:"entrada",categoria:"aporte",valor:80000,pago_em:ymd(D(-50)),descricao:"Aporte Tae & Dani",contraparte:"Tae & Dani"});
+  for(let k=3;k>=0;k--){const m=new Date(now.getFullYear(),now.getMonth()-k,10);const pago=m<now;
+    ativ.forEach(p=>{if(parseYmd(p.contrato_inicio)>m)return;fe({tipo:"entrada",categoria:p.modalidade==="aluguel"?"aluguel_espaco":"fixo_cliente",valor:p.valor_fixo,vencimento:ymd(m),pago_em:pago?ymd(m):null,proposta_id:p.id,descricao:"Fixo "+p.marca,contraparte:p.marca,forma:"Boleto",nf_numero:pago?String(100+F.length):null});
+      const g=J.filter(j=>j.proposta_id===p.id&&j.gmv&&monthKey(new Date(j.inicio))===monthKey(new Date(m.getFullYear(),m.getMonth()-1,1))).reduce((s,j)=>s+j.gmv,0);if(g&&p.perc_variavel)fe({tipo:"entrada",categoria:"variavel_cliente",valor:Math.round(g*p.perc_variavel/100),vencimento:ymd(m),pago_em:pago?ymd(m):null,proposta_id:p.id,descricao:"% vendas "+p.marca,contraparte:p.marca,forma:"Boleto"})});
+    const v=new Date(now.getFullYear(),now.getMonth()-k,5),pg=v<now;
+    fe({tipo:"saida",categoria:"aluguel_imovel",natureza:"fixa",valor:13000,vencimento:ymd(v),pago_em:pg?ymd(v):null,descricao:"Aluguel Av. Paulista",contraparte:"Locadora",forma:"Pix"});
+    fe({tipo:"saida",categoria:"condominio_iptu",natureza:"fixa",valor:3200,vencimento:ymd(v),pago_em:pg?ymd(v):null,descricao:"Condomínio + IPTU",forma:"Boleto"});
+    fe({tipo:"saida",categoria:"salarios",natureza:"fixa",valor:9800,vencimento:ymd(v),pago_em:pg?ymd(v):null,descricao:"Folha CLT",forma:"Transferência"});
+    fe({tipo:"saida",categoria:"contas",natureza:"fixa",valor:1450,vencimento:ymd(v),pago_em:pg?ymd(v):null,descricao:"Energia + internet",forma:"Boleto"});
+    fe({tipo:"saida",categoria:"contador",natureza:"fixa",valor:1200,vencimento:ymd(v),pago_em:pg?ymd(v):null,descricao:"Contabilidade",forma:"Pix"});
+    const cach=J.filter(j=>j.seller_pago_por==="implay"&&j.status==="realizado"&&monthKey(new Date(j.inicio))===monthKey(v)).reduce((s,j)=>s+(j.valor_seller||0),0);if(cach)fe({tipo:"saida",categoria:"seller",natureza:"variavel",valor:cach,pago_em:pg?ymd(v):null,vencimento:ymd(v),descricao:"Cachês de sellers do mês",forma:"Pix"});
+    fe({tipo:"saida",categoria:"marketing",natureza:"variavel",valor:Math.round(2000+rnd()*3000),pago_em:pg?ymd(v):null,vencimento:ymd(v),descricao:"Conteúdo e anúncios",forma:"Cartão"})}
+  fe({tipo:"saida",categoria:"obra",natureza:"variavel",valor:48000,pago_em:ymd(D(-85)),descricao:"Obra do estúdio (booths)",contraparte:"Construtora"});fe({tipo:"saida",categoria:"equipamentos",natureza:"variavel",valor:36000,pago_em:ymd(D(-80)),descricao:"Câmeras, luz e áudio",contraparte:"Fornecedor"});
+  fe({tipo:"saida",categoria:"limpeza",natureza:"fixa",valor:270,pago_em:ymd(D(-6)),descricao:"Limpeza escritório",contraparte:"Maria",pago_por:"proprio",reembolso:"solicitado",reembolso_para:M[4].id,tem_comprovante:false});
+  fe({tipo:"saida",categoria:"live_custos",natureza:"variavel",valor:640,pago_em:ymd(D(-3)),descricao:"Uber equipe live na loja",contraparte:"Uber",pago_por:"proprio",reembolso:"aprovado",reembolso_para:M[2].id});
+  const A=[];C.slice(0,5).forEach((c,i)=>{const prod=c.marca+" kit "+(i+1);A.push({id:uid(),cliente_id:c.id,marca:c.marca,produto:prod,movimento:"entrada",qtd:200+i*100,data:ymd(D(-60+i)),status:"ativo"});
+    for(let k=0;k<4;k++)A.push({id:uid(),cliente_id:c.id,marca:c.marca,produto:prod,movimento:"saida",qtd:10+Math.floor(rnd()*40),para:"@creator"+Math.floor(rnd()*90),data:ymd(D(-50+k*9)),status:"ativo"})});
+  return {membros:M,clientes:C,propostas:P,jobs:J,fin:F,amostras:A,ev:EV.map((e,i)=>Object.assign({id:i+1},e))}}
+async function toggleDemo(){if(S.demo){S.demo=false;S.ev=null;await loadAll();toast("Dados reais de volta");render();return}
+  const d=demoData();Object.assign(S,d);S.demo=true;toast("Modo demonstração: dados fictícios, nada é salvo");render()}
+const _run=run;run=async function(p,ok){if(S.demo){toast("Modo demonstração: nada é salvo",true);throw new Error("demo")}return _run(p,ok)};
+const _refresh=refresh;refresh=async function(){if(S.demo)return;return _refresh()};
+const _render=render;render=function(){_render();const sf=$(".sfoot");if(sf)sf.insertAdjacentHTML("afterbegin",`<button class="btn sm ${S.demo?"f":""}" data-act="demo" style="width:100%;margin-bottom:10px">${S.demo?"Sair da demonstração":"Modo demonstração"}</button>`);
+  if(S.demo){const c=$(".content");if(c)c.insertAdjacentHTML("beforebegin",`<div class="demobar">MODO DEMONSTRAÇÃO · dados fictícios para apresentação · nada é salvo <button class="btn sm" data-act="demo">Sair</button></div>`)}};
+const _showDoc=showDoc;showDoc=function(p){setPage("landscape");_showDoc(p)};
+
+/* ---------- eventos v3 ---------- */
+document.addEventListener("change",e=>{const t=e.target;if(t.matches("[data-rper]")){S.rp.per=t.value;render()}});
+document.addEventListener("input",e=>{const t=e.target;if(t.dataset.q==="ctr"){S.f.ctr.q=t.value;$("#lst").innerHTML=LISTS.ctr()}if(t.dataset.q==="eq"&&(S.f.eq.view||"cards")==="cards"){clearTimeout(S._eqT);S._eqT=setTimeout(()=>{render();const i=$("[data-q=eq]");if(i){i.focus();i.setSelectionRange(i.value.length,i.value.length)}},350)}},true);
+document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]");if(!a)return;const v=a.dataset.v,id=a.dataset.id;
+  switch(a.dataset.act){
+    case"tab":if(v==="relatorios"&&S.rp.tab==="autonomia"&&!S.ev)loadEv();break;
+    case"rpGo":S.tab="relatorios";S.rp.tab=v;render();break;
+    case"eqView":S.f.eq.view=v;render();break;
+    case"demo":e.stopImmediatePropagation();await toggleDemo();break;
+    case"ctrCli":{e.stopPropagation();const p=S.propostas.find(x=>x.id===id);closeSheet();showCtr(ctrCliente(p));break}
+    case"ctrSel":{e.stopPropagation();const m=S.membros.find(x=>x.id===id);closeSheet();showCtr(ctrSeller(m));break}
+    case"rpPrint":showCtr(`<div class="rprint"><h1 style="font-size:18px;margin-bottom:10px">Implay · Relatório · ${esc((RPT.find(x=>x[0]===S.rp.tab)||[])[1]||"")} · ${PER_LAB[S.rp.per]}</h1>${$("#main").innerHTML}</div>`,"landscape");break;
+    case"rpCsv":if(!S._csv||!["marcas","sellers","resultado","estudio","autonomia"].includes(S.rp.tab)){const {lives}=rpData();csvDownload("implay_vendas.csv",[["Nº","Data","Marca","Seller","Horas","GMV","Pedidos"],...lives.map(j=>[jn(j.numero),new Date(j.inicio).toLocaleDateString("pt-BR"),j.marca,nome(j.principal_id),nf(hrs(j),1),nf(j.gmv||0,2),j.pedidos||""])])}else csvDownload("implay_"+S.rp.tab+".csv",S._csv);break;
+  }},true);
+
+const _openProp=openProp;openProp=function(id){_openProp(id);const p=id&&S.propostas.find(x=>x.id===id);if(p&&p.status==="aceita"){const a=$("#sheetIn .acts");if(a)a.insertAdjacentHTML("afterbegin",`<button type="button" class="btn f" data-act="ctrCli" data-id="${id}">Gerar contrato</button>`)}};
+const _openMembro=openMembro;openMembro=function(id){_openMembro(id);const m=id&&S.membros.find(x=>x.id===id);if(m&&(m.papel==="seller"||["freelancer","pj","mei"].includes(m.vinculo))){const a=$("#sheetIn .acts");if(a)a.insertAdjacentHTML("afterbegin",`<button type="button" class="btn f" data-act="ctrSel" data-id="${id}">Gerar contrato</button>`)}};
 
 /* ================= interações ================= */
 function syncShow(){const fm=$("#sheetIn form");if(!fm)return;fm.querySelectorAll("[data-show]").forEach(el=>{const[k,val]=el.dataset.show.split("=");const inp=fm.querySelector(`[name="${k}"]`);el.hidden=!inp||inp.value!==val})}
