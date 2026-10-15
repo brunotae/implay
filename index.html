@@ -18,7 +18,7 @@
 <style>
 :root{--noite:#0B0B0C;--bg2:#0F0F11;--card:#151518;--card2:#1C1C20;--linha:#26262B;--linha2:#33333A;--chalk:#F7F7F2;--cinza:#A3A3AB;--grafite:#5F5F67;
 --volt:#D4FF2F;--flash:#FF3FA4;--cobalt:#2B3BFF;--ok:#7CE38B;--warn:#FFB547;--bad:#FF5C6C;
---fh:Unbounded,Inter,system-ui,sans-serif;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom);--side:244px;--rail:310px}
+--fh:Inter,system-ui,-apple-system,sans-serif;--fb:Unbounded,Inter,sans-serif;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom);--side:244px;--rail:310px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--noite);color:var(--chalk);font-family:Inter,system-ui,-apple-system,sans-serif;font-size:13.5px;line-height:1.45;overflow-x:hidden}
 [hidden]{display:none!important}
@@ -367,6 +367,30 @@ i.lg{display:inline-block;width:9px;height:9px;border-radius:3px;margin:0 3px 0 
 .ctr .local{margin-top:30px;text-align:center}
 .rprint{padding:16px;max-width:1200px;margin:0 auto}
 @media print{.ctr{margin:0;padding:0;max-width:none;border-radius:0;box-shadow:none}.ctr h2{break-after:avoid}.rprint{-webkit-print-color-adjust:exact;print-color-adjust:exact;background:var(--noite)}}
+/* ===== legibilidade + calendário ===== */
+html,body{font-size:14px;letter-spacing:.005em}
+:root{--cinza:#B9B9C2;--grafite:#70707A}
+h1,h2,h3,.uh{font-weight:800;letter-spacing:-.015em}
+.mk .n,.kpi .n,.stage .n,.fb b,.pst b,.bars .bl span:last-child,table.tb .r{font-variant-numeric:tabular-nums}
+.mk .n{font-size:18px;font-weight:800}.mk .l{font-size:10.5px}.mk .s{font-size:11.5px}
+table.tb td{font-size:13.5px}table.tb .s{font-size:12px}
+.sitem .sl b{font-size:14px}.sitem .sl small{font-size:11.5px}
+.item .s,.hint{font-size:12.5px}
+.logo,.pg h1,.pg h2,.pg .big,.pg .num,.pg .plogo,.pg .sticker,.pg .uh,.ctr .clogo{font-family:var(--fb)!important}
+.dbtn{display:flex;align-items:center;gap:10px;width:100%;background:var(--card);border:1px solid var(--linha);border-radius:11px;padding:10px 12px;min-height:44px;font-size:14.5px;font-weight:600;cursor:pointer;text-align:left;color:var(--chalk)}
+.dbtn svg{color:var(--volt)}.dbtn.vazio{color:var(--cinza);font-weight:500}.dbtn:hover{border-color:var(--linha2)}
+.cal{margin-top:8px;background:var(--card2);border:1px solid var(--linha2);border-radius:14px;padding:10px;max-width:340px;box-shadow:0 14px 30px rgba(0,0,0,.45)}
+.cal .ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.cal .ch b{font-size:14px;text-transform:capitalize}
+.cal .ch button{width:36px;height:36px;border-radius:10px;border:1px solid var(--linha);background:var(--card);font-size:18px;cursor:pointer}
+.cal .cw{display:grid;grid-template-columns:repeat(7,1fr);text-align:center;font-size:10.5px;font-weight:700;color:var(--cinza);text-transform:uppercase;margin-bottom:4px}
+.cal .cg{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.cal .cd{position:relative;height:38px;border-radius:10px;border:1px solid transparent;background:transparent;font-size:14px;font-weight:600;cursor:pointer;color:var(--chalk)}
+.cal .cd:hover{background:var(--card)}.cal .cd.out{color:var(--grafite)}
+.cal .cd.hj{border-color:var(--volt)}.cal .cd.sel{background:var(--volt);color:#000}
+.cal .cd i{position:absolute;right:3px;top:2px;font-style:normal;font-size:9px;font-weight:800;background:var(--flash);color:#fff;border-radius:99px;padding:0 4px;line-height:13px}
+.cal .cf{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:11px}
+.cal .cf button{border:1px solid var(--linha);background:var(--card);border-radius:99px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer}
 </style>
 </head>
 <body>
@@ -420,7 +444,22 @@ function minOpts(sel){return [0,15,30,45].map(m=>`<option value="${m}" ${m===sel
 function timeSel(name,d){const h=d?d.getHours():10,m=d?Math.round(d.getMinutes()/15)*15%60:0;
   return `<div class="time"><select name="${name}_h">${hourOpts(h)}</select><select name="${name}_m">${minOpts(m)}</select></div>`}
 function seg(name,opts,val,cls=""){return `<input type="hidden" name="${name}" value="${esc(val??"")}"><div class="seg ${cls}" data-seg="${name}">${opts.map(o=>{const[v,l]=Array.isArray(o)?o:[o,o];return `<button type="button" data-v="${esc(v)}" class="${String(v)===String(val??"")?"on":""}">${esc(l)}</button>`}).join("")}</div>`}
-function dateFld(name,label,val,req){return `<div class="fld"><label>${label}</label><input type="date" name="${name}" value="${val||""}" ${req?"required":""} data-ext><div class="hint v" data-ext-for="${name}">${val?"→ "+dExt(val):""}</div></div>`}
+function dLong(v){if(!v)return"";const d=parseYmd(v);return DL[d.getDay()]+", "+d.getDate()+" de "+ML[d.getMonth()]+" de "+d.getFullYear()}
+function dateFld(name,label,val,req){return `<div class="fld"><label>${label}</label><input type="hidden" name="${name}" value="${val||""}"><button type="button" class="dbtn ${val?"":"vazio"}" data-act="calOpen" data-n="${name}"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span>${val?dLong(val):"Escolher no calendário"}</span></button><div class="cal" data-cal="${name}" hidden></div></div>`}
+function calHtml(name,ref){const fm=$(`#sheetIn [name="${name}"]`);const sel=fm&&fm.value;const today=new Date();
+  const first=new Date(ref.getFullYear(),ref.getMonth(),1);const start=new Date(first);start.setDate(1-first.getDay());
+  const jobsDia={};S.jobs.forEach(j=>{if(j.status==="cancelado")return;const k=ymd(new Date(j.inicio));jobsDia[k]=(jobsDia[k]||0)+1});
+  let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=ymd(d);
+    cells+=`<button type="button" class="cd ${d.getMonth()!==ref.getMonth()?"out":""} ${sameDay(d,today)?"hj":""} ${k===sel?"sel":""}" data-act="calPick" data-n="${name}" data-v="${k}">${d.getDate()}${jobsDia[k]?`<i>${jobsDia[k]}</i>`:""}</button>`}
+  return `<div class="ch"><button type="button" data-act="calNav" data-n="${name}" data-m="-1">‹</button><b>${ML[ref.getMonth()]} ${ref.getFullYear()}</b><button type="button" data-act="calNav" data-n="${name}" data-m="1">›</button></div>
+  <div class="cw">${["dom","seg","ter","qua","qui","sex","sáb"].map(x=>`<span>${x}</span>`).join("")}</div><div class="cg">${cells}</div>
+  <div class="cf"><button type="button" data-act="calPick" data-n="${name}" data-v="${ymd(today)}">Hoje</button><button type="button" data-act="calPick" data-n="${name}" data-v="${ymd(new Date(Date.now()+864e5))}">Amanhã</button><button type="button" data-act="calPick" data-n="${name}" data-v="">Limpar</button><span class="muted">número = lives no dia</span></div>`}
+function calShow(name,ref){const c=$(`#sheetIn [data-cal="${name}"]`);c.dataset.m=ymd(ref);c.innerHTML=calHtml(name,ref);c.hidden=false}
+document.addEventListener("click",e=>{const a=e.target.closest("[data-act]");if(!a)return;const n=a.dataset.n;
+  if(a.dataset.act==="calOpen"){e.stopImmediatePropagation();const c=$(`#sheetIn [data-cal="${n}"]`);const open=!c.hidden;document.querySelectorAll("#sheetIn .cal").forEach(x=>x.hidden=true);if(open)return;const v=$(`#sheetIn [name="${n}"]`).value;calShow(n,v?parseYmd(v):new Date())}
+  else if(a.dataset.act==="calNav"){e.stopImmediatePropagation();const c=$(`#sheetIn [data-cal="${n}"]`);const r=parseYmd(c.dataset.m);r.setDate(1);r.setMonth(r.getMonth()+Number(a.dataset.m));calShow(n,r)}
+  else if(a.dataset.act==="calPick"){e.stopImmediatePropagation();const inp=$(`#sheetIn [name="${n}"]`);inp.value=a.dataset.v;const b=$(`#sheetIn [data-act=calOpen][data-n="${n}"]`);b.querySelector("span").textContent=a.dataset.v?dLong(a.dataset.v):"Escolher no calendário";b.classList.toggle("vazio",!a.dataset.v);$(`#sheetIn [data-cal="${n}"]`).hidden=true;inp.dispatchEvent(new Event("change",{bubbles:true}))}
+},true);
 function fld(name,label,val,type="text",extra=""){return `<div class="fld"><label>${label}</label><input type="${type}" name="${name}" value="${esc(val??"")}" ${extra}></div>`}
 function moneyFld(name,label,val){return `<div class="fld"><label>${label}</label><input inputmode="decimal" name="${name}" value="${esc(numIn(val))}" placeholder="0,00"></div>`}
 function area(name,label,val){return `<div class="fld"><label>${label}</label><textarea name="${name}">${esc(val??"")}</textarea></div>`}
@@ -744,7 +783,7 @@ function openFin(id,preset={}){
    ${moneyFld("valor","Valor (R$)",f.valor)}
    ${fld("descricao","Descrição",f.descricao,"text",'placeholder="ex.: limpeza do escritório"')}
    ${fld("contraparte","Quem recebeu / quem pagou",f.contraparte)}
-   <div class="cols2">${dateFld("vencimento","Vencimento",f.vencimento)}${dateFld("pago_em","Pago / recebido em (vazio = pendente)",f.pago_em)}</div>
+   <div class="cols2 t2">${dateFld("vencimento","Vencimento",f.vencimento)}${dateFld("pago_em","Pago / recebido em (vazio = pendente)",f.pago_em)}</div>
    <div class="fld"><label>Forma</label>${seg("forma",["Pix","Boleto","Cartão","Transferência","Dinheiro"],f.forma)}</div>
    <div class="cols2"><div class="fld"><label>Job</label><select name="job_id"><option value="">—</option>${S.jobs.slice().reverse().slice(0,200).map(j=>`<option value="${j.id}" ${j.id===f.job_id?"selected":""}>${jn(j.numero)} · ${esc(j.marca||"")} · ${dCurta(j.inicio)}</option>`).join("")}</select></div>
    <div class="fld"><label>Contrato</label><select name="proposta_id"><option value="">—</option>${S.propostas.filter(p=>p.status==="aceita").map(p=>`<option value="${p.id}" ${p.id===f.proposta_id?"selected":""}>${esc(p.contrato_numero)} · ${esc(p.marca)}</option>`).join("")}</select></div></div>
