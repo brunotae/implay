@@ -402,6 +402,22 @@ table.tb td{font-size:13.5px}table.tb .s{font-size:12px}
 .espg button.on{background:var(--volt);color:#000;border-color:var(--volt)}
 @media(max-width:420px){.elab{width:100%}}
 .floor{grid-template-columns:repeat(8,minmax(0,1fr))!important}.floor.sm{grid-template-columns:repeat(8,minmax(0,1fr))!important}
+.mgrid.big{gap:6px}
+.mgrid.big .md{min-height:118px;padding:6px 7px;cursor:default;display:flex;flex-direction:column;gap:3px;border:1px solid var(--linha)}
+.mgrid.big .md.today{border-color:var(--volt);box-shadow:inset 0 0 0 1px var(--volt)}
+.mgrid.big .md.past:not(.out){background:#121215}
+.mwd{text-align:center;font-size:11px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.08em;padding:4px 0}
+.mdh{display:flex;justify-content:space-between;align-items:center}
+.mdh b{font-size:14px;cursor:pointer;padding:2px 4px;border-radius:6px}.mdh b:hover{background:var(--card2)}
+.md.today .mdh b{background:var(--volt);color:#000}
+.madd{opacity:0;border:1px solid var(--linha);background:var(--card2);border-radius:6px;width:22px;height:22px;font-weight:800;cursor:pointer;color:var(--volt);line-height:1}
+.md:hover .madd{opacity:1}
+@media(hover:none){.madd{opacity:.7}}
+.mj{font-size:11.5px;background:var(--card2);border-left:3px solid var(--volt);border-radius:6px;padding:3px 6px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mj:hover{background:#26262c}.mj.open{border-left-color:var(--flash)}.mj.done{opacity:.6}
+.mj b{font-weight:700}.mj span{color:var(--cinza);font-size:10.5px}
+.mmore{font-size:11px;color:var(--cinza);cursor:pointer;padding-left:4px}
+@media(max-width:760px){.mgrid.big .md{min-height:74px;padding:4px}.mj{font-size:10px;padding:2px 4px}.mj span{display:none}.mgrid.big{gap:3px}}
 </style>
 </head>
 <body>
@@ -424,7 +440,7 @@ const CAT_SAI=[["seller","Cachê de seller","variavel"],["aluguel_imovel","Alugu
 const CAT_NOME=Object.fromEntries([...CAT_ENT,...CAT_SAI].map(c=>[c[0],c[1]]));
 const PACOTES=["Essencial","Crescimento","Escala","Marca + afiliados","Live de lançamento","Aluguel do espaço"];
 const S={me:null,tab:"painel",membros:[],clientes:[],propostas:[],jobs:[],fin:[],amostras:[],
-  week:mondayOf(new Date()),agView:"semana",jobsF:"proximos",propF:"todas",finF:"tudo",finMes:monthKey(new Date()),amF:"saldo",eqF:"todos",finSub:"lanc"};
+  week:mondayOf(new Date()),agView:"mes",jobsF:"proximos",propF:"todas",finF:"tudo",finMes:monthKey(new Date()),amF:"saldo",eqF:"todos",finSub:"lanc"};
 
 /* ---------- utilidades ---------- */
 function $(s,r=document){return r.querySelector(s)}
@@ -549,11 +565,14 @@ VIEWS.agenda=()=>{
     <div class="pills" style="margin:0"><button data-act="agView" data-v="semana" class="${S.agView==="semana"?"on":""}">Semana</button><button data-act="agView" data-v="mes" class="${S.agView==="mes"?"on":""}">Mês</button></div>
     <div class="row"><button class="btn sm" data-act="agNav" data-v="-1">‹</button><button class="btn sm" data-act="agHoje">hoje</button><button class="btn sm" data-act="agNav" data-v="1">›</button><button class="btn p sm" data-act="novoJob">+ Novo job</button></div></div>`;
   if(S.agView==="mes"){
-    const ref=new Date(S.week.getTime()+3*864e5);const first=new Date(ref.getFullYear(),ref.getMonth(),1);const start=mondayOf(first);
+    if(!S.agMes){const n=new Date();S.agMes=new Date(n.getFullYear(),n.getMonth(),1)}const ref=S.agMes;const first=new Date(ref.getFullYear(),ref.getMonth(),1);const start=mondayOf(first);
     let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);
       const js=S.jobs.filter(j=>j.status!=="cancelado"&&sameDay(new Date(j.inicio),d));
-      cells+=`<div class="md ${d.getMonth()!==ref.getMonth()?"out":""} ${sameDay(d,today)?"today":""}" data-act="agDia" data-v="${ymd(d)}"><b>${d.getDate()}</b><br>${js.length?`<span class="dot">${js.length}</span>`:""}</div>`}
-    return head+`<h2 style="font-size:20px;margin-bottom:10px">${ML[ref.getMonth()]} ${ref.getFullYear()}</h2><div class="mgrid">${DS.slice(1).concat(DS[0]).map(d=>`<div class="small muted" style="text-align:center">${d}</div>`).join("")}${cells}</div>`;
+      js.sort((a,b)=>a.inicio<b.inicio?-1:1);
+      cells+=`<div class="md ${d.getMonth()!==ref.getMonth()?"out":""} ${sameDay(d,today)?"today":""} ${d<new Date(today.toDateString())?"past":""}"><div class="mdh"><b data-act="agDia" data-v="${ymd(d)}" title="Ver a semana">${d.getDate()}</b><button class="madd" data-act="novoJobDia" data-v="${ymd(d)}" title="Novo job neste dia">+</button></div>
+      ${js.slice(0,3).map(j=>`<div class="mj ${!j.principal_id&&j.status==="aberto"?"open":""} ${j.status==="realizado"?"done":""}" data-act="job" data-id="${j.id}"><b>${hm(j.inicio)}</b> ${esc(j.marca||cliNome(j.cliente_id)||"Live")}${j.espaco?` <span>${j.espaco}</span>`:""}</div>`).join("")}${js.length>3?`<div class="mmore" data-act="agDia" data-v="${ymd(d)}">+${js.length-3} mais</div>`:""}</div>`}
+    const mjs=S.jobs.filter(j=>j.status!=="cancelado"&&new Date(j.inicio).getMonth()===ref.getMonth()&&new Date(j.inicio).getFullYear()===ref.getFullYear());
+    return head+`<div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 style="font-size:20px;text-transform:capitalize">${ML[ref.getMonth()]} ${ref.getFullYear()}</h2><span class="muted small">${mjs.length} lives no mês · ${mjs.filter(j=>!j.principal_id&&j.status==="aberto").length} vagas abertas · <i class="lg a"></i>com seller <i class="lg b"></i>vaga aberta</span></div><div class="mgrid big">${DS.slice(1).concat(DS[0]).map(d=>`<div class="mwd">${d}</div>`).join("")}${cells}</div>`;
   }
   const days=[...Array(7)].map((_,i)=>{const d=new Date(S.week);d.setDate(d.getDate()+i);return d});
   const fimS=new Date(days[6]);fimS.setHours(23,59,59);
@@ -1429,9 +1448,10 @@ document.addEventListener("click",async e=>{
     case"sair":await db.auth.signOut();S.me=null;renderLogin();break;
     case"backup":{const t=JSON.stringify({membros:S.membros,clientes:S.clientes,propostas:S.propostas,jobs:S.jobs,fin:S.fin,amostras:S.amostras},null,1);try{await navigator.clipboard.writeText(t);toast("Backup copiado")}catch(_){toast("Não consegui copiar",true)}break}
     case"agView":S.agView=val;render();break;
-    case"agNav":S.week=new Date(S.week);if(S.agView==="mes"){const r=new Date(S.week.getTime()+3*864e5);r.setDate(1);r.setMonth(r.getMonth()+Number(val));S.week=mondayOf(r)}else S.week.setDate(S.week.getDate()+7*Number(val));render();break;
-    case"agHoje":S.week=mondayOf(new Date());render();break;
+    case"agNav":S.week=new Date(S.week);if(S.agView==="mes"){const r=new Date(S.agMes);r.setMonth(r.getMonth()+Number(val));S.agMes=r;S.week=mondayOf(r)}else S.week.setDate(S.week.getDate()+7*Number(val));render();break;
+    case"agHoje":S.week=mondayOf(new Date());S.agMes=null;render();break;
     case"agDia":S.week=mondayOf(parseYmd(val));S.agView="semana";render();break;
+    case"novoJobDia":{const dd=parseYmd(val);dd.setHours(10,0,0,0);const df=new Date(dd);df.setHours(14);openJob(null,{inicio:dd.toISOString(),fim:df.toISOString()});break}
     case"novoJob":{const pre={};if(a.dataset.prop){const p=S.propostas.find(x=>x.id===a.dataset.prop);Object.assign(pre,{proposta_id:p.id,cliente_id:p.cliente_id,marca:p.marca,modalidade:p.modalidade});}openJob(null,pre);break}
     case"job":openJob(id);break;
     case"jobSalvar":await saveJob(id);break;
