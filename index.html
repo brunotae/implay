@@ -391,6 +391,17 @@ table.tb td{font-size:13.5px}table.tb .s{font-size:12px}
 .cal .cd i{position:absolute;right:3px;top:2px;font-style:normal;font-size:9px;font-weight:800;background:var(--flash);color:#fff;border-radius:99px;padding:0 4px;line-height:13px}
 .cal .cf{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:11px}
 .cal .cf button{border:1px solid var(--linha);background:var(--card);border-radius:99px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer}
+.dsel{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700;margin-bottom:6px;color:var(--volt)}
+.dsel svg{color:var(--volt)}.dsel.vazio{color:var(--cinza);font-weight:500}
+.cal{margin-top:0;box-shadow:none;background:var(--card)}
+.espg{display:flex;flex-direction:column;gap:6px}
+.erow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.elab{width:74px;flex:0 0 auto;font-size:11px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.06em}
+.ebtns{display:flex;gap:4px;flex-wrap:wrap;flex:1;min-width:0}
+.espg button{border:1px solid var(--linha);background:var(--card);border-radius:8px;min-width:38px;height:30px;padding:0 6px;font-size:12px;font-weight:700;cursor:pointer;color:var(--chalk)}
+.espg button.on{background:var(--volt);color:#000;border-color:var(--volt)}
+@media(max-width:420px){.elab{width:100%}}
+.floor{grid-template-columns:repeat(8,minmax(0,1fr))!important}.floor.sm{grid-template-columns:repeat(8,minmax(0,1fr))!important}
 </style>
 </head>
 <body>
@@ -405,7 +416,7 @@ const SB_URL="https://agdqlnaedojcgivwluty.supabase.co";
 const SB_KEY="sb_publishable_PKGxxrfpduzI7xY1_DWQyQ_cnJA9isP";
 const db=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:"implay-erp-auth"}});
 
-const ESPACOS=[...Array.from({length:11},(_,i)=>"E"+(i+1)),...Array.from({length:6},(_,i)=>"P"+(i+1)),"B1","B2","C1"];
+const ESPACOS=[...Array.from({length:8},(_,i)=>"E"+(i+1)),...Array.from({length:8},(_,i)=>"P"+(i+1)),"B1","B2","C1"];
 const ESPACO_NOME={E:"Economy",P:"Premium",B:"Business",C:"Cabine"};
 const ESTUDIO="Estúdio Implay · Av. Paulista, 2206, 16º andar";
 const CAT_ENT=[["aporte","Aporte Tae & Dani"],["fixo_cliente","Fixo do cliente"],["variavel_cliente","% sobre vendas"],["aluguel_espaco","Aluguel do espaço"],["rendimento","Rendimento / juros"],["outra_entrada","Outra entrada"]];
@@ -445,20 +456,21 @@ function timeSel(name,d){const h=d?d.getHours():10,m=d?Math.round(d.getMinutes()
   return `<div class="time"><select name="${name}_h">${hourOpts(h)}</select><select name="${name}_m">${minOpts(m)}</select></div>`}
 function seg(name,opts,val,cls=""){return `<input type="hidden" name="${name}" value="${esc(val??"")}"><div class="seg ${cls}" data-seg="${name}">${opts.map(o=>{const[v,l]=Array.isArray(o)?o:[o,o];return `<button type="button" data-v="${esc(v)}" class="${String(v)===String(val??"")?"on":""}">${esc(l)}</button>`}).join("")}</div>`}
 function dLong(v){if(!v)return"";const d=parseYmd(v);return DL[d.getDay()]+", "+d.getDate()+" de "+ML[d.getMonth()]+" de "+d.getFullYear()}
-function dateFld(name,label,val,req){return `<div class="fld"><label>${label}</label><input type="hidden" name="${name}" value="${val||""}"><button type="button" class="dbtn ${val?"":"vazio"}" data-act="calOpen" data-n="${name}"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span>${val?dLong(val):"Escolher no calendário"}</span></button><div class="cal" data-cal="${name}" hidden></div></div>`}
-function calHtml(name,ref){const fm=$(`#sheetIn [name="${name}"]`);const sel=fm&&fm.value;const today=new Date();
+function dateFld(name,label,val,req){const ref=val?parseYmd(val):new Date();return `<div class="fld"><label>${label}</label><input type="hidden" name="${name}" value="${val||""}"><div class="dsel ${val?"":"vazio"}" data-dsel="${name}"><svg class="i" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg><span>${val?dLong(val):"Toque no dia abaixo"}</span></div><div class="cal" data-cal="${name}" data-m="${ymd(ref)}">${calHtml(name,ref,val||"")}</div></div>`}
+function espSeg(val){const G=[["E","Economy"],["P","Premium"],["B","Business"],["C","Cabine"]];return `<input type="hidden" name="espaco" value="${esc(val||"")}"><div class="espg" data-seg="espaco">${G.map(([k,l])=>`<div class="erow"><span class="elab">${l}</span><div class="ebtns">${ESPACOS.filter(e=>e[0]===k).map(e=>`<button type="button" data-v="${e}" class="${e===val?"on":""}">${e}</button>`).join("")}</div></div>`).join("")}</div>`}
+function calHtml(name,ref,sel){const today=new Date();
   const first=new Date(ref.getFullYear(),ref.getMonth(),1);const start=new Date(first);start.setDate(1-first.getDay());
   const jobsDia={};S.jobs.forEach(j=>{if(j.status==="cancelado")return;const k=ymd(new Date(j.inicio));jobsDia[k]=(jobsDia[k]||0)+1});
   let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=ymd(d);
     cells+=`<button type="button" class="cd ${d.getMonth()!==ref.getMonth()?"out":""} ${sameDay(d,today)?"hj":""} ${k===sel?"sel":""}" data-act="calPick" data-n="${name}" data-v="${k}">${d.getDate()}${jobsDia[k]?`<i>${jobsDia[k]}</i>`:""}</button>`}
   return `<div class="ch"><button type="button" data-act="calNav" data-n="${name}" data-m="-1">‹</button><b>${ML[ref.getMonth()]} ${ref.getFullYear()}</b><button type="button" data-act="calNav" data-n="${name}" data-m="1">›</button></div>
   <div class="cw">${["dom","seg","ter","qua","qui","sex","sáb"].map(x=>`<span>${x}</span>`).join("")}</div><div class="cg">${cells}</div>
-  <div class="cf"><button type="button" data-act="calPick" data-n="${name}" data-v="${ymd(today)}">Hoje</button><button type="button" data-act="calPick" data-n="${name}" data-v="${ymd(new Date(Date.now()+864e5))}">Amanhã</button><button type="button" data-act="calPick" data-n="${name}" data-v="">Limpar</button><span class="muted">número = lives no dia</span></div>`}
-function calShow(name,ref){const c=$(`#sheetIn [data-cal="${name}"]`);c.dataset.m=ymd(ref);c.innerHTML=calHtml(name,ref);c.hidden=false}
+  <div class="cf"><button type="button" data-act="calPick" data-n="${name}" data-v="${ymd(today)}">Hoje</button><button type="button" data-act="calPick" data-n="${name}" data-v="${ymd(new Date(Date.now()+864e5))}">Amanhã</button><button type="button" data-act="calPick" data-n="${name}" data-v="">Limpar</button><span class="muted">número rosa = lives no dia</span></div>`}
+function calShow(name,ref){const c=$(`#sheetIn [data-cal="${name}"]`);const v=$(`#sheetIn [name="${name}"]`).value;c.dataset.m=ymd(ref);c.innerHTML=calHtml(name,ref,v);c.hidden=false}
 document.addEventListener("click",e=>{const a=e.target.closest("[data-act]");if(!a)return;const n=a.dataset.n;
   if(a.dataset.act==="calOpen"){e.stopImmediatePropagation();const c=$(`#sheetIn [data-cal="${n}"]`);const open=!c.hidden;document.querySelectorAll("#sheetIn .cal").forEach(x=>x.hidden=true);if(open)return;const v=$(`#sheetIn [name="${n}"]`).value;calShow(n,v?parseYmd(v):new Date())}
   else if(a.dataset.act==="calNav"){e.stopImmediatePropagation();const c=$(`#sheetIn [data-cal="${n}"]`);const r=parseYmd(c.dataset.m);r.setDate(1);r.setMonth(r.getMonth()+Number(a.dataset.m));calShow(n,r)}
-  else if(a.dataset.act==="calPick"){e.stopImmediatePropagation();const inp=$(`#sheetIn [name="${n}"]`);inp.value=a.dataset.v;const b=$(`#sheetIn [data-act=calOpen][data-n="${n}"]`);b.querySelector("span").textContent=a.dataset.v?dLong(a.dataset.v):"Escolher no calendário";b.classList.toggle("vazio",!a.dataset.v);$(`#sheetIn [data-cal="${n}"]`).hidden=true;inp.dispatchEvent(new Event("change",{bubbles:true}))}
+  else if(a.dataset.act==="calPick"){e.stopImmediatePropagation();const inp=$(`#sheetIn [name="${n}"]`);inp.value=a.dataset.v;const b=$(`#sheetIn [data-dsel="${n}"]`);b.querySelector("span").textContent=a.dataset.v?dLong(a.dataset.v):"Toque no dia abaixo";b.classList.toggle("vazio",!a.dataset.v);calShow(n,a.dataset.v?parseYmd(a.dataset.v):parseYmd($(`#sheetIn [data-cal="${n}"]`).dataset.m));inp.dispatchEvent(new Event("change",{bubbles:true}))}
 },true);
 function fld(name,label,val,type="text",extra=""){return `<div class="fld"><label>${label}</label><input type="${type}" name="${name}" value="${esc(val??"")}" ${extra}></div>`}
 function moneyFld(name,label,val){return `<div class="fld"><label>${label}</label><input inputmode="decimal" name="${name}" value="${esc(numIn(val))}" placeholder="0,00"></div>`}
@@ -551,7 +563,7 @@ VIEWS.agenda=()=>{
   <div class="week">${days.map(d=>{const js=wk.filter(j=>sameDay(new Date(j.inicio),d));const occ=js.filter(j=>j.local_tipo==="estudio"&&j.espaco).map(j=>j.espaco);
    return `<div class="day ${sameDay(d,today)?"today":""}"><div class="dh"><span class="small muted">${DS[d.getDay()].toUpperCase()}</span><b>${d.getDate()}</b></div>
    ${js.length?js.map(jobCard).join(""):`<div class="small muted">livre</div>`}
-   ${occ.length?`<div class="small muted" style="margin-top:6px">${new Set(occ).size}/20 espaços</div>`:""}</div>`}).join("")}</div>
+   ${occ.length?`<div class="small muted" style="margin-top:6px">${new Set(occ).size}/${ESPACOS.length} espaços</div>`:""}</div>`}).join("")}</div>
   <div class="${conf.length?"warnbox":"okbox"}" style="margin-top:12px">${conf.length?conf.map(esc).join("<br>"):"✓ Sem conflito de espaço ou de seller nesta semana"}</div>`;
 };
 
@@ -580,7 +592,7 @@ function openJob(id,preset={}){
    ${fld("produto","Produto / tema da live",j.produto)}
    <div class="fld"><label>Modalidade</label>${seg("modalidade",[["servico","Serviço completo"],["aluguel","Só aluguel do espaço"]],j.modalidade)}</div>
    <div class="fld"><label>Local</label>${seg("local_tipo",[["estudio","Estúdio Paulista"],["cliente","Local do cliente"],["online","Online"]],j.local_tipo)}</div>
-   <div class="fld" data-show="local_tipo=estudio"><label>Espaço</label>${seg("espaco",ESPACOS,j.espaco,"sp")}<div class="hint">E = Economy · P = Premium · B = Business · C = Cabine</div></div>
+   <div class="fld" data-show="local_tipo=estudio"><label>Espaço</label>${espSeg(j.espaco)}</div>
    <div data-show="local_tipo=cliente">${fld("local_endereco","Endereço do cliente",j.local_endereco)}</div>
    ${dateFld("data","Data",ini?ymd(ini):"",true)}
    <div class="cols2 t2"><div class="fld"><label>Começa</label>${timeSel("ini",ini)}</div><div class="fld"><label>Termina</label>${timeSel("fim",fim||(ini?new Date(ini.getTime()+4*36e5):null)||new Date(2000,0,1,14,0))}</div></div>
@@ -1272,7 +1284,7 @@ VIEWS.relatorios=()=>{const {R,lives,fin}=rpData();const t=S.rp.tab;
     const tipo={Economy:0,Premium:0,Business:0,Cabine:0};Object.entries(g).forEach(([e,v])=>tipo[ESPACO_NOME[e[0]]]+=v);
     const aluguel=js.filter(j=>j.modalidade==="aluguel").length;
     S._csv=[["Espaço","Horas reservadas","Ocupação % (12h/dia)"],...ESPACOS.map(e=>[e,nf(g[e],1),nf(g[e]/cap*100,1)])];
-    return head+`<div class="mks">${mini("Horas reservadas",nf(tot,1)+" h","","v")}${mini("Ocupação média",nf(tot/(cap*20)*100,1)+"%","base 12 h/dia × 20 espaços")}${mini("Lives no estúdio",js.length)}${mini("Só aluguel",aluguel,"","c")}${mini("Dias no período",dias)}</div>
+    return head+`<div class="mks">${mini("Horas reservadas",nf(tot,1)+" h","","v")}${mini("Ocupação média",nf(tot/(cap*ESPACOS.length)*100,1)+"%","base 12 h/dia × "+ESPACOS.length+" espaços")}${mini("Lives no estúdio",js.length)}${mini("Só aluguel",aluguel,"","c")}${mini("Dias no período",dias)}</div>
     <div class="grid2"><div class="panel"><h3>Ocupação por espaço <span class="muted small">% de 12 h/dia</span></h3>${bars(ESPACOS.map(e=>[e,g[e]/cap*100]),v=>nf(v,1)+"%")}</div><div class="panel"><h3>Horas por tipo de espaço</h3>${bars(Object.entries(tipo).map(([k,v])=>[k,v]),v=>nf(v,1)+" h","var(--cobalt)")}
     <div class="lab" style="margin-top:16px">Mapa do estúdio</div><div class="floor">${ESPACOS.map(e=>{const p=g[e]/cap;return `<div class="b ${p>.5?"on":p>.15?"v":""}" title="${nf(p*100,1)}%">${e}</div>`}).join("")}</div><div class="floorlg"><span><i style="background:var(--flash)"></i>&gt;50%</span><span><i style="background:var(--volt)"></i>15–50%</span><span><i style="background:var(--card2)"></i>&lt;15%</span></div></div></div>`}
   if(t==="autonomia"){if(!S.ev)return head+`<div class="empty">Carregando histórico…</div>`;
@@ -1345,7 +1357,7 @@ function demoData(){let sd=7;const rnd=()=>(sd=(sd*9301+49297)%233280)/233280;co
   for(let d=-100;d<=21;d++){const day=D(d);if(day.getDay()===0)continue;
     ativ.forEach(p=>{if(parseYmd(p.contrato_inicio)>day||parseYmd(p.contrato_fim)<day)return;const freq=p.pacote==="Escala"?.8:p.pacote==="Crescimento"?.6:p.pacote==="Aluguel do espaço"?.25:.45;if(rnd()>freq)return;
       const h=pick([10,14,15,19,19,20]);const dur=p.modalidade==="aluguel"?pick([2,3]):4;const ini=D(d,h),fim=D(d,h+dur);const past=fim<now;
-      const sp=pick(sel.slice(0,12)),sb=rnd()>.4?pick(sel.slice(0,12)):null;const espaco=p.modalidade==="aluguel"?pick(["B1","B2","C1"]):pick(ESPACOS.slice(0,17));
+      const sp=pick(sel.slice(0,12)),sb=rnd()>.4?pick(sel.slice(0,12)):null;const espaco=p.modalidade==="aluguel"?pick(["B1","B2","C1"]):pick(ESPACOS.filter(e=>/^[EP]/.test(e)));
       const base={Crescimento:2800,Escala:3800,Essencial:2000}[p.pacote]||0;const gmv=p.modalidade==="aluguel"?null:Math.round(base*dur*(.5+rnd()*1.2)*(1+(sellersN.indexOf(sp.nome)%4)*.12));
       const j={id:uid(),numero:++jn_,proposta_id:p.id,cliente_id:p.cliente_id,marca:p.marca,produto:p.produtos,modalidade:p.modalidade,local_tipo:rnd()>.9?"cliente":"estudio",espaco,inicio:ini.toISOString(),fim:fim.toISOString(),valor_seller:p.modalidade==="aluguel"?null:dur*90,seller_pago_por:rnd()>.3?"cliente":"implay",publicado:true,
         principal_id:p.modalidade==="aluguel"?null:(past||rnd()>.3?sp.id:null),substituto_id:p.modalidade==="aluguel"?null:(sb&&sb.id!==sp.id&&(past||rnd()>.5)?sb.id:null),status:past?(rnd()>.04?"realizado":"cancelado"):"aberto",gmv:past?gmv:null,pedidos:past&&gmv?Math.round(gmv/(70+rnd()*60)):null,created_at:D(d-10).toISOString()};
@@ -1401,7 +1413,7 @@ const _openMembro=openMembro;openMembro=function(id){_openMembro(id);const m=id&
 function syncShow(){const fm=$("#sheetIn form");if(!fm)return;fm.querySelectorAll("[data-show]").forEach(el=>{const[k,val]=el.dataset.show.split("=");const inp=fm.querySelector(`[name="${k}"]`);el.hidden=!inp||inp.value!==val})}
 document.addEventListener("click",async e=>{
   const sb=e.target.closest("[data-seg] button");
-  if(sb&&!sb.disabled){const g=sb.parentElement,name=g.dataset.seg;const inp=g.previousElementSibling;const same=sb.classList.contains("on");
+  if(sb&&!sb.disabled){const g=sb.closest("[data-seg]"),name=g.dataset.seg;const inp=g.previousElementSibling;const same=sb.classList.contains("on");
     g.querySelectorAll("button").forEach(b=>b.classList.remove("on"));
     if(same&&["espaco","forma"].includes(name)){inp.value=""}else{sb.classList.add("on");inp.value=sb.dataset.v}
     if(name==="cat_s"){const c=CAT_SAI.find(x=>x[0]===inp.value);if(c){const n=$("#sheetIn [data-seg=natureza]");n.previousElementSibling.value=c[2];n.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v===c[2]))}}
