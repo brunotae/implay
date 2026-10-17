@@ -495,6 +495,7 @@ table.tb td{font-size:13.5px}table.tb .s{font-size:12px}
 .pg.v1 h1,.pg.v1 h2,.pg.v1 .vbig,.pg.v1 .vhuge,.pg.v1 .vbora,.pg.v1 .vpt,.pg.v1 .vpv,.pg.v1 .vn,.pg.v1 .vwm{font-family:"Bricolage Grotesque",Figtree,sans-serif!important;letter-spacing:-.01em}
 .pg.v1 .vtb th:first-child{border-top-left-radius:18px}.pg.v1 .vtb th:last-child{border-top-right-radius:18px}
 .pg.v1 img.semimg{visibility:hidden}
+@keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}.sheet .in.shake{animation:shk .25s}
 </style>
 </head>
 <body>
@@ -569,8 +570,11 @@ function fld(name,label,val,type="text",extra=""){return `<div class="fld"><labe
 function moneyFld(name,label,val){return `<div class="fld"><label>${label}</label><input inputmode="decimal" name="${name}" value="${esc(numIn(val))}" placeholder="0,00"></div>`}
 function area(name,label,val){return `<div class="fld"><label>${label}</label><textarea name="${name}">${esc(val??"")}</textarea></div>`}
 function formData(){const o={};new FormData($("#sheetIn form")).forEach((v,k)=>o[k]=typeof v==="string"?v.trim():v);if(o.cliente_id==="__novo__")o.cliente_id="";return o}
-function openSheet(html){$("#sheetIn").innerHTML=html;$("#sheet").hidden=false;$("#sheetIn").scrollTop=0}
-function closeSheet(){$("#sheet").hidden=true;$("#sheetIn").innerHTML=""}
+function openSheet(html){S_dirty=false;$("#sheetIn").innerHTML=html;$("#sheet").hidden=false;$("#sheetIn").scrollTop=0}
+function closeSheet(){$("#sheet").hidden=true;$("#sheetIn").innerHTML="";S_dirty=false}
+let S_dirty=false;document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest("#sheetIn"))S_dirty=true},true);document.addEventListener("change",e=>{if(e.target.closest&&e.target.closest("#sheetIn"))S_dirty=true},true);
+document.addEventListener("click",e=>{const b=e.target.closest("#sheetIn [data-act=fechar]");if(b&&S_dirty&&!b.dataset.armed){e.stopImmediatePropagation();e.preventDefault();b.dataset.armed="1";const t=b.textContent;b.textContent="Fechar sem salvar?";b.classList.add("d");setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent=t;b.classList.remove("d")}},4000)}},true);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#sheet").hidden)e.preventDefault()},true);
 function armed(btn){if(btn.dataset.armed){return true}btn.dataset.armed="1";const t=btn.textContent;btn.textContent="Toque de novo para confirmar";setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent=t}},4000);return false}
 async function run(p,okMsg){const {data,error}=await p;if(error){console.warn(error);toast(traduz(error.message),true);throw error}if(okMsg)toast(okMsg);return data}
 function traduz(m){m=m||"";if(/row-level security/i.test(m)){const t=(m.match(/table "([^"]+)"/)||[])[1]||"";return"Sem permissão no banco"+(t?" ("+t+")":"")+". Rode o SQL de correção ou fale com um sócio.";}if(/Failed to fetch|network/i.test(m))return"Sem conexão. Tente de novo.";return m}
@@ -1758,7 +1762,7 @@ document.addEventListener("click",async e=>{
     if(same&&["espaco","forma"].includes(name)){inp.value=""}else{sb.classList.add("on");inp.value=sb.dataset.v}
     if(name==="cat_s"){const c=CAT_SAI.find(x=>x[0]===inp.value);if(c){const n=$("#sheetIn [data-seg=natureza]");n.previousElementSibling.value=c[2];n.querySelectorAll("button").forEach(b=>b.classList.toggle("on",b.dataset.v===c[2]))}}
     syncShow();return}
-  if(e.target===$("#sheet")){closeSheet();return}
+  if(e.target===$("#sheet")){const i=$("#sheetIn");i.classList.remove("shake");void i.offsetWidth;i.classList.add("shake");return}
   const a=e.target.closest("[data-act]");if(!a)return;const act=a.dataset.act,id=a.dataset.id,val=a.dataset.v;
   if(a.tagName==="A")e.preventDefault();
   try{switch(act){
