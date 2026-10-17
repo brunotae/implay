@@ -496,6 +496,7 @@ table.tb td{font-size:13.5px}table.tb .s{font-size:12px}
 .pg.v1 .vtb th:first-child{border-top-left-radius:18px}.pg.v1 .vtb th:last-child{border-top-right-radius:18px}
 .pg.v1 img.semimg{visibility:hidden}
 @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}.sheet .in.shake{animation:shk .25s}
+.pick .pchips{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 8px}.pch{background:var(--card2);border:1px solid var(--linha2);color:var(--chalk);border-radius:999px;padding:7px 13px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}.pch:hover{border-color:var(--volt)}.pch.on{background:var(--volt);color:#000;border-color:var(--volt)}
 </style>
 </head>
 <body>
@@ -569,7 +570,17 @@ document.addEventListener("click",e=>{const a=e.target.closest("[data-act]");if(
 function fld(name,label,val,type="text",extra=""){return `<div class="fld"><label>${label}</label><input type="${type}" name="${name}" value="${esc(val??"")}" ${extra}></div>`}
 function moneyFld(name,label,val){return `<div class="fld"><label>${label}</label><input inputmode="decimal" name="${name}" value="${esc(numIn(val))}" placeholder="0,00"></div>`}
 function area(name,label,val){return `<div class="fld"><label>${label}</label><textarea name="${name}">${esc(val??"")}</textarea></div>`}
-function formData(){const o={};new FormData($("#sheetIn form")).forEach((v,k)=>o[k]=typeof v==="string"?v.trim():v);if(o.cliente_id==="__novo__")o.cliente_id="";return o}
+
+/* Padrão Tae: botões com as opções mais comuns + campo livre para o que não estiver nos botões */
+function pick(name,label,val,opts,o={}){const v=val??"";const suf=o.suf||"";const on=x=>String(x)===String(v);
+  return `<div class="fld pick" data-pick="${name}"><label>${label}</label><div class="pchips">${opts.map(x=>{const [vv,tt]=Array.isArray(x)?x:[x,x+suf];return `<button type="button" class="pch ${on(vv)?"on":""}" data-act="pickSet" data-v="${esc(String(vv))}">${esc(String(tt))}</button>`}).join("")}</div>
+  <input name="${name}" value="${esc(String(v))}" placeholder="${esc(o.ph||"Outro: escreva aqui")}" ${o.num?'inputmode="numeric"':""} class="pin2"></div>`}
+function pickSync(box){const v=box.querySelector("input").value;box.querySelectorAll(".pch").forEach(b=>b.classList.toggle("on",b.dataset.v===v))}
+document.addEventListener("click",e=>{const b=e.target.closest("[data-act=pickSet]");if(!b)return;e.stopImmediatePropagation();const box=b.closest("[data-pick]");const i=box.querySelector("input");i.value=b.dataset.v;pickSync(box);i.dispatchEvent(new Event("input",{bubbles:true}));i.dispatchEvent(new Event("change",{bubbles:true}))},true);
+document.addEventListener("input",e=>{const box=e.target.closest&&e.target.closest("[data-pick]");if(box&&e.target.tagName==="INPUT")pickSync(box)},true);
+const OP_VALIDADE=[[7,"7 dias"],[10,"10 dias"],[15,"15 dias"]];
+const OP_VIGENCIA=[[1,"1 mês"],[3,"3 meses"],[6,"6 meses"],[12,"12 meses"]];
+const OP_PAGTO=["Pix à vista","Boleto ou Pix, todo dia 10 do mês","50% na assinatura + 50% na 1ª live","Cartão de crédito em até 3x"];function formData(){const o={};new FormData($("#sheetIn form")).forEach((v,k)=>o[k]=typeof v==="string"?v.trim():v);if(o.cliente_id==="__novo__")o.cliente_id="";return o}
 function openSheet(html){S_dirty=false;$("#sheetIn").innerHTML=html;$("#sheet").hidden=false;$("#sheetIn").scrollTop=0}
 function closeSheet(){$("#sheet").hidden=true;$("#sheetIn").innerHTML="";S_dirty=false}
 let S_dirty=false;document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest("#sheetIn"))S_dirty=true},true);document.addEventListener("change",e=>{if(e.target.closest&&e.target.closest("#sheetIn"))S_dirty=true},true);
@@ -776,8 +787,8 @@ function openProp(id){
    <div class="hint">Se deixar vazio, usa o preço do pacote recomendado.</div>
    <div class="sec"><h2>Condições</h2></div>
    ${dateFld("primeira_live","Primeira live",p.primeira_live)}
-   <div class="cols2">${fld("vigencia_meses","Vigência (meses)",p.vigencia_meses,"number","inputmode=numeric")}${fld("validade_dias","Proposta válida por (dias)",p.validade_dias,"number","inputmode=numeric")}</div>
-   ${fld("pagamento","Pagamento: forma e data",p.pagamento)}
+   <div class="cols2">${pick("vigencia_meses","Vigência (meses)",p.vigencia_meses,OP_VIGENCIA,{num:1,ph:"Outro: nº de meses"})}${pick("validade_dias","Proposta válida por (dias)",p.validade_dias,OP_VALIDADE,{num:1,ph:"Outro: nº de dias"})}</div>
+   ${pick("pagamento","Pagamento: forma e data",p.pagamento,OP_PAGTO,{ph:"Outra forma: escreva aqui"})}
    <div class="cols2">${fld("contato1","Contato 1",p.contato1)}${fld("contato2","Contato 2",p.contato2)}</div>
    <div class="fld"><label>Situação</label>${seg("status",[["rascunho","Rascunho"],["enviada","Enviada"],["aceita","Aceita (vira contrato)"],["recusada","Recusada"]],p.status)}</div>
    ${p.contrato_numero?`<div class="okbox" style="margin-top:12px">Contrato ${esc(p.contrato_numero)} · ${dCurta(p.contrato_inicio)} a ${dCurta(p.contrato_fim)}</div>`:""}
@@ -1592,8 +1603,8 @@ function openOrc(id){
    <div class="cols2 t2">${fld("marca","Marca (aparece na proposta)",o.marca,"text","required")}${fld("mes_ref","Mês da proposta",o.mes_ref)}</div>
    <div id="oeItens">${GRUPOS.map(([g,t,d])=>`<div class="ogrp"><div class="ogh"><b>${t}</b><span class="muted small">${d}</span></div><div class="ocards">${precosList().filter(p=>p.grupo===g).map(p=>oeCard(p.chave)).join("")}</div></div>`).join("")}</div>
    <div class="sec"><h2>Condições</h2></div>
-   <div class="cols2 t2">${fld("validade_dias","Proposta válida por (dias)",o.validade_dias,"number","inputmode=numeric")}${fld("vigencia_meses","Vigência dos pacotes (meses)",o.vigencia_meses,"number","inputmode=numeric")}</div>
-   ${fld("pagamento","Pagamento: forma e data",o.pagamento)}${area("obs","Observações (aparecem no orçamento)",o.obs)}
+   <div class="cols2 t2">${pick("validade_dias","Proposta válida por",o.validade_dias,OP_VALIDADE,{num:1,ph:"Outro: nº de dias"})}${pick("vigencia_meses","Vigência dos pacotes",o.vigencia_meses,OP_VIGENCIA,{num:1,ph:"Outro: nº de meses"})}</div>
+   ${pick("pagamento","Pagamento: forma e data",o.pagamento,OP_PAGTO,{ph:"Outra forma: escreva aqui"})}${area("obs","Observações (aparecem no orçamento)",o.obs)}
    <label class="chk"><input type="checkbox" id="oeCompleto" ${o.completo!==false?"checked":""}> Incluir a apresentação completa (mercado, cases, método) antes do orçamento</label>
    <div id="oeSum">${oeSumHtml()}</div>
    <div class="acts" id="oeActs">${oeActs(o)}</div></form>`);
