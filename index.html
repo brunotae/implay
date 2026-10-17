@@ -13,7 +13,7 @@
 <link rel="icon" href="icon-v1.png">
 <link rel="apple-touch-icon" href="apple-touch-icon-v1.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700;800&family=Inter:wght@400;500;600;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{--noite:#0B0B0C;--bg2:#0F0F11;--card:#151518;--card2:#1C1C20;--linha:#26262B;--linha2:#33333A;--chalk:#F7F7F2;--cinza:#A3A3AB;--grafite:#5F5F67;
@@ -418,6 +418,80 @@ table.tb td{font-size:13.5px}table.tb .s{font-size:12px}
 .mj b{font-weight:700}.mj span{color:var(--cinza);font-size:10.5px}
 .mmore{font-size:11px;color:var(--cinza);cursor:pointer;padding-left:4px}
 @media(max-width:760px){.mgrid.big .md{min-height:74px;padding:4px}.mj{font-size:10px;padding:2px 4px}.mj span{display:none}.mgrid.big{gap:3px}}
+/* ===== v4 orçamentos ===== */
+.sheet .in:has(.oe){max-width:980px}
+.ogrp{margin-top:16px}.ogh{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap;margin-bottom:8px}.ogh b{font-size:13.5px}
+.ocards{display:grid;grid-template-columns:repeat(auto-fill,minmax(215px,1fr));gap:10px}
+.ocard{background:var(--card);border:1px solid var(--linha);border-radius:14px;padding:12px;opacity:.55;transition:.15s;display:flex;flex-direction:column;gap:8px}
+.ocard.on{opacity:1;border-color:var(--volt);box-shadow:0 0 0 1px var(--volt) inset}
+.otog{display:flex;align-items:center;gap:10px;background:none;border:0;color:var(--chalk);font:inherit;cursor:pointer;padding:0;text-align:left}.otog b{font-size:15px;letter-spacing:.02em}
+.otog .sw{width:34px;height:20px;border-radius:99px;background:var(--linha2);position:relative;flex:none;transition:.15s}.otog .sw:after{content:"";position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#888;transition:.15s}
+.ocard.on .otog .sw{background:var(--volt)}.ocard.on .otog .sw:after{left:17px;background:#000}
+.odesc{font-size:11.5px;color:var(--cinza);line-height:1.4}
+.oprice{font-size:18px}.oprice s{color:var(--grafite);font-size:13px;margin-right:2px}.oprice small{font-size:11px;color:var(--cinza);margin-left:2px}
+.oprice .op{font-size:11.5px;color:var(--cinza);margin-top:2px}.oprice .op b{color:var(--chalk)}
+.oprice .dn{color:var(--flash)!important}.oprice .up{color:var(--ok)!important}
+.oqtd{display:flex;align-items:center;gap:8px}.oqtd button{width:26px;height:26px;border-radius:8px;border:1px solid var(--linha2);background:var(--card2);color:var(--chalk);cursor:pointer}
+.ocard .open{background:none;border:1px dashed var(--linha2);color:var(--cinza);border-radius:10px;padding:6px 8px;font:inherit;font-size:11.5px;cursor:pointer;text-align:left}.ocard .open:hover{color:var(--volt);border-color:var(--volt)}
+.ocard .lnk{background:none;border:0;color:var(--cinza);text-decoration:underline;font:inherit;font-size:11px;cursor:pointer;padding:4px 0}
+.osum{display:grid;grid-template-columns:auto 1fr auto;gap:16px;background:var(--card2);border-radius:14px;padding:12px 14px;margin-top:16px}.osum>div{display:flex;flex-direction:column;gap:2px}.osum b{font-size:14px}
+.chk{display:flex;gap:8px;align-items:center;font-size:12.5px;margin-top:12px;color:var(--cinza)}
+.pin{background:var(--card2);border:1px solid var(--linha);border-radius:8px;color:var(--chalk);padding:6px 8px;font:inherit;font-size:12.5px;width:100%;min-width:180px}.pin.n{width:100px;min-width:0;text-align:right}.pin.s{width:60px;min-width:0;text-align:right}
+@media(max-width:760px){.osum{grid-template-columns:1fr}}
+/* ===== proposta V1 ===== */
+.pg.v1{--vd:#131411;--vc:#F3F3EC;--vp:#561D45;--vv:#D5FF3F;--vs:#C9DB82;--vk:#EF8FC4;--vg:#565753;font-family:Figtree,Inter,sans-serif;padding:54px 64px;background:var(--vd);color:var(--vc)}
+.pg.v1.cream{background:var(--vc);color:var(--vd)}.pg.v1.pink{background:var(--vk);color:var(--vd)}.pg.v1.plum{background:var(--vp);color:var(--vc)}.pg.v1.sage{background:var(--vs);color:var(--vd)}
+.pg.v1 h1,.pg.v1 h2,.pg.v1 .vbig,.pg.v1 .vhuge,.pg.v1 .vbora,.pg.v1 .vpt,.pg.v1 .vpv,.pg.v1 .vn{font-family:"Bricolage Grotesque",Figtree,sans-serif;letter-spacing:-.02em}
+.pg.v1 h2{font-size:40px;line-height:1.08;font-weight:700;max-width:900px;margin:10px 0 0}
+.pg.v1:has(.vphone.r) h2,.pg.v1:has(.vphone.r) .vnote,.pg.v1:has(.vph2) .vnote,.pg.v1:has(.vgmv) h2{max-width:640px}
+.pg.v1 .vct{list-style:none;padding:0;margin:8px 0 0}.pg.v1 .vct li{margin:3px 0}.pg.v1 .vct b{display:inline-block;min-width:110px}
+.pg.v1 .vk{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;opacity:.75;display:flex;align-items:center;gap:12px}
+.pg.v1 .vcl{height:26px;width:auto;opacity:1}
+.pg.v1 .vnum{position:absolute;right:40px;bottom:28px;font-size:12px;font-weight:700;opacity:.5}
+.pg.v1 .vlogo{height:34px;width:auto;display:block}.pg.v1 .vlogo2{height:28px;width:auto;background:var(--vd);padding:8px 12px;border-radius:10px}.pg.v1 .vlogo3{position:absolute;left:64px;bottom:40px;height:30px}
+.pg.v1 .vchip{display:inline-block;margin-top:70px;border:1px solid var(--vv);color:var(--vv);border-radius:99px;padding:6px 14px;font-size:13px;font-weight:600}
+.pg.v1 .vt{font-size:66px;line-height:1;font-weight:800;margin-top:22px;max-width:600px}.pg.v1 .hl{color:var(--vv)}
+.pg.v1 .vfoot{position:absolute;left:64px;bottom:46px;font-size:14px;opacity:.8}.pg.v1 .vfoot span{font-weight:700;color:var(--vv)}
+.pg.v1 .vphone{position:absolute;right:90px;top:60px;width:300px;height:620px;border-radius:38px;overflow:hidden;border:8px solid #000;box-shadow:0 20px 50px rgba(0,0,0,.4)}.pg.v1 .vphone img{width:100%;height:100%;object-fit:cover}
+.pg.v1 .vphone.r{right:64px;top:110px;width:230px;height:470px}.pg.v1 .vphone.r.sm{width:200px;height:400px;top:250px}
+.pg.v1 .vnoar{position:absolute;left:14px;top:14px;background:#e3245b;color:#fff;font-size:11px;font-weight:700;border-radius:6px;padding:3px 8px}
+.pg.v1 .vb1,.pg.v1 .vb2{position:absolute;background:#fff;color:#111;border-radius:16px;padding:10px 16px;font-weight:600;font-size:15px;box-shadow:0 8px 24px rgba(0,0,0,.3)}.pg.v1 .vb1{right:330px;top:300px}.pg.v1 .vb2{right:40px;top:430px;background:var(--vv)}
+.pg.v1 .vg2,.pg.v1 .vg3,.pg.v1 .vg4{display:grid;gap:16px;margin-top:30px}.pg.v1 .vg2{grid-template-columns:1fr 1fr}.pg.v1 .vg3{grid-template-columns:repeat(3,1fr)}.pg.v1 .vg4{grid-template-columns:repeat(4,1fr)}
+.pg.v1 .vg2.w,.pg.v1 .vg3.sm{max-width:700px}
+.pg.v1 .vc{border-radius:20px;padding:20px;font-size:15px;line-height:1.4}.pg.v1 .vc p{margin:8px 0 0}.pg.v1 .vc small{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;opacity:.7}
+.pg.v1 .vc.cream{background:var(--vc);color:var(--vd)}.pg.v1 .vc.sage{background:var(--vs);color:var(--vd)}.pg.v1 .vc.volt{background:var(--vv);color:var(--vd)}.pg.v1 .vc.pink{background:var(--vk);color:var(--vd)}.pg.v1 .vc.plum{background:var(--vp);color:var(--vc)}.pg.v1 .vc.plum2{background:#934B78;color:var(--vc)}.pg.v1 .vc.dark{background:var(--vd);color:var(--vc)}.pg.v1 .vc.gray{background:var(--vg);color:var(--vc)}
+.pg.v1 .vc ul,.pg.v1 .vbox ul{margin:8px 0 0;padding-left:18px}.pg.v1 .vc li,.pg.v1 .vbox li{margin:4px 0}
+.pg.v1 .vbig{font-size:44px;font-weight:800;line-height:1}.pg.v1 .vbig.v{color:var(--vv)}
+.pg.v1 .vhuge{font-size:96px;font-weight:800;line-height:1;margin-top:20px}.pg.v1 .vhuge.v{color:var(--vv)}
+.pg.v1 .vn{font-size:28px;font-weight:800;display:block;margin-bottom:6px}
+.pg.v1 .vsrc{position:absolute;left:64px;right:64px;bottom:40px;font-size:10.5px;opacity:.65;line-height:1.4}
+.pg.v1 .vnote{font-size:14px;max-width:760px;margin-top:22px;opacity:.85;line-height:1.45}
+.pg.v1 .vsub{font-size:18px;margin-top:10px;opacity:.85}
+.pg.v1 .vtags{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}.pg.v1 .vtags span{border:1px solid currentColor;border-radius:99px;padding:5px 12px;font-size:12.5px;font-weight:600}
+.pg.v1 .vlogos{width:100%;height:470px;object-fit:contain;margin-top:20px}
+.pg.v1 .vqs{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:24px;max-width:900px}.pg.v1 .vqs p{font-size:13.5px;margin-top:6px;opacity:.85}
+.pg.v1 .vcol{position:absolute;left:64px;right:64px;bottom:50px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.pg.v1 .vcol img{width:100%;height:230px;object-fit:cover;border-radius:16px}
+.pg.v1 .vul{margin-top:24px;max-width:640px;font-size:15px;line-height:1.5}
+.pg.v1 .vbox{background:var(--vd);color:var(--vc);border-radius:20px;padding:20px 24px;max-width:600px;margin-top:22px;font-size:14px}.pg.v1 .vbox.cream{background:var(--vc);color:var(--vd)}
+.pg.v1 .vsteps{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:30px}.pg.v1 .vsteps>div{background:var(--vc);color:var(--vd);border-radius:18px;padding:16px;font-size:13px}.pg.v1 .vsteps p{margin-top:4px;opacity:.75}.pg.v1 .vsteps .vn{color:var(--vp)}
+.pg.v1 .vcycle{margin-top:30px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;font-weight:700}.pg.v1 .vcycle span{background:var(--vv);color:var(--vd);border-radius:99px;padding:8px 16px}.pg.v1 .vcycle em{font-weight:400;font-style:normal;opacity:.8;font-size:13.5px;flex-basis:100%}
+.pg.v1 .vph2{position:absolute;right:64px;top:170px;width:270px;height:470px;object-fit:cover;border-radius:20px}
+.pg.v1 .vgmv{position:absolute;right:64px;bottom:110px;width:260px;height:300px;object-fit:cover;border-radius:20px}.pg.v1 .vsrc.dk{opacity:.75}
+.pg.v1.sage .vg2{max-width:700px}
+.pg.v1 .vtb{width:100%;border-collapse:separate;border-spacing:0;margin-top:28px;font-size:15px;background:#fff;border-radius:18px;overflow:hidden}
+.pg.v1 .vtb th{background:var(--vd);color:var(--vc);text-align:left;padding:14px 16px;font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+.pg.v1 .vtb td{padding:14px 16px;border-top:1px solid #e5e5dc;vertical-align:top}.pg.v1 .vtb td small{display:block;font-size:12px;opacity:.7;margin-top:3px}
+.pg.v1 .vtb s,.pg.v1 .vpv s{opacity:.55;font-weight:400;margin-right:4px}.pg.v1 .vtb tr.hlr td{background:var(--vv)}
+.pg.v1 .vtb.sm{font-size:13px;margin-top:18px}.pg.v1 .vtb.sm td{padding:10px 14px}
+.pg.v1 .vpk{display:grid;gap:16px;margin-top:28px}.pg.v1 .vpk.n1{grid-template-columns:minmax(0,420px)}.pg.v1 .vpk.n2{grid-template-columns:1fr 1fr}.pg.v1 .vpk.n3{grid-template-columns:repeat(3,1fr)}
+.pg.v1 .vpt{font-size:34px;font-weight:800}.pg.v1 .vpv{font-size:32px;font-weight:800;margin-top:16px}.pg.v1 .vpv small{font-size:15px;font-weight:600}
+.pg.v1 .vmeta{display:grid;grid-template-columns:2fr 1fr 1fr 1.2fr 1.2fr;gap:10px;margin-top:18px}.pg.v1 .vmeta>div{background:#fff;border-radius:14px;padding:10px 14px;display:flex;flex-direction:column;font-size:13px}.pg.v1 .vmeta small{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;opacity:.6}.pg.v1 .vmeta span{font-size:11px;opacity:.7}
+.pg.v1 .vcond{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px;font-size:12.5px}.pg.v1 .vcond ul{margin:6px 0 0;padding-left:18px}
+.pg.v1.doc .vnote{margin-top:12px;font-size:12.5px}.pg.v1.doc .vsrc{bottom:28px}
+.pg.v1 .vwm{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-18deg);font-family:"Bricolage Grotesque",sans-serif;font-size:64px;font-weight:800;color:rgba(229,36,91,.16);white-space:nowrap;pointer-events:none;z-index:3}
+.pg.v1 .vdraft{position:absolute;right:40px;top:24px;background:#e3245b;color:#fff;font-size:11px;font-weight:800;letter-spacing:.12em;border-radius:6px;padding:4px 10px;z-index:4}
+.pg.v1 .vbora{font-size:120px;font-weight:800;color:var(--vv);line-height:1;margin-top:20px}
+.pg.v1 .row{display:flex}
 </style>
 </head>
 <body>
@@ -496,7 +570,7 @@ function openSheet(html){$("#sheetIn").innerHTML=html;$("#sheet").hidden=false;$
 function closeSheet(){$("#sheet").hidden=true;$("#sheetIn").innerHTML=""}
 function armed(btn){if(btn.dataset.armed){return true}btn.dataset.armed="1";const t=btn.textContent;btn.textContent="Toque de novo para confirmar";setTimeout(()=>{if(btn.isConnected){delete btn.dataset.armed;btn.textContent=t}},4000);return false}
 async function run(p,okMsg){const {data,error}=await p;if(error){console.warn(error);toast(traduz(error.message),true);throw error}if(okMsg)toast(okMsg);return data}
-function traduz(m){m=m||"";if(/row-level security/i.test(m))return"Sem permissão para isso (fale com um sócio).";if(/Failed to fetch|network/i.test(m))return"Sem conexão. Tente de novo.";return m}
+function traduz(m){m=m||"";if(/row-level security/i.test(m)){const t=(m.match(/table "([^"]+)"/)||[])[1]||"";return"Sem permissão no banco"+(t?" ("+t+")":"")+". Rode o SQL de correção ou fale com um sócio.";}if(/Failed to fetch|network/i.test(m))return"Sem conexão. Tente de novo.";return m}
 
 /* ---------- dados ---------- */
 async function loadAll(){
@@ -1141,7 +1215,7 @@ function gsearch(q){q=q.trim();const box=$("#gres");if(!q){box.hidden=true;retur
 function csvDownload(name,rows){const csv="﻿"+rows.map(r=>r.map(x=>'"'+String(x??"").replace(/"/g,'""')+'"').join(";")).join("\n");const u=URL.createObjectURL(new Blob([csv],{type:"text/csv"}));const a=document.createElement("a");a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove()}
 document.addEventListener("input",e=>{const t=e.target;
   if(t.id==="gq"){gsearch(t.value);return}
-  if(t.dataset.q){S.f[t.dataset.q].q=t.value;const L={jobs:"jobs",prop:"prop",cli:"cli",fin:"fin",am:"am",eq:"eq"}[t.dataset.q];if($("#lst"))$("#lst").innerHTML=LISTS[L]()}});
+  if(t.dataset.q){S.f[t.dataset.q].q=t.value;const L={jobs:"jobs",prop:"prop",cli:"cli",fin:"fin",am:"am",eq:"eq"}[t.dataset.q];if(L&&$("#lst"))$("#lst").innerHTML=LISTS[L]()}});
 document.addEventListener("change",e=>{const t=e.target;if(t.dataset.fsel){const[k,f]=t.dataset.fsel.split(".");S.f[k][f]=t.value;render()}});
 document.addEventListener("click",e=>{if(!e.target.closest(".gsearch")&&$("#gres"))$("#gres").hidden=true;
   const a=e.target.closest("[data-act]");if(!a)return;const v=a.dataset.v;
@@ -1427,6 +1501,240 @@ document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]
 
 const _openProp=openProp;openProp=function(id){_openProp(id);const p=id&&S.propostas.find(x=>x.id===id);if(p&&p.status==="aceita"){const a=$("#sheetIn .acts");if(a)a.insertAdjacentHTML("afterbegin",`<button type="button" class="btn f" data-act="ctrCli" data-id="${id}">Gerar contrato</button>`)}};
 const _openMembro=openMembro;openMembro=function(id){_openMembro(id);const m=id&&S.membros.find(x=>x.id===id);if(m&&(m.papel==="seller"||["freelancer","pj","mei"].includes(m.vinculo))){const a=$("#sheetIn .acts");if(a)a.insertAdjacentHTML("afterbegin",`<button type="button" class="btn f" data-act="ctrSel" data-id="${id}">Gerar contrato</button>`)}};
+
+/* ================= v4: Orçamentos (proposta V1) com aprovação ================= */
+const PRECOS_PADRAO=[
+ {chave:"pontual.GO",grupo:"pontual",categoria:"GO",titulo:"GO",descricao:"Baia compacta, celular, 1 live seller, 4 horas",valor:1200,valor_ref:null,perc:10,lives:1,horas:4,ordem:1},
+ {chave:"pontual.BOOST",grupo:"pontual",categoria:"BOOST",titulo:"BOOST",descricao:"Baia média, câmera profissional, 1 live seller, 4 horas",valor:2250,valor_ref:null,perc:10,lives:1,horas:4,ordem:2},
+ {chave:"pontual.ICON",grupo:"pontual",categoria:"ICON",titulo:"ICON",descricao:"Baia grande, duas câmeras profissionais, 2 live sellers, 4 horas",valor:4000,valor_ref:null,perc:10,lives:1,horas:4,ordem:3},
+ {chave:"pacote.GO",grupo:"pacote",categoria:"GO",titulo:"GO",descricao:"Estúdio compacto · 1 host com celular",valor:6800,valor_ref:null,perc:10,lives:12,horas:3,ordem:4},
+ {chave:"pacote.BOOST",grupo:"pacote",categoria:"BOOST",titulo:"BOOST",descricao:"Estúdio médio · 1 a 2 hosts com câmera 4K",valor:10000,valor_ref:null,perc:10,lives:12,horas:3,ordem:5},
+ {chave:"pacote.ICON",grupo:"pacote",categoria:"ICON",titulo:"ICON",descricao:"Estúdio premium · 2 hosts com câmera 4K",valor:16000,valor_ref:null,perc:10,lives:12,horas:3,ordem:6},
+ {chave:"drop.ICON",grupo:"drop",categoria:"ICON",titulo:"Live Drop",descricao:"4 lives ICON · baia grande, duas câmeras profissionais, 2 live sellers, 4 horas",valor:12500,valor_ref:16000,perc:10,lives:4,horas:4,ordem:7}];
+const GRUPOS=[["pontual","Live Pontual","Uma live avulsa, por categoria de estúdio"],["pacote","Pacotes mensais","Lives recorrentes no mês"],["drop","Live de lançamento (Drop)","Projeto de lançamento com várias lives"]];
+const OST={rascunho:["rascunho",""],aguardando:["aguardando aprovação","w"],aprovado:["aprovado","o"],recusado:["recusado","x"],enviado:["enviado ao cliente","c"],aceito:["aceito","v"],cancelado:["cancelado","x"]};
+S.precos=[];S.orcs=[];S.f.orc={q:"",st:"todos",view:"lista"};
+function on(n){return "ORC-"+String(n||0).padStart(4,"0")}
+function preco(k){return (S.precos.length?S.precos:PRECOS_PADRAO).find(p=>p.chave===k)}
+function precosList(){return (S.precos.length?S.precos:PRECOS_PADRAO).slice().sort((a,b)=>(a.ordem||0)-(b.ordem||0))}
+function itemDesc(it){const p=preco(it.k);if(!p||!it.on)return false;return Number(it.valor)<Number(p.valor)||Number(it.perc)<Number(p.perc)}
+function orcTemDesc(o){return (o.itens||[]).some(itemDesc)}
+function orcResumo(o){const g={pontual:[],pacote:[],drop:[]};(o.itens||[]).filter(i=>i.on).forEach(i=>{const p=preco(i.k);if(p)g[p.grupo].push(p.categoria)});
+  return [g.pontual.length?"Pontual "+g.pontual.join("/"):"",g.pacote.length?"Pacote "+g.pacote.join("/"):"",g.drop.length?"Live Drop":""].filter(Boolean).join(" · ")||"—"}
+function orcValorTxt(o){const it=(o.itens||[]).filter(i=>i.on);const pk=it.filter(i=>(preco(i.k)||{}).grupo==="pacote");
+  if(pk.length)return brl(Math.min(...pk.map(i=>Number(i.valor))))+(pk.length>1?" a "+brl(Math.max(...pk.map(i=>Number(i.valor)))):"")+"/mês";
+  const pt=it.filter(i=>(preco(i.k)||{}).grupo==="pontual");if(pt.length)return "a partir de "+brl(Math.min(...pt.map(i=>Number(i.valor))));
+  const dr=it.find(i=>(preco(i.k)||{}).grupo==="drop");return dr?brl(dr.valor):"—"}
+
+/* ---------- carregar dados ---------- */
+const _loadAll4=loadAll;loadAll=async function(){await _loadAll4();if(S.demo)return;
+  const [p,o]=await Promise.all([db.from("imp_precos").select("*").order("ordem",{ascending:true}),db.from("imp_orcamentos").select("*").order("numero",{ascending:false})]);
+  S.orcSemSQL=!!(p.error||o.error);S.precos=p.data&&p.data.length?p.data:[];S.orcs=o.data||[]};
+
+/* ---------- menu, badge, pendências ---------- */
+MENU[1][1].splice(1,0,["orcamentos","Orçamentos","Proposta V1 + aprovação","doc"]);
+MENU[1][1].forEach(x=>{if(x[0]==="propostas"){x[1]="Propostas (antigas)";x[2]="Modelo anterior"}});
+Object.assign(TAB_NOME,{orcamentos:"Orçamentos"});Object.assign(TAB_SUB,{orcamentos:"Escolha cliente, categorias e pacotes; ajuste valores; aprove e gere a proposta em PDF"});
+HEADACT.orcamentos=()=>`<button class="btn p sm" data-act="orcNovo">+ Novo orçamento</button>`;
+function orcPendentes(){if(!isSocio())return [];return S.orcs.filter(o=>o.status==="aguardando"&&!(o.tem_desconto&&o.created_by===S.me.user_id))}
+const _badges4=badges;badges=function(){const b=_badges4();b.orcamentos=orcPendentes().length;return b};
+const _pend4=pendencias;pendencias=function(){const p=_pend4();const o=orcPendentes();if(o.length)p.unshift({t:`${o.length} orçamento${o.length>1?"s":""} aguardando sua aprovação`,v:"",act:"tab",a:"orcamentos"});return p};
+
+/* ---------- lista ---------- */
+function orcLista(){const f=S.f.orc;let l=S.orcs.filter(o=>has(f.q,o.marca,on(o.numero),o.elaborado_nome,cliNome(o.cliente_id)));return l}
+LISTS.orc=()=>{const f=S.f.orc;let l=orcLista();if(f.st==="meus")l=l.filter(o=>o.created_by===S.me.user_id);else if(f.st==="pendentes")l=orcPendentes();else if(f.st!=="todos")l=l.filter(o=>o.status===f.st);
+  return tbl([["Nº"],["Cliente"],["Itens"],["Valor"],["Elaborado"],["Aprovação"],["Situação"]],l.map(o=>`<tr data-act="orcAbrir" data-id="${o.id}"><td data-l="Nº"><b>${on(o.numero)}</b></td>
+   <td class="m0"><div class="t">${esc(o.marca)}</div><div class="s">${esc(cliNome(o.cliente_id)||"")}</div></td>
+   <td data-l="Itens">${esc(orcResumo(o))}${o.tem_desconto?` <span class="tag f">desconto</span>`:""}</td>
+   <td data-l="Valor" class="r">${orcValorTxt(o)}</td>
+   <td data-l="Elaborado">${esc(o.elaborado_nome||"—")}<div class="s">${o.elaborado_em?dCurta(o.elaborado_em):""}</div></td>
+   <td data-l="Aprovação">${o.aprovado_nome?`${esc(o.aprovado_nome)}<div class="s">${dCurta(o.aprovado_em)}</div>`:o.status==="aguardando"?`<span class="muted small">${o.tem_desconto?"outro sócio":"um sócio"}</span>`:"—"}</td>
+   <td data-l="Situação"><span class="tag ${OST[o.status][1]}">${OST[o.status][0]}</span></td></tr>`),"Nenhum orçamento ainda. Clique em + Novo orçamento.")};
+VIEWS.orcamentos=()=>{const f=S.f.orc;
+  if(S.orcSemSQL&&!S.demo)return `<div class="warnbox">Falta rodar o SQL <b>implay_orcamentos.sql</b> no Supabase (SQL Editor → New query → Run). Depois recarregue a página.</div>`;
+  const tabs=`<div class="chips" style="margin-bottom:10px"><button data-act="orcView" data-v="lista" class="${f.view!=="precos"?"on":""}">Orçamentos</button><button data-act="orcView" data-v="precos" class="${f.view==="precos"?"on":""}">Tabela de preços</button></div>`;
+  if(f.view==="precos")return tabs+precosView();
+  const l=orcLista(),c=s=>l.filter(o=>o.status===s).length;
+  return tabs+chips("orc",[["todos","Todos",l.length],["pendentes","Para eu aprovar",orcPendentes().length],["meus","Feitos por mim",l.filter(o=>o.created_by===S.me.user_id).length],["rascunho","Rascunho",c("rascunho")],["aguardando","Aguardando",c("aguardando")],["aprovado","Aprovados",c("aprovado")],["enviado","Enviados",c("enviado")],["aceito","Aceitos",c("aceito")],["recusado","Recusados",c("recusado")]],f.st)
+   +`<div class="tool">${qbox("orc","Buscar marca, nº, quem elaborou…")}</div><div id="lst">${LISTS.orc()}</div>`};
+function precosView(){const ro=!isSocio();
+  return `<div class="hint" style="margin-bottom:10px">Preços de tabela usados em todo orçamento novo. ${ro?"Só sócios podem alterar.":"Alterar aqui não muda orçamentos já feitos."}</div>`+GRUPOS.map(([g,t])=>`<div class="sec"><h2>${t}</h2></div><div class="tblw"><table class="tb"><thead><tr><th>Categoria</th><th>Descrição</th><th class="r">Valor (R$)</th><th class="r">%</th><th class="r">Lives</th><th class="r">Horas</th>${g==="drop"?`<th class="r">Valor cheio</th>`:""}${ro?"":"<th></th>"}</tr></thead><tbody>
+  ${precosList().filter(p=>p.grupo===g).map(p=>`<tr data-pk="${p.chave}"><td><b>${esc(p.categoria)}</b></td><td>${ro?esc(p.descricao):`<input class="pin" data-f="descricao" value="${esc(p.descricao||"")}">`}</td>
+   <td class="r">${ro?brl(p.valor):`<input class="pin n" data-f="valor" inputmode="decimal" value="${numIn(p.valor)}">`}</td><td class="r">${ro?numIn(p.perc)+"%":`<input class="pin s" data-f="perc" inputmode="decimal" value="${numIn(p.perc)}">`}</td>
+   <td class="r">${ro?p.lives:`<input class="pin s" data-f="lives" inputmode="numeric" value="${p.lives??""}">`}</td><td class="r">${ro?numIn(p.horas):`<input class="pin s" data-f="horas" inputmode="decimal" value="${numIn(p.horas)}">`}</td>
+   ${g==="drop"?`<td class="r">${ro?brl(p.valor_ref):`<input class="pin n" data-f="valor_ref" inputmode="decimal" value="${numIn(p.valor_ref)}">`}</td>`:""}${ro?"":`<td><button class="btn p sm" data-act="precoSalvar" data-k="${p.chave}">Salvar</button></td>`}</tr>`).join("")}</tbody></table></div>`).join("")}
+
+/* ---------- editor ---------- */
+function orcNovoObj(){return {status:"rascunho",validade_dias:10,vigencia_meses:3,pagamento:"Boleto ou Pix, todo dia 10 do mês",mes_ref:mesAtual(),completo:true,itens:precosList().map(p=>({k:p.chave,on:false,valor:Number(p.valor),perc:Number(p.perc),qtd:1}))}}
+function openOrc(id){
+  const o=id?JSON.parse(JSON.stringify(S.orcs.find(x=>x.id===id))):orcNovoObj();
+  precosList().forEach(p=>{if(!o.itens.find(i=>i.k===p.chave))o.itens.push({k:p.chave,on:false,valor:Number(p.valor),perc:Number(p.perc),qtd:1})});
+  if(o.completo===undefined)o.completo=true;S.oe=o;
+  const travado=["aprovado","enviado","aceito"].includes(o.status);
+  openSheet(`<form onsubmit="return false" class="oe"><div class="row" style="justify-content:space-between"><h3>${id?on(o.numero)+" · "+esc(o.marca):"Novo orçamento"}</h3>${id?`<span class="tag ${OST[o.status][1]}">${OST[o.status][0]}</span>`:""}</div>
+   ${id?`<div class="hint">Elaborado por <b>${esc(o.elaborado_nome||"")}</b> em ${new Date(o.elaborado_em).toLocaleString("pt-BR")}${o.aprovado_nome?` · aprovado por <b>${esc(o.aprovado_nome)}</b> em ${new Date(o.aprovado_em).toLocaleString("pt-BR")}`:""}${o.recusa_motivo&&o.status==="recusado"?` · motivo da recusa: ${esc(o.recusa_motivo)}`:""}</div>`:`<div class="hint">Elaborado por <b>${esc(S.me.nome)}</b> · ${new Date().toLocaleDateString("pt-BR")}</div>`}
+   ${travado?`<div class="okbox" style="margin-top:10px">Aprovado. Se mudar qualquer valor, ele volta para rascunho e precisa de nova aprovação.</div>`:""}
+   ${cliSel(o.cliente_id,"Cliente")}
+   <div class="cols2 t2">${fld("marca","Marca (aparece na proposta)",o.marca,"text","required")}${fld("mes_ref","Mês da proposta",o.mes_ref)}</div>
+   <div id="oeItens">${GRUPOS.map(([g,t,d])=>`<div class="ogrp"><div class="ogh"><b>${t}</b><span class="muted small">${d}</span></div><div class="ocards">${precosList().filter(p=>p.grupo===g).map(p=>oeCard(p.chave)).join("")}</div></div>`).join("")}</div>
+   <div class="sec"><h2>Condições</h2></div>
+   <div class="cols2 t2">${fld("validade_dias","Proposta válida por (dias)",o.validade_dias,"number","inputmode=numeric")}${fld("vigencia_meses","Vigência dos pacotes (meses)",o.vigencia_meses,"number","inputmode=numeric")}</div>
+   ${fld("pagamento","Pagamento: forma e data",o.pagamento)}${area("obs","Observações (aparecem no orçamento)",o.obs)}
+   <label class="chk"><input type="checkbox" id="oeCompleto" ${o.completo!==false?"checked":""}> Incluir a apresentação completa (mercado, cases, método) antes do orçamento</label>
+   <div id="oeSum">${oeSumHtml()}</div>
+   <div class="acts" id="oeActs">${oeActs(o)}</div></form>`);
+}
+function oeItem(k){return S.oe.itens.find(i=>i.k===k)}
+function oeCard(k){const p=preco(k),it=oeItem(k);const mud=Number(it.valor)!==Number(p.valor),mudp=Number(it.perc)!==Number(p.perc);
+  return `<div class="ocard ${it.on?"on":""}" data-k="${k}"><button type="button" class="otog" data-act="oeTog" data-k="${k}"><span class="sw"></span><b>${esc(p.categoria)}</b></button>
+   <div class="odesc">${esc(p.descricao||"")}${p.grupo==="pacote"&&p.lives?`<br><span class="muted">${p.lives} lives de ~${numIn(p.horas)} h · ${numIn(p.lives*p.horas)} h por mês</span>`:""}</div>
+   <div class="oprice" data-k="${k}">${oePriceHtml(k)}</div>
+   ${p.grupo==="pontual"?`<div class="oqtd"><span class="muted small">Qtd. de lives</span><button type="button" data-act="oeQtd" data-k="${k}" data-v="-1">−</button><b>${it.qtd||1}</b><button type="button" data-act="oeQtd" data-k="${k}" data-v="1">+</button></div>`:""}
+   <div class="oedit" ${it.edit?"":"hidden"}><div class="cols2"><div class="fld" style="margin-top:6px"><label>Valor (R$)</label><input inputmode="decimal" data-oe="valor" data-k="${k}" value="${numIn(it.valor)}"></div><div class="fld" style="margin-top:6px"><label>% sobre vendas</label><input inputmode="decimal" data-oe="perc" data-k="${k}" value="${numIn(it.perc)}"></div></div>
+   <button type="button" class="lnk" data-act="oeReset" data-k="${k}">Voltar ao preço de tabela</button></div>
+   <button type="button" class="open" data-act="oeEdit" data-k="${k}">${it.edit?"Fechar ✓":"✏️ Alterar valor ou %"}${mud||mudp?" · alterado":""}</button></div>`}
+function oePriceHtml(k){const p=preco(k),it=oeItem(k);const mud=Number(it.valor)!==Number(p.valor),mudp=Number(it.perc)!==Number(p.perc);
+  const suf=p.grupo==="pacote"?"/mês":p.grupo==="pontual"?"/live":"";
+  return `${p.valor_ref&&!mud?`<s>${brl(p.valor_ref)}</s> `:""}${mud?`<s>${brl(p.valor)}</s> `:""}<b class="${mud?(Number(it.valor)<Number(p.valor)?"dn":"up"):""}">${brl(it.valor)}</b><small>${suf}</small>
+   <div class="op">${mudp?`<s>${numIn(p.perc)}%</s> `:""}<b class="${mudp?(Number(it.perc)<Number(p.perc)?"dn":"up"):""}">+ ${numIn(it.perc)}%</b> sobre vendas das lives</div>`}
+function oeSumHtml(){const o=S.oe;const it=o.itens.filter(i=>i.on);const desc=orcTemDesc(o);
+  let regra;if(!it.length)regra=`<div class="warnbox">Ligue pelo menos uma categoria, pacote ou a Live Drop.</div>`;
+  else if(!isSocio())regra=`<div class="warnbox">Você é da equipe: este orçamento vai para <b>aprovação de um sócio</b> antes de gerar a versão final.</div>`;
+  else if(desc)regra=`<div class="warnbox">Tem <b>desconto</b>: precisa da aprovação de <b>outro sócio</b> antes de gerar a versão final.</div>`;
+  else regra=`<div class="okbox">Preços de tabela: você pode aprovar e gerar na hora.</div>`;
+  return `<div class="osum"><div><span class="muted small">Itens ligados</span><b>${it.length}</b></div><div><span class="muted small">Resumo</span><b>${esc(orcResumo(o))}</b></div><div><span class="muted small">Valor</span><b>${orcValorTxt(o)}</b></div></div>${regra}`}
+function oeActs(o){const id=o.id;const me=S.me;const desc=orcTemDesc(o);const meu=!id||o.created_by===me.user_id;const out=[];
+  if(!["enviado","aceito"].includes(o.status)||true)out.push(`<button type="button" class="btn" data-act="orcSalvar" data-v="rascunho">Salvar rascunho</button>`);
+  if(!["aprovado","enviado","aceito"].includes(o.status)){
+    if(isSocio()&&!desc)out.push(`<button type="button" class="btn p" data-act="orcSalvar" data-v="aprovado">Aprovar e gerar</button>`);
+    else if(o.status!=="aguardando")out.push(`<button type="button" class="btn p" data-act="orcSalvar" data-v="aguardando">Enviar para aprovação</button>`);
+  }
+  if(id&&o.status==="aguardando"&&isSocio()&&!(desc&&meu)){out.push(`<button type="button" class="btn p" data-act="orcAprovar" data-id="${id}">Aprovar</button>`,`<button type="button" class="btn d" data-act="orcRecusar" data-id="${id}">Recusar</button>`)}
+  if(id&&o.status==="aguardando"&&desc&&meu)out.push(`<span class="muted small">Aguardando outro sócio aprovar</span>`);
+  out.push(`<button type="button" class="btn f" data-act="orcPdf">${["aprovado","enviado","aceito"].includes(o.status)?"Gerar PDF":"Prévia (rascunho)"}</button>`);
+  if(id&&o.status==="aprovado")out.push(`<button type="button" class="btn" data-act="orcStatus" data-id="${id}" data-v="enviado">Marcar como enviado</button>`);
+  if(id&&["aprovado","enviado"].includes(o.status))out.push(`<button type="button" class="btn" data-act="orcAceito" data-id="${id}">Cliente aceitou → contrato</button>`);
+  out.push(`<button type="button" class="btn" data-act="fechar">Fechar</button>`);
+  if(id&&!["aceito","cancelado"].includes(o.status))out.push(`<button type="button" class="btn d" data-act="orcStatus" data-id="${id}" data-v="cancelado">Cancelar</button>`);
+  return out.join("")}
+function oeRefresh(k){if(k){const c=$(`#sheetIn .ocard[data-k="${k}"]`);if(c){const ed=c.querySelector(".oedit").hidden;c.outerHTML=oeCard(k)}}const s=$("#oeSum");if(s)s.innerHTML=oeSumHtml();const a=$("#oeActs");if(a)a.innerHTML=oeActs(S.oe)}
+function oeCollect(){const f=formData();const o=S.oe;o.cliente_id=f.cliente_id||null;o.marca=f.marca||cliNome(f.cliente_id)||"";o.mes_ref=f.mes_ref||null;o.validade_dias=f.validade_dias?Number(f.validade_dias):10;o.vigencia_meses=f.vigencia_meses?Number(f.vigencia_meses):3;o.pagamento=f.pagamento||null;o.obs=f.obs||null;o.completo=!!($("#oeCompleto")||{}).checked;return o}
+async function orcSalvar(status){const o=oeCollect();if(!o.marca)return toast("Preencha a marca ou escolha o cliente",true),null;
+  if(status!=="rascunho"&&!o.itens.some(i=>i.on))return toast("Ligue pelo menos um item",true),null;
+  const row={cliente_id:o.cliente_id,marca:o.marca,mes_ref:o.mes_ref,itens:o.itens.map(({k,on,valor,perc,qtd})=>({k,on:!!on,valor:Number(valor),perc:Number(perc),qtd:Number(qtd||1)})),validade_dias:o.validade_dias,vigencia_meses:o.vigencia_meses,pagamento:o.pagamento,obs:(o.completo===false?"[curto] ":"")+(o.obs||"")};
+  row.obs=row.obs.replace(/^\[curto\] $/,"[curto]");if(!row.obs)row.obs=null;
+  if(["aprovado","enviado","aceito"].includes(o.status)&&status==="rascunho")status=o.status;
+  row.status=status;
+  let saved;if(o.id)saved=await run(db.from("imp_orcamentos").update(row).eq("id",o.id).select().single(),status==="aprovado"?"Aprovado":status==="aguardando"?"Enviado para aprovação":"Salvo");
+  else saved=await run(db.from("imp_orcamentos").insert(row).select().single(),status==="aprovado"?"Aprovado":status==="aguardando"?"Enviado para aprovação":"Rascunho salvo");
+  const i=S.orcs.findIndex(x=>x.id===saved.id);if(i>=0)S.orcs[i]=saved;else S.orcs.unshift(saved);return saved}
+function orcCompleto(o){return !(o.obs||"").startsWith("[curto]")}
+function orcObs(o){return (o.obs||"").replace(/^\[curto\]\s?/,"")}
+
+/* ---------- documento V1 ---------- */
+const CONTATOS="Caio Riccio · (21) 96590-7894 · Pedro Sallun · (16) 99116-7669 · Bruno Tae · (11) 98964-4378";
+function v1page(cls,html,num){return {cls,html,num}}
+function orcDoc(o){const P=[];const M=esc(o.marca||"Marca");const final=["aprovado","enviado","aceito"].includes(o.status);
+  const it=(o.itens||[]).filter(i=>i.on);const grp=g=>it.filter(i=>(preco(i.k)||{}).grupo===g);
+  const venc=new Date(o.elaborado_em||Date.now());venc.setDate(venc.getDate()+(o.validade_dias||10));
+  const pr=(i,suf="")=>{const p=preco(i.k);const mud=Number(i.valor)!==Number(p.valor);return `${mud?`<s>${brl(p.valor)}</s> `:""}<b>${brl(i.valor)}</b>${suf}`};
+  const pc=i=>{const p=preco(i.k);const m=Number(i.perc)!==Number(p.perc);return `${m?`<s>${numIn(p.perc)}%</s> `:""}<b>${numIn(i.perc)}%</b>`};
+  P.push(v1page("dark",`<img class="vlogo" src="prop/logo.png"><div class="vchip">Proposta de operação de Live Shop</div><h1 class="vt">Operação de Live<br>Shop para a <span class="hl">${M}</span></h1>
+   <div class="vfoot">${esc(o.mes_ref||"")} · proposta válida por ${o.validade_dias||10} dias corridos<br><span>${on(o.numero)}</span></div>
+   <div class="vphone"><img src="prop/capa.jpg"><span class="vnoar">● no ar</span></div><div class="vb1">Qual promo?</div><div class="vb2">só até as 21h!</div>`));
+  if(orcCompleto(o)){
+  P.push(v1page("dark",`<div class="vk">O mercado</div><h2>Na China, a live já vende um terço do varejo online. Nos EUA, o TikTok Shop dobrou em um ano</h2>
+   <div class="vg3"><div class="vc cream"><small>China · 2025</small><div class="vbig">≈ 1/3</div><p>do varejo online chinês vem de live commerce: mais de ¥ 5 trilhões. A live respondeu por 80% do crescimento do e-commerce no país.</p></div>
+   <div class="vc sage"><small>EUA · 2025</small><div class="vbig">US$ 15,8 bi</div><p>vendidos pelo TikTok Shop (+108% no ano), 18% de todo o social commerce americano.</p></div>
+   <div class="vc volt"><small>Mundo · 2025</small><div class="vbig">US$ 64 bi</div><p>de GMV do TikTok Shop em 16 mercados (+94%). A projeção é passar de US$ 100 bi em 2026.</p></div></div>
+   <div class="vsrc">Fontes: China, white paper SAMR/CASS via Xinhua (mar/2026) · EUA, eMarketer (dez/2025) · Mundo, Momentum Works (2026).</div>`));
+  P.push(v1page("pink",`<div class="vk">O Brasil</div><h2>No primeiro ano do TikTok Shop no Brasil, o GMV das lives cresceu 161 vezes</h2>
+   <div class="vg4"><div class="vc plum"><div class="vbig">161x</div><p>GMV das lives, de maio/2025 a maio/2026</p></div><div class="vc plum"><div class="vbig">20x</div><p>número de lives por dia no mesmo período</p></div><div class="vc plum"><div class="vbig">23%</div><p>do GMV do TikTok Shop no Brasil vem de live. Nos EUA, fica entre 8% e 14%</p></div><div class="vc cream"><div class="vbig">5–9%</div><p>do e-commerce brasileiro pode passar pelo TikTok Shop até 2028</p></div></div>
+   <div class="vsrc">O BTG estima R$ 20 bilhões de GMV anualizado do TikTok Shop no Brasil em 2026. Fontes: TikTok Newsroom (mai/2026) · Momentum Works (ago/2025) · Santander/Digital Inside (2025) · BTG Pactual (2026).</div>`));
+  P.push(v1page("cream",`<div class="vk">Quem já vende com a gente</div><h2>Marcas que vendem com a IMPlay</h2><div class="vtags"><span>Beleza e cuidados pessoais</span><span>Alimentos e bebidas</span><span>Saúde</span><span>Pet</span></div><img class="vlogos" src="prop/logos.jpg">`));
+  P.push(v1page("dark",`<div class="vk">Quem somos</div><h2>A IMPlay</h2><div class="vqs"><div><div class="vbig v">8 anos</div><p>em marketing de influência e live streaming</p></div><div><div class="vbig v">2 offices</div><p>Estúdios na Praia de Charitas, em Niterói, e na Av. Paulista, em São Paulo</p></div><div><div class="vbig v">50 marcas</div><p>atendidas em redes como TikTok, Shopee e outras</p></div></div>
+   <p class="vnote">Estúdios com isolamento acústico, feitos para Live Shop. A operação também acontece na loja da marca.</p><div class="vcol"><img src="prop/charitas.jpg"><img src="prop/premio.jpg"><img src="prop/paulista.jpg"><img src="prop/estudio.jpg"></div>`));
+  P.push(v1page("plum",`<div class="vk">Audiência · live IMPlay</div><h2>Numa live de 5 horas, 136 mil visualizações e 10.952 espectadores engajados</h2><div class="vg3 sm"><div class="vc volt"><div class="vbig">136 mil</div><p>visualizações totais</p></div><div class="vc cream"><div class="vbig">10.952</div><p>espectadores engajados</p></div><div class="vc plum2"><div class="vbig">27 mil</div><p>visualizações por hora, em média</p></div></div>
+   <ul class="vul"><li>Na Shopee, moedas pagas pela própria plataforma são distribuídas durante as lives.</li><li>Na Shopee, as lives diárias passaram de 50 para mais de 1 mil entre o fim de 2023 e janeiro de 2025.</li></ul><div class="vphone r"><img src="prop/audiencia.jpg"><span class="vnoar">● no ar</span></div>`));
+  P.push(v1page("dark",`<div class="vk">A tríade IMPlay</div><h2>Creators geram alcance, o GMV Max multiplica e a live converte</h2><div class="vg3"><div class="vc pink"><div class="vn">1</div><b>Creators · orgânico</b><p>Nossa rede publica vídeos que vendem o produto e levam gente para a loja.</p></div><div class="vc sage"><div class="vn">2</div><b>GMV Max · pago</b><p>Os vídeos que mais vendem viram anúncio, com investimento guiado por meta de ROAS.</p></div><div class="vc volt"><div class="vn">3</div><b>Lives · conversão</b><p>A live recebe esse público e fecha a venda com demonstração, oferta e chat.</p></div></div><p class="vnote">O que vende na live vira pauta para os creators e criativo para o GMV Max. O ciclo recomeça com mais dados.</p>`));
+  P.push(v1page("plum",`<div class="vk">Nossa visão</div><h2>Live é consistência e previsibilidade</h2><div class="vg3"><div class="vc cream"><div class="vn">01</div><b>Demonstração vende</b><p>Produto na mão, uso mostrado e dúvida do chat respondida na hora.</p></div><div class="vc cream"><div class="vn">02</div><b>Frequência cria público</b><p>A plataforma entende a relevância da marca e direciona mais audiência para as marcas que engajam.</p></div><div class="vc volt"><div class="vn">03</div><b>Os dados decidem a próxima live</b><p>Cada transmissão mostra qual produto, oferta e horário vendem mais.</p></div></div>`));
+  P.push(v1page("sage",`<div class="vk">Case · lives recorrentes no estúdio <img class="vcl" src="prop/l_heymu.png"></div><div class="vtags dk"><span>5 lives por semana</span><span>6 horas por live</span></div><div class="vhuge">R$ 800 mil+</div><h2 style="margin-top:0">vendidos para a Hey!Mu nos três primeiros meses</h2>
+   <div class="vbox"><b>O que fizemos</b><ul><li>Apresentadoras treinadas pela IMPlay</li><li>Estúdio com cenário adaptado à marca</li><li>Suporte técnico e criativo ao vivo e depois da live</li><li>Planejamento de ofertas e flash sales</li></ul></div><div class="vphone r"><img src="prop/heymu.jpg"><span class="vnoar">● no ar</span></div>`));
+  P.push(v1page("plum",`<div class="vk">Case · lançamento <img class="vcl" src="prop/l_heymu.png"></div><p class="vsub">3 milhões de curtidas durante a transmissão.</p><div class="vhuge v">R$ 300 mil+</div><h2 style="margin-top:0">vendidos numa live de lançamento de 48 horas</h2>
+   <div class="vbox cream"><b>O que fizemos</b><ul><li>Cenografia, equipamentos e estrutura completa</li><li>Flash sales, sorteios e dinâmicas com convidados</li><li>Equipe de live sellers e operadores em escala</li><li>Acompanhamento presencial durante as 48 horas</li><li>Alinhamento com o time do TikTok Shop</li></ul></div>`));
+  P.push(v1page("dark",`<div class="vk">Case · live na loja <img class="vcl" src="prop/l_haoma.png"></div><h2 class="v">Haoma vendeu mais de R$ 10 mil nas duas primeiras horas da primeira live</h2>
+   <div class="vbox cream"><b>O que fizemos</b><ul><li>Montamos um ambiente profissional de transmissão dentro da loja</li><li>Treinamos as vendedoras para apresentar ao vivo</li><li>Acompanhamos produtos e ofertas durante toda a live</li></ul></div>`));
+  P.push(v1page("sage",`<div class="vk">Case · lives recorrentes no estúdio <img class="vcl" src="prop/l_caffeine.png"></div><div class="vhuge">+R$ 30 mil</div><h2 style="margin-top:0">na primeira live</h2>
+   <div class="vbox"><b>O que fizemos</b><ul><li>Planejamento de lives e sellers</li><li>Estudo dos melhores argumentos de venda durante a live</li><li>Operador adicionando ofertas nos pontos de máximo engajamento</li></ul></div><div class="vphone r"><img src="prop/caffeine.jpg"></div>`));
+  P.push(v1page("pink",`<div class="vk">Case · afiliados · IMPlay × Ticky by Antonela Braga <img class="vcl" src="prop/l_ticky.png"></div><h2>R$ 123 mil em GMV no lançamento da Ticky, só com vídeos e lives de creators afiliados</h2>
+   <div class="vg3 sm"><div class="vc plum"><div class="vbig">400+</div><p>creators ativos na campanha</p></div><div class="vc plum"><div class="vbig">3 mil+</div><p>conteúdos produzidos</p></div><div class="vc plum"><div class="vbig">58 mil+</div><p>itens vendidos na loja até hoje</p></div></div>
+   <p class="vnote dk">A marca começou do zero no TikTok Shop. As vendas do lançamento vieram dos creators selecionados pela IMPlay, sem a Antonela, uma das donas, participar. A loja já faturou mais de R$ 2 milhões só no TikTok Shop, somando todas as fontes de venda.</p><div class="vphone r sm"><img src="prop/ticky.jpg"></div>`));
+  P.push(v1page("dark",`<div class="vk">Método IMPlay</div><h2>Cinco passos para colocar a marca no ar e um ciclo que se repete a cada live</h2>
+   <div class="vsteps">${[["Escopo e metas","produtos, ofertas, volume de lives"],["Casting","apresentadores com o perfil da marca"],["Cenário e setup","estúdio adaptado à identidade da marca"],["Imersão e treino","produto, argumentos e objeções"],["Calendário","dias, horários e datas do TikTok"]].map((s,i)=>`<div><b class="vn">${i+1}</b><b>${s[0]}</b><p>${s[1]}</p></div>`).join("")}</div>
+   <div class="vcycle"><span>Planejar a live</span>→<span>Ao vivo</span>→<span>Analisar</span>↺ <em>Produtos, ofertas e roteiro mudam a partir do que a última live mostrou</em></div>`));
+  P.push(v1page("cream",`<div class="vk">Como funciona · a IMPlay cuida de tudo com a marca por perto</div><h2>O que acontece antes, durante e depois de cada live</h2>
+   <div class="vg4">${[["Pré-produção","dark",["Seleção de SKUs e ofertas","Roteiro e demonstrações","Casting e treino dos apresentadores","Cenário adaptado à marca","Calendário com o TikTok e negociação de incentivos"]],["Produção","dark",["Estúdio com isolamento acústico","Apresentadores treinados","Direção de live","Operação da plataforma: produtos fixados, flash sales e cupons","Suporte técnico ao vivo"]],["Pós-produção","dark",["Resumo da live em até 24 horas","Dashboard mensal","Revisão com a marca","Cadastro de SKUs novos"]],["Papel da marca","volt",["Envio dos produtos para a live","Configuração da loja","Estoque e logística","Aprovação de preços e ofertas","Atendimento ao cliente","Verba de GMV Max"]]].map(([t,c,l])=>`<div class="vc ${c}"><b>${t}</b><ul>${l.map(x=>`<li>${x}</li>`).join("")}</ul></div>`).join("")}</div>`));
+  P.push(v1page("dark",`<div class="vk">Equipe no ar</div><h2>Quem está no ar e quem opera por trás da câmera</h2><div class="vg2 w"><div class="vc volt"><b>Apresentação</b><ul><li>Demonstra os produtos</li><li>Responde às perguntas do chat</li><li>Conduz as ofertas no tempo do roteiro</li></ul></div><div class="vc cream"><b>Operação</b><ul><li>Fixa o produto em destaque</li><li>Libera as ofertas aprovadas</li><li>Acompanha chat, estoque e estabilidade da transmissão</li></ul></div></div>
+   <p class="vnote">O número de apresentadores, operadores e câmeras depende da categoria contratada (GO, BOOST ou ICON).</p><img class="vph2" src="prop/equipe.jpg">`));
+  P.push(v1page("sage",`<div class="vk">Tráfego pago · GMV Max</div><h2>GMV Max: o investimento em anúncio com meta de ROI</h2><div class="vg2"><div class="vc dark"><b>Como funciona</b><ul><li>A nossa equipe configura o gerenciador de anúncios, escolhe os criativos, inclusive vídeos de creators e afiliados, e onde exibir: For You, busca e aba Shop.</li><li>Sua marca vende pelos anúncios e também traz audiência para a live.</li></ul></div><div class="vc volt"><b>ROI Protection</b><p>Se o retorno do dia ficar abaixo de 90% da meta, numa campanha com mais de 20 pedidos no dia, o TikTok devolve a diferença em crédito de anúncio.*</p></div></div>
+   <img class="vgmv" src="prop/gmvmax.jpg"><div class="vsrc dk">* Regras do TikTok Ads (set/2026): vale para campanhas criadas desde 25/02/2026 e não conta dias com meta ajustada, campanha pausada ou produto editado. Confirmar a validade no Brasil com o gerente de conta. No TikTok, "ROI" é receita ÷ investimento, o mesmo cálculo do ROAS.</div>`));
+  P.push(v1page("cream",`<div class="vk">Nossos serviços</div><h2>Como vender com a IMPlay</h2><div class="vg3"><div class="vc sage"><b>Lives recorrentes</b><p>Lives no perfil da marca, no estúdio IMPlay, com apresentadores e operação nossos. Pacotes mensais por volume.</p><small>Como a Hey!Mu</small></div><div class="vc pink"><b>Marca + afiliados</b><p>Gestão da loja e dos afiliados: briefing, amostras, cobrança de entregas, campanhas, ajuste de SKUs e estratégia de GMV Max.</p><small>Como a Ticky</small></div><div class="vc dark"><b>Live de lançamento</b><p>Projeto especial para lançamento, inauguração da loja ou grande data: lives longas, cenografia, convidados e dinâmicas.</p><small>Como as 48 horas da Hey!Mu</small></div></div>`));
+  }
+  if(grp("pontual").length){const l=grp("pontual");P.push(v1page("cream",`<div class="vk">Investimento</div><h2>Live Pontual: valores e categoria</h2><table class="vtb"><tr><th>Categoria</th><th>Qtd. de lives</th><th>Valor por live</th><th>Variável</th><th>Subtotal</th></tr>
+   ${l.map(i=>{const p=preco(i.k);return `<tr><td><b>${esc(p.categoria)}</b><small>${esc(p.descricao)}</small></td><td>${i.qtd||1}</td><td>${pr(i)}</td><td>${pc(i)}</td><td><b>${brl(Number(i.valor)*(i.qtd||1))}</b></td></tr>`}).join("")}</table>
+   <p class="vnote dk"><b>Todos incluem:</b> estúdio com áudio e vídeo, apresentadores treinados, roteiro e ofertas. <b>Não inclui:</b> custos com cenário.</p>`))}
+  if(grp("pacote").length){const l=grp("pacote");P.push(v1page("dark",`<div class="vk">Investimento</div><h2>Pacotes mensais de lives</h2><div class="vpk n${l.length}">${l.map((i,ix)=>{const p=preco(i.k);return `<div class="vc ${["cream","gray","volt"][["GO","BOOST","ICON"].indexOf(p.categoria)]||"cream"}"><b class="vpt">${esc(p.categoria)}</b><p>${esc(p.descricao)}</p><p>${p.lives} lives de ~${numIn(p.horas)} h · ${numIn(p.lives*p.horas)} h por mês</p><div class="vpv">${pr(i,"<small>/mês</small>")}</div><p>+ ${pc(i)} sobre vendas das lives</p></div>`}).join("")}</div>
+   <p class="vnote"><b>Todos incluem:</b> estúdio com áudio e vídeo, apresentadores treinados, roteiro e ofertas. Gestão do tráfego pago via GMV Max. Vigência de ${o.vigencia_meses||3} meses, renovável.</p>`))}
+  if(grp("drop").length){const i=grp("drop")[0],p=preco(i.k);const cheio=Number(p.valor_ref||p.valor);P.push(v1page("cream",`<div class="vk">Investimento</div><h2>Live Drop: live de lançamento</h2><table class="vtb"><tr><th>Pacote</th><th>Categoria</th><th>Valor</th><th>Variável</th></tr>
+   <tr><td><b>${p.lives} lives</b></td><td>${esc(p.descricao)}</td><td>${brl(cheio)}</td><td>${pc(i)}</td></tr><tr class="hlr"><td colspan="2"><b>CONDIÇÃO ESPECIAL</b></td><td>${Number(i.valor)<cheio?`<s>${brl(cheio)}</s> `:""}<b>${brl(i.valor)}</b></td><td>${pc(i)}</td></tr></table>
+   <p class="vnote dk"><b>Inclui:</b> estúdio com áudio e vídeo, apresentadores treinados, roteiro e ofertas. <b>Não inclui:</b> custos com cenário.</p>`))}
+  const cli=S.clientes.find(c=>c.id===o.cliente_id)||{};
+  P.push(v1page("cream doc",`${final?"":`<div class="vwm">RASCUNHO · aguardando aprovação</div>`}<div class="row" style="justify-content:space-between;align-items:flex-start"><div><div class="vk">Orçamento</div><h2>${on(o.numero)} · ${M}</h2></div><img src="prop/logo.png" class="vlogo2"></div>
+   <div class="vmeta"><div><small>Cliente</small><b>${esc(cli.empresa||o.marca)}</b>${cli.cnpj?`<span>CNPJ ${esc(cli.cnpj)}</span>`:""}</div><div><small>Emitido em</small><b>${new Date(o.elaborado_em||Date.now()).toLocaleDateString("pt-BR")}</b></div><div><small>Válido até</small><b>${venc.toLocaleDateString("pt-BR")}</b></div><div><small>Elaborado por</small><b>${esc(o.elaborado_nome||S.me.nome)}</b></div><div><small>Aprovado por</small><b>${o.aprovado_nome?esc(o.aprovado_nome):"—"}</b>${o.aprovado_em?`<span>${new Date(o.aprovado_em).toLocaleDateString("pt-BR")}</span>`:""}</div></div>
+   <table class="vtb sm"><tr><th>Item</th><th>Descrição</th><th>Valor</th><th>Variável</th></tr>${it.map(i=>{const p=preco(i.k);const nm={pontual:"Live Pontual",pacote:"Pacote mensal",drop:"Live Drop"}[p.grupo];
+    return `<tr><td><b>${nm} · ${esc(p.categoria)}</b></td><td>${esc(p.descricao)}${p.grupo==="pontual"?` · ${i.qtd||1} live(s)`:p.grupo==="pacote"?` · ${p.lives} lives/mês`:""}</td><td>${pr(i,p.grupo==="pacote"?"/mês":p.grupo==="pontual"?"/live":"")}</td><td>${pc(i)} sobre vendas</td></tr>`}).join("")}</table>
+   <div class="vcond"><div><b>Condições</b><ul><li>Pagamento: ${esc(o.pagamento||"a combinar")}</li><li>Vigência dos pacotes: ${o.vigencia_meses||3} meses, renovável</li><li>Percentual calculado sobre as vendas das lives, sem pedidos cancelados ou devolvidos</li><li>Início conforme agenda do estúdio</li></ul></div><div><b>Fica por conta da marca</b><ul><li>Verba de mídia (GMV Max) e comissão dos afiliados</li><li>Produtos, fretes, envios, atendimento e logística</li><li>Cenário com a identidade visual da marca, orçado à parte</li><li>Lives de 12 horas ou mais, orçadas como lançamento</li></ul></div></div>
+   ${orcObs(o)?`<p class="vnote dk"><b>Observações:</b> ${esc(orcObs(o))}</p>`:""}<div class="vsrc dk">IMP DIGITAL LTDA · CNPJ 44.189.776/0001-77 · Proposta válida por ${o.validade_dias||10} dias corridos. Depois disso, valores e disponibilidade podem mudar.</div>`));
+  P.push(v1page("dark",`<div class="vbora">bora!</div><h2>Escolha o pacote e<br>marcamos a primeira live</h2><div class="vg2 w"><div class="vc cream"><b>O que a marca envia</b><ul><li>Lista de produtos e condições comerciais</li><li>Amostras</li><li>Acesso à loja no TikTok Shop</li></ul></div><div class="vc volt"><b>Fale com a gente</b><ul class="vct"><li><b>Caio Riccio</b>(21) 96590-7894</li><li><b>Pedro Sallun</b>(16) 99116-7669</li><li><b>Bruno Tae</b>(11) 98964-4378</li></ul><p><b>@implayhub · implaylive.com.br</b></p><p style="font-size:12px;opacity:.75">Orçamento ${on(o.numero)} · elaborado por ${esc(o.elaborado_nome||S.me.nome)}</p></div></div>
+   <p class="vnote">Com o pacote aprovado, reservamos a agenda do estúdio e começamos a preparação assim que os produtos chegam. As informações desta proposta são confidenciais e destinadas apenas aos envolvidos.</p><img class="vlogo3" src="prop/logo.png">`));
+  return P.map((p,i)=>`<div class="pgw"><div class="pg v1 ${p.cls}">${i?`<div class="vnum">${String(i+1).padStart(2,"0")}</div>`:""}${p.html}${!final&&i?`<div class="vdraft">RASCUNHO</div>`:""}</div></div>`).join("")}
+function showOrcDoc(o){setPage("landscape");const d=$("#doc");d.innerHTML=`<div class="bar"><button class="btn p" data-act="docPrint">Salvar PDF / Imprimir</button><button class="btn" data-act="docClose">Fechar</button></div>${orcDoc(o)}<div class="sp30" style="height:30px"></div>`;d.hidden=false;d.scrollTop=0;fitDoc()}
+
+/* ---------- eventos ---------- */
+document.addEventListener("input",e=>{const t=e.target;
+  if(t.dataset.oe){const it=oeItem(t.dataset.k);it[t.dataset.oe]=num(t.value)??0;const pe=$(`#sheetIn .oprice[data-k="${t.dataset.k}"]`);if(pe)pe.innerHTML=oePriceHtml(t.dataset.k);$("#oeSum").innerHTML=oeSumHtml();$("#oeActs").innerHTML=oeActs(S.oe)}
+  if(t.dataset.q==="orc"){S.f.orc.q=t.value;$("#lst").innerHTML=LISTS.orc()}},true);
+document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]");if(!a)return;const act=a.dataset.act,k=a.dataset.k,v=a.dataset.v,id=a.dataset.id;
+  const H=()=>{e.stopImmediatePropagation()};
+  try{switch(act){
+   case"orcNovo":H();closeSheet();openOrc(null);break;
+   case"orcAbrir":H();openOrc(id);break;
+   case"orcView":H();S.f.orc.view=v;render();break;
+   case"oeTog":H();{const it=oeItem(k);it.on=!it.on;oeRefresh(k)}break;
+   case"oeEdit":H();{const it=oeItem(k);it.edit=!it.edit;oeRefresh(k);if(it.edit){const i=$(`#sheetIn [data-oe=valor][data-k="${k}"]`);if(i)i.focus()}}break;
+   case"oeReset":H();{const it=oeItem(k),p=preco(k);it.valor=Number(p.valor);it.perc=Number(p.perc);oeRefresh(k)}break;
+   case"oeQtd":H();{const it=oeItem(k);it.qtd=Math.max(1,(it.qtd||1)+Number(v));oeRefresh(k)}break;
+   case"orcSalvar":H();{const s=await orcSalvar(v);if(s){if(v==="aprovado"){closeSheet();render();showOrcDoc(s)}else{closeSheet();S.tab="orcamentos";render()}}}break;
+   case"orcAprovar":H();{const o=await run(db.from("imp_orcamentos").update({status:"aprovado"}).eq("id",id).select().single(),"Orçamento aprovado");const i=S.orcs.findIndex(x=>x.id===id);S.orcs[i]=o;closeSheet();render()}break;
+   case"orcRecusar":H();{if(!a.dataset.armed){a.dataset.armed=1;a.insertAdjacentHTML("afterend",`<input id="recMot" placeholder="Motivo da recusa (opcional)" style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--linha);border-radius:999px;padding:8px 12px">`);a.textContent="Confirmar recusa";return}
+     const o=await run(db.from("imp_orcamentos").update({status:"recusado",recusa_motivo:($("#recMot")||{}).value||null}).eq("id",id).select().single(),"Recusado");const i=S.orcs.findIndex(x=>x.id===id);S.orcs[i]=o;closeSheet();render()}break;
+   case"orcStatus":H();{if(v==="cancelado"&&!armed(a))return;const o=await run(db.from("imp_orcamentos").update({status:v}).eq("id",id).select().single(),v==="enviado"?"Marcado como enviado":"Cancelado");const i=S.orcs.findIndex(x=>x.id===id);S.orcs[i]=o;closeSheet();render()}break;
+   case"orcPdf":H();{const o=oeCollect();const base=o.id?S.orcs.find(x=>x.id===o.id):{};const view=Object.assign({},base,o,{obs:(o.completo===false?"[curto] ":"")+(o.obs||""),elaborado_nome:base.elaborado_nome||S.me.nome,elaborado_em:base.elaborado_em||new Date().toISOString(),numero:base.numero||0});
+     const changed=o.id&&JSON.stringify(o.itens.map(({k,on,valor,perc,qtd})=>[k,!!on,+valor,+perc,+(qtd||1)]))!==JSON.stringify((base.itens||[]).map(({k,on,valor,perc,qtd})=>[k,!!on,+valor,+perc,+(qtd||1)]));if(changed){view.status="rascunho";view.aprovado_nome=null}
+     closeSheet();showOrcDoc(view)}break;
+   case"orcAceito":H();{const o=S.orcs.find(x=>x.id===id);const pk=(o.itens||[]).filter(i=>i.on&&(preco(i.k)||{}).grupo==="pacote");const dr=(o.itens||[]).find(i=>i.on&&(preco(i.k)||{}).grupo==="drop");
+     const esc1=pk[0]||dr||(o.itens||[]).find(i=>i.on);const p=preco(esc1.k);const hoje=new Date();const fim=new Date(hoje);fim.setMonth(fim.getMonth()+(o.vigencia_meses||3));fim.setDate(fim.getDate()-1);
+     const row={cliente_id:o.cliente_id,marca:o.marca,mes_ref:o.mes_ref,pacote:(p.grupo==="pacote"?"Pacote ":p.grupo==="drop"?"":"Live Pontual ")+p.categoria,modalidade:"servico",valor_fixo:Number(esc1.valor)*(p.grupo==="pontual"?(esc1.qtd||1):1),perc_variavel:Number(esc1.perc),vigencia_meses:o.vigencia_meses,pagamento:o.pagamento,status:"aceita",aceita_em:hoje.toISOString(),contrato_inicio:ymd(hoje),contrato_fim:ymd(fim),obs:"Gerado do orçamento "+on(o.numero)};
+     let pr2=await run(db.from("imp_propostas").insert(row).select().single());pr2=await run(db.from("imp_propostas").update({contrato_numero:"C-"+String(pr2.numero).padStart(4,"0")}).eq("id",pr2.id).select().single());
+     const o2=await run(db.from("imp_orcamentos").update({status:"aceito",proposta_id:pr2.id}).eq("id",id).select().single(),"Contrato "+pr2.contrato_numero+" criado");S.orcs[S.orcs.findIndex(x=>x.id===id)]=o2;await loadAll();closeSheet();render()}break;
+   case"precoSalvar":H();{const tr=a.closest("tr");const row={};tr.querySelectorAll(".pin").forEach(i=>{const f=i.dataset.f;row[f]=f==="descricao"?i.value:(f==="lives"?parseInt(i.value)||null:num(i.value))});row.updated_at=new Date().toISOString();
+     const p=await run(db.from("imp_precos").update(row).eq("chave",k).select().single(),"Preço atualizado");const ix=S.precos.findIndex(x=>x.chave===k);if(ix>=0)S.precos[ix]=p;render()}break;
+  }}catch(err){console.warn(err)}},true);
+
+/* ---------- demonstração ---------- */
+const _toggle4=toggleDemo;toggleDemo=async function(){await _toggle4();if(S.demo){S.precos=PRECOS_PADRAO.map(p=>Object.assign({},p));const cl=S.clientes;const mk=(n,c,st,its,elab,apr,dias)=>({id:"orc"+n,numero:n,cliente_id:c.id,marca:c.marca,mes_ref:"Outubro de 2026",itens:PRECOS_PADRAO.map(p=>{const x=its[p.chave];return {k:p.chave,on:!!x,valor:x&&x[0]!==undefined?x[0]:p.valor,perc:x&&x[1]!==undefined?x[1]:p.perc,qtd:1}}),validade_dias:10,vigencia_meses:3,pagamento:"Boleto, todo dia 10",status:st,elaborado_nome:elab,elaborado_em:new Date(Date.now()-dias*864e5).toISOString(),aprovado_nome:apr,aprovado_em:apr?new Date(Date.now()-(dias-1)*864e5).toISOString():null,created_by:"x"});
+    S.orcs=[mk(12,cl[5],"aguardando",{"pacote.BOOST":[9000],"pacote.ICON":[]},"Marina Costa",null,1),mk(11,cl[6],"aprovado",{"pontual.GO":[],"pontual.BOOST":[],"pontual.ICON":[]},"Caio",S.me.nome,3),mk(10,cl[7],"enviado",{"drop.ICON":[]},"Larissa","Pedro",6),mk(9,cl[0],"aceito",{"pacote.BOOST":[],"pacote.ICON":[15000,8]},"Pedro","Thiago",20),mk(8,cl[3],"recusado",{"pacote.GO":[5000,5]},"Rafael Lima",null,25)];
+    S.orcs.forEach(o=>o.tem_desconto=orcTemDesc(o));render()}};
 
 /* ================= interações ================= */
 function syncShow(){const fm=$("#sheetIn form");if(!fm)return;fm.querySelectorAll("[data-show]").forEach(el=>{const[k,val]=el.dataset.show.split("=");const inp=fm.querySelector(`[name="${k}"]`);el.hidden=!inp||inp.value!==val})}
