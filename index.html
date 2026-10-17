@@ -1043,7 +1043,7 @@ function railHtml(pend){
    ${js.length?`<div class="tl">${js.map(j=>`<div class="e" data-act="job" data-id="${j.id}"><div class="h">${hm(j.inicio)}</div><div class="d ${j.principal_id?"":"f"}"></div><div><b>${esc(j.marca||"Live")}</b><span>${j.local_tipo==="estudio"?"Estúdio "+(j.espaco||""):j.local_tipo==="cliente"?"Local do cliente":"Online"} · ${j.principal_id?esc(nome(j.principal_id)):"sem seller"}</span></div></div>`).join("")}</div>`:`<div class="muted small">Nenhuma live hoje.</div>`}</div>
    <div class="panel"><h3>Precisa de você</h3>${pend.length?pend.map(p=>`<div class="pend" data-act="${p.act}" data-v="${p.a}"><span>${esc(p.t)}</span><b>${p.v||"›"}</b></div>`).join(""):`<div class="muted small">Tudo em dia ✦</div>`}</div>
    ${isSocio()?`<div class="panel railv"><h3>Aporte Tae & Dani</h3><div class="uh" style="font-size:22px">${brl(ap.saldo)}</div><div class="muted small" style="margin-top:4px">saldo a devolver · aportado ${brl(ap.tot)}</div><div class="muted small" style="margin-top:8px">1º prazo de devolução: ${ap.prazo?dCurta(ap.prazo)+" "+ap.prazo.getFullYear():"—"}</div></div>`:""}
-   <div class="panel"><h3>Atalhos</h3><div class="row"><button class="btn sm" data-act="propNova">+ Proposta</button><button class="btn sm" data-act="finNovo" data-tipo="saida" data-proprio="1">Paguei do bolso</button><button class="btn sm" data-act="amNova" data-v="entrada">+ Amostras</button><button class="btn sm" data-act="cliNovo">+ Cliente</button></div></div>`;
+   <div class="panel"><h3>Atalhos</h3><div class="row"><button class="btn sm" data-act="propNova">+ Orçamento</button><button class="btn sm" data-act="finNovo" data-tipo="saida" data-proprio="1">Paguei do bolso</button><button class="btn sm" data-act="amNova" data-v="entrada">+ Amostras</button><button class="btn sm" data-act="cliNovo">+ Cliente</button></div></div>`;
 }
 function chips(key,opts,cur){return `<div class="chips">${opts.map(([k,l,n])=>`<button data-act="fchip" data-f="${key}" data-v="${k}" class="${cur===k?"on":""}">${l}${n!==undefined?`<span class="c">${n}</span>`:""}</button>`).join("")}</div>`}
 function qbox(key,ph){return `<div class="q">${ic("search")}<input data-q="${key}" value="${esc(S.f[key].q)}" placeholder="${ph}"></div>`}
@@ -1083,7 +1083,7 @@ VIEWS.painel=()=>{
   const ent=S.fin.filter(f=>f.status==="ativo"&&f.tipo==="entrada"&&f.pago_em&&f.pago_em.slice(0,7)===mesK&&f.categoria!=="aporte");
   const sai=S.fin.filter(f=>f.status==="ativo"&&f.tipo==="saida"&&f.pago_em&&f.pago_em.slice(0,7)===mesK);
   return `<div class="hero"><span class="stk">aura ✦</span><div><div class="kick">● Implay Studio · Av. Paulista 2206</div><h2>Vende ao vivo.<br><em>Mede na hora.</em></h2><p>Olá, ${esc(S.me.nome)}. Hoje: ${cnt.hoje} lives, ${occNow.size} espaços no ar agora e ${vagas.length} vagas abertas para sellers.</p>
-   <div class="row" style="margin-top:16px"><button class="btn p sm" data-act="novoJob">+ Novo job</button><button class="btn sm" data-act="propNova">+ Proposta</button></div></div>
+   <div class="row" style="margin-top:16px"><button class="btn p sm" data-act="novoJob">+ Novo job</button><button class="btn sm" data-act="propNova">+ Orçamento</button></div></div>
    <div><div class="lab">Espaços do estúdio hoje</div><div class="floor">${ESPACOS.map(e=>`<div class="b ${occNow.has(e)?"on":occ.has(e)?"v":""}">${e}</div>`).join("")}</div>
    <div class="floorlg"><span><i style="background:var(--flash)"></i>no ar agora</span><span><i style="background:var(--volt)"></i>reservado hoje</span><span><i style="background:var(--card2);border:1px solid var(--linha)"></i>livre</span></div></div></div>
   <div class="stages">
@@ -1421,7 +1421,7 @@ VIEWS.painel=()=>{const now=new Date(),mesK=monthKey(now);const R=rangeOf("mes")
   if(st==="hoje")l=l.filter(j=>sameDay(new Date(j.inicio),now));else if(st==="vagas")l=vagas;else l=l.filter(j=>new Date(j.fim)>now&&new Date(j.inicio)<fimSem);
   const gm={};lm.forEach(j=>{const k=j.marca||"—";gm[k]=(gm[k]||0)+(Number(j.gmv)||0)});const gs={};lm.forEach(j=>{if(j.principal_id)gs[j.principal_id]=(gs[j.principal_id]||0)+(Number(j.gmv)||0)});
   const mes=lastMonths(6).map(([k,lb])=>[lb,S.jobs.filter(j=>j.status==="realizado"&&monthKey(new Date(j.inicio))===k).reduce((s,j)=>s+(Number(j.gmv)||0),0)]);
-  return `<div class="welcome"><div><div class="kick">● ${hojeTxt()} · Implay Studio Paulista</div><h1>Olá, ${esc(S.me.nome)} <span style="color:var(--volt)">✦</span></h1></div><div class="row"><button class="btn p sm" data-act="novoJob">+ Novo job</button><button class="btn sm" data-act="propNova">+ Proposta</button><button class="btn sm" data-act="tab" data-v="relatorios">Relatórios</button></div></div>
+  return `<div class="welcome"><div><div class="kick">● ${hojeTxt()} · Implay Studio Paulista</div><h1>Olá, ${esc(S.me.nome)} <span style="color:var(--volt)">✦</span></h1></div><div class="row"><button class="btn p sm" data-act="novoJob">+ Novo job</button><button class="btn sm" data-act="propNova">+ Orçamento</button><button class="btn sm" data-act="tab" data-v="relatorios">Relatórios</button></div></div>
   <div class="mks six">${mini("GMV do mês",brlK(gmv),lm.length+" lives realizadas","v")}${mini("Receita do mês",brlK(rec),"sem aportes")}${mini("Resultado do mês",brlK(rec-des),"receita − despesas",rec-des<0?"f":"")}${mini("Contratos ativos",ativos.length,brlK(soma(ativos.map(p=>({valor:p.valor_fixo}))))+"/mês fixo","c")}${mini("Lives em 7 dias",cnt.semana,cnt.hoje+" hoje")}${mini("Vagas abertas",vagas.length,"sem seller",vagas.length?"f":"")}</div>
   <div class="grid3">
    <div class="panel"><h3>Funil comercial <a data-act="tab" data-v="funil">abrir ›</a></h3><div class="fbar">${FUNIL.map(([k,lb])=>`<div class="fb" data-act="tab" data-v="funil"><b>${fun[k]}</b><span>${lb.split(" /")[0]}</span></div>`).join("")}</div></div>
@@ -1536,7 +1536,14 @@ const _loadAll4=loadAll;loadAll=async function(){await _loadAll4();if(S.demo)ret
 
 /* ---------- menu, badge, pendências ---------- */
 MENU[1][1].splice(1,0,["orcamentos","Orçamentos","Proposta V1 + aprovação","doc"]);
-MENU[1][1].forEach(x=>{if(x[0]==="propostas"){x[1]="Propostas (antigas)";x[2]="Modelo anterior"}});
+{const ix=MENU[1][1].findIndex(x=>x[0]==="propostas");if(ix>=0)MENU[1][1].splice(ix,1)}
+HEADACT.funil=()=>`<button class="btn p sm" data-act="orcNovo">+ Novo orçamento</button>`;
+/* funil e painel: orçamentos em aberto entram como lead / enviada; contratos continuam vindo de imp_propostas */
+function orcPseudo(){return S.orcs.filter(o=>!["aceito"].includes(o.status)).map(o=>{const it=(o.itens||[]).filter(i=>i.on);const pk=it.filter(i=>(preco(i.k)||{}).grupo==="pacote");const v=pk.length?Math.min(...pk.map(i=>+i.valor)):it.length?Math.min(...it.map(i=>+i.valor)):0;
+  return {id:"o:"+o.id,marca:o.marca,cliente_id:o.cliente_id,pacote:orcResumo(o),valor_fixo:v,numero:o.numero,contrato_numero:on(o.numero),status:o.status==="enviado"?"enviada":["recusado","cancelado"].includes(o.status)?"recusada":"rascunho"}})}
+function comOrcs(fn){return function(){const real=S.propostas;S.propostas=real.filter(p=>p.status==="aceita").concat(orcPseudo());try{return fn.apply(this,arguments)}finally{S.propostas=real}}}
+VIEWS.funil=comOrcs(VIEWS.funil);VIEWS.painel=comOrcs(VIEWS.painel);
+const _pend5=pendencias;pendencias=function(){return _pend5().filter(x=>x.act!=="goProp")};
 Object.assign(TAB_NOME,{orcamentos:"Orçamentos"});Object.assign(TAB_SUB,{orcamentos:"Escolha cliente, categorias e pacotes; ajuste valores; aprove e gere a proposta em PDF"});
 HEADACT.orcamentos=()=>`<button class="btn p sm" data-act="orcNovo">+ Novo orçamento</button>`;
 function orcPendentes(){if(!isSocio())return [];return S.orcs.filter(o=>o.status==="aguardando"&&!(o.tem_desconto&&o.created_by===S.me.user_id))}
@@ -1711,7 +1718,9 @@ document.addEventListener("input",e=>{const t=e.target;
 document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]");if(!a)return;const act=a.dataset.act,k=a.dataset.k,v=a.dataset.v,id=a.dataset.id;
   const H=()=>{e.stopImmediatePropagation()};
   try{switch(act){
-   case"orcNovo":H();closeSheet();openOrc(null);break;
+   case"orcNovo":case"propNova":H();closeSheet();openOrc(null);if(a.dataset.cli){const c=$("#sheetIn [name=cliente_id]");if(c)c.value=a.dataset.cli;const cl=S.clientes.find(x=>x.id===a.dataset.cli);const m=$("#sheetIn [name=marca]");if(m&&cl)m.value=cl.marca}break;
+   case"prop":if(id&&id.startsWith("o:")){H();openOrc(id.slice(2))}break;
+   case"goProp":H();if(v==="aceita"){S.tab="contratos"}else{S.tab="orcamentos";S.f.orc.view="lista";S.f.orc.st=v==="enviada"?"enviado":"todos"}render();break;
    case"orcAbrir":H();openOrc(id);break;
    case"orcView":H();S.f.orc.view=v;render();break;
    case"oeTog":H();{const it=oeItem(k);it.on=!it.on;oeRefresh(k)}break;
