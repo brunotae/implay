@@ -492,6 +492,9 @@ table.tb td{font-size:13.5px}table.tb .s{font-size:12px}
 .pg.v1 .vdraft{position:absolute;right:40px;top:24px;background:#e3245b;color:#fff;font-size:11px;font-weight:800;letter-spacing:.12em;border-radius:6px;padding:4px 10px;z-index:4}
 .pg.v1 .vbora{font-size:120px;font-weight:800;color:var(--vv);line-height:1;margin-top:20px}
 .pg.v1 .row{display:flex}
+.pg.v1 h1,.pg.v1 h2,.pg.v1 .vbig,.pg.v1 .vhuge,.pg.v1 .vbora,.pg.v1 .vpt,.pg.v1 .vpv,.pg.v1 .vn,.pg.v1 .vwm{font-family:"Bricolage Grotesque",Figtree,sans-serif!important;letter-spacing:-.01em}
+.pg.v1 .vtb th:first-child{border-top-left-radius:18px}.pg.v1 .vtb th:last-child{border-top-right-radius:18px}
+.pg.v1 img.semimg{visibility:hidden}
 </style>
 </head>
 <body>
@@ -1698,7 +1701,8 @@ function orcDoc(o){const P=[];const M=esc(o.marca||"Marca");const final=["aprova
   P.push(v1page("dark",`<div class="vbora">bora!</div><h2>Escolha o pacote e<br>marcamos a primeira live</h2><div class="vg2 w"><div class="vc cream"><b>O que a marca envia</b><ul><li>Lista de produtos e condições comerciais</li><li>Amostras</li><li>Acesso à loja no TikTok Shop</li></ul></div><div class="vc volt"><b>Fale com a gente</b><ul class="vct"><li><b>Caio Riccio</b>(21) 96590-7894</li><li><b>Pedro Sallun</b>(16) 99116-7669</li><li><b>Bruno Tae</b>(11) 98964-4378</li></ul><p><b>@implayhub · implaylive.com.br</b></p><p style="font-size:12px;opacity:.75">Orçamento ${on(o.numero)} · elaborado por ${esc(o.elaborado_nome||S.me.nome)}</p></div></div>
    <p class="vnote">Com o pacote aprovado, reservamos a agenda do estúdio e começamos a preparação assim que os produtos chegam. As informações desta proposta são confidenciais e destinadas apenas aos envolvidos.</p><img class="vlogo3" src="prop/logo.png">`));
   return P.map((p,i)=>`<div class="pgw"><div class="pg v1 ${p.cls}">${i?`<div class="vnum">${String(i+1).padStart(2,"0")}</div>`:""}${p.html}${!final&&i?`<div class="vdraft">RASCUNHO</div>`:""}</div></div>`).join("")}
-function showOrcDoc(o){setPage("landscape");const d=$("#doc");d.innerHTML=`<div class="bar"><button class="btn p" data-act="docPrint">Salvar PDF / Imprimir</button><button class="btn" data-act="docClose">Fechar</button></div>${orcDoc(o)}<div class="sp30" style="height:30px"></div>`;d.hidden=false;d.scrollTop=0;fitDoc()}
+function imgFb(el){const f=el.dataset.f;const alt=["prop/"+f,f,"../prop/"+f,"/prop/"+f];const n=(+el.dataset.t||0)+1;el.dataset.t=n;if(n<alt.length)el.src=alt[n];else{el.classList.add("semimg");el.onerror=null;S.semImg=true;const w=$("#docImgWarn");if(w)w.hidden=false}}
+function showOrcDoc(o){setPage("landscape");S.semImg=false;const d=$("#doc");d.innerHTML=`<div class="bar"><button class="btn p" data-act="docPrint">Salvar PDF / Imprimir</button><button class="btn" data-act="docClose">Fechar</button><span id="docImgWarn" hidden style="color:#ffb340;font-size:12px;align-self:center">⚠ Fotos não encontradas: falta a pasta <b>prop</b> ao lado do index.html no GitHub</span></div>${orcDoc(o).replace(/src="prop\/([^"]+)"/g,'src="prop/$1" data-f="$1" onerror="imgFb(this)"')}<div class="sp30" style="height:30px"></div>`;d.hidden=false;d.scrollTop=0;fitDoc()}
 
 /* ---------- eventos ---------- */
 document.addEventListener("input",e=>{const t=e.target;
