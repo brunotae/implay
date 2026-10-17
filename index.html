@@ -1532,7 +1532,7 @@ const PRECOS_PADRAO=[
 const GRUPOS=[["pontual","Live Pontual","Uma live avulsa, por categoria de estúdio"],["pacote","Pacotes mensais","Lives recorrentes no mês"],["drop","Live de lançamento (Drop)","Projeto de lançamento com várias lives"]];
 const OST={rascunho:["rascunho",""],aguardando:["aguardando aprovação","w"],aprovado:["aprovado","o"],recusado:["recusado","x"],enviado:["enviado ao cliente","c"],aceito:["aceito","v"],cancelado:["cancelado","x"]};
 S.precos=[];S.orcs=[];S.f.orc={q:"",st:"todos",view:"lista"};
-function on(n){return "ORC-"+String(n||0).padStart(4,"0")}
+function on(n){return n?"ORC-"+String(n).padStart(4,"0"):"Prévia (sem número)"}
 function preco(k){return (S.precos.length?S.precos:PRECOS_PADRAO).find(p=>p.chave===k)}
 function precosList(){return (S.precos.length?S.precos:PRECOS_PADRAO).slice().sort((a,b)=>(a.ordem||0)-(b.ordem||0))}
 function itemDesc(it){const p=preco(it.k);if(!p||!it.on)return false;return Number(it.valor)<Number(p.valor)||Number(it.perc)<Number(p.perc)}
@@ -1724,6 +1724,19 @@ function orcDoc(o){const P=[];const M=esc(o.marca||"Marca");const final=["aprova
    <p class="vnote">Com o pacote aprovado, reservamos a agenda do estúdio e começamos a preparação assim que os produtos chegam. As informações desta proposta são confidenciais e destinadas apenas aos envolvidos.</p><img class="vlogo3" src="prop/logo.png">`));
   return P.map((p,i)=>`<div class="pgw"><div class="pg v1 ${p.cls}">${i?`<div class="vnum">${String(i+1).padStart(2,"0")}</div>`:""}${p.html}${!final&&i?`<div class="vdraft">RASCUNHO</div>`:""}</div></div>`).join("")}
 function imgFb(el){const f=el.dataset.f;const alt=["prop/"+f,f,"../prop/"+f,"/prop/"+f];const n=(+el.dataset.t||0)+1;el.dataset.t=n;if(n<alt.length)el.src=alt[n];else{el.classList.add("semimg");el.onerror=null;S.semImg=true;const w=$("#docImgWarn");if(w)w.hidden=false}}
+/* abre o orçamento numa aba nova (o quadro de edição continua aberto na aba do ERP) */
+function orcTab(o,w){if(!w)return false;try{
+  const snap={o,precos:precosList(),cli:S.clientes.find(c=>c.id===o.cliente_id)||null,me:S.me&&S.me.nome};
+  localStorage.setItem("implay-orc-prev",JSON.stringify(snap));
+  w.location.href=location.pathname+"?orc=prev&t="+Date.now();return true}catch(e){console.warn(e);try{w.close()}catch(_){}return false}}
+function orcPreviewBoot(){if(new URLSearchParams(location.search).get("orc")!=="prev")return false;
+  let snap=null;try{snap=JSON.parse(localStorage.getItem("implay-orc-prev")||"null")}catch(e){}
+  if(!snap){document.body.innerHTML='<p style="font:15px Inter,sans-serif;color:#ccc;padding:30px">Prévia expirada. Gere de novo pelo ERP.</p>';return true}
+  S.precos=snap.precos||[];S.clientes=snap.cli?[snap.cli]:[];S.me={nome:snap.me||""};
+  const o=snap.o;document.title=(o.numero?on(o.numero):"Prévia")+" · "+(o.marca||"Orçamento");
+  showOrcDoc(o);const bar=$("#doc .bar");bar.querySelector('[data-act=docClose]').outerHTML='<button class="btn" onclick="window.close()">Fechar aba</button>';
+  document.addEventListener("click",e=>{if(e.target.closest("[data-act=docClose]"))e.stopImmediatePropagation()},true);
+  addEventListener("resize",fitDoc);return true}
 function showOrcDoc(o){setPage("landscape");S.semImg=false;const d=$("#doc");d.innerHTML=`<div class="bar"><button class="btn p" data-act="docPrint">Salvar PDF / Imprimir</button><button class="btn" data-act="docClose">Fechar</button><span id="docImgWarn" hidden style="color:#ffb340;font-size:12px;align-self:center">⚠ Fotos não encontradas: falta a pasta <b>prop</b> ao lado do index.html no GitHub</span></div>${orcDoc(o).replace(/src="prop\/([^"]+)"/g,'src="prop/$1" data-f="$1" onerror="imgFb(this)"')}<div class="sp30" style="height:30px"></div>`;d.hidden=false;d.scrollTop=0;fitDoc()}
 
 /* ---------- eventos ---------- */
@@ -1742,14 +1755,14 @@ document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]
    case"oeEdit":H();{const it=oeItem(k);it.edit=!it.edit;oeRefresh(k);if(it.edit){const i=$(`#sheetIn [data-oe=valor][data-k="${k}"]`);if(i)i.focus()}}break;
    case"oeReset":H();{const it=oeItem(k),p=preco(k);it.valor=Number(p.valor);it.perc=Number(p.perc);oeRefresh(k)}break;
    case"oeQtd":H();{const it=oeItem(k);it.qtd=Math.max(1,(it.qtd||1)+Number(v));oeRefresh(k)}break;
-   case"orcSalvar":H();{const s=await orcSalvar(v);if(s){if(v==="aprovado"){closeSheet();render();showOrcDoc(s)}else{closeSheet();S.tab="orcamentos";render()}}}break;
+   case"orcSalvar":H();{const w=v==="aprovado"?window.open("","_blank"):null;let s=null;try{s=await orcSalvar(v)}finally{if(!s&&w)w.close()}if(s){if(v==="aprovado"){closeSheet();render();if(!orcTab(s,w))showOrcDoc(s)}else{closeSheet();S.tab="orcamentos";render()}}}break;
    case"orcAprovar":H();{const o=await run(db.from("imp_orcamentos").update({status:"aprovado"}).eq("id",id).select().single(),"Orçamento aprovado");const i=S.orcs.findIndex(x=>x.id===id);S.orcs[i]=o;closeSheet();render()}break;
    case"orcRecusar":H();{if(!a.dataset.armed){a.dataset.armed=1;a.insertAdjacentHTML("afterend",`<input id="recMot" placeholder="Motivo da recusa (opcional)" style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--linha);border-radius:999px;padding:8px 12px">`);a.textContent="Confirmar recusa";return}
      const o=await run(db.from("imp_orcamentos").update({status:"recusado",recusa_motivo:($("#recMot")||{}).value||null}).eq("id",id).select().single(),"Recusado");const i=S.orcs.findIndex(x=>x.id===id);S.orcs[i]=o;closeSheet();render()}break;
    case"orcStatus":H();{if(v==="cancelado"&&!armed(a))return;const o=await run(db.from("imp_orcamentos").update({status:v}).eq("id",id).select().single(),v==="enviado"?"Marcado como enviado":"Cancelado");const i=S.orcs.findIndex(x=>x.id===id);S.orcs[i]=o;closeSheet();render()}break;
    case"orcPdf":H();{const o=oeCollect();const base=o.id?S.orcs.find(x=>x.id===o.id):{};const view=Object.assign({},base,o,{obs:(o.completo===false?"[curto] ":"")+(o.obs||""),elaborado_nome:base.elaborado_nome||S.me.nome,elaborado_em:base.elaborado_em||new Date().toISOString(),numero:base.numero||0});
      const changed=o.id&&JSON.stringify(o.itens.map(({k,on,valor,perc,qtd})=>[k,!!on,+valor,+perc,+(qtd||1)]))!==JSON.stringify((base.itens||[]).map(({k,on,valor,perc,qtd})=>[k,!!on,+valor,+perc,+(qtd||1)]));if(changed){view.status="rascunho";view.aprovado_nome=null}
-     closeSheet();showOrcDoc(view)}break;
+     if(!orcTab(view,window.open("","_blank"))){closeSheet();showOrcDoc(view)}}break;
    case"orcAceito":H();{const o=S.orcs.find(x=>x.id===id);const pk=(o.itens||[]).filter(i=>i.on&&(preco(i.k)||{}).grupo==="pacote");const dr=(o.itens||[]).find(i=>i.on&&(preco(i.k)||{}).grupo==="drop");
      const esc1=pk[0]||dr||(o.itens||[]).find(i=>i.on);const p=preco(esc1.k);const hoje=new Date();const fim=new Date(hoje);fim.setMonth(fim.getMonth()+(o.vigencia_meses||3));fim.setDate(fim.getDate()-1);
      const row={cliente_id:o.cliente_id,marca:o.marca,mes_ref:o.mes_ref,pacote:(p.grupo==="pacote"?"Pacote ":p.grupo==="drop"?"":"Live Pontual ")+p.categoria,modalidade:"servico",valor_fixo:Number(esc1.valor)*(p.grupo==="pontual"?(esc1.qtd||1):1),perc_variavel:Number(esc1.perc),vigencia_meses:o.vigencia_meses,pagamento:o.pagamento,status:"aceita",aceita_em:hoje.toISOString(),contrato_inicio:ymd(hoje),contrato_fim:ymd(fim),obs:"Gerado do orçamento "+on(o.numero)};
@@ -1856,7 +1869,7 @@ document.addEventListener("change",e=>{
 });
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh()});
 setInterval(refresh,60000);
-boot();
+if(!orcPreviewBoot())boot();
 </script>
 </body>
 </html>
