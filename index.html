@@ -509,6 +509,15 @@ h1,h2,.pagehead h1{font-family:var(--fb);letter-spacing:-.01em}
 .pcard .fn{font-size:11.5px;color:var(--volt);margin-top:6px;font-weight:600}
 .ulc{margin:6px 0 0;padding-left:18px;font-size:12.5px;line-height:1.6}
 @media(max-width:760px){.kv>div{grid-template-columns:1fr;gap:2px}.qs{grid-template-columns:1fr 70px 44px}}
+.kv.two{display:grid;grid-template-columns:1fr 1fr;gap:10px 28px}
+.dropz{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;border:2px dashed var(--linha2);border-radius:18px;padding:26px 16px;cursor:pointer;background:var(--bg2);transition:.15s;margin-bottom:12px}
+.dropz b{font-family:var(--fb);font-size:18px}.dropz span{font-size:12.5px;color:var(--cinza)}.dropz:hover,.dropz.on{border-color:var(--volt);background:rgba(213,255,63,.06)}.dropz.on b{color:var(--volt)}
+.dic{flex:none;width:38px;height:38px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--cinza)}
+.dic.PDF{background:#3a1416;color:#ff8b8b}.dic.IMG{background:#14283a;color:#8bc5ff}.dic.DOC{background:#14203a;color:#8ba8ff}.dic.XLS{background:#143a1e;color:#8bffa8}.dic.PPT{background:#3a2a14;color:#ffc58b}
+#lst .m0 .s{word-break:break-all}.dlink{cursor:pointer;color:var(--chalk);text-decoration:none}.dlink:hover{color:var(--volt);text-decoration:underline}
+.uprow{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--linha);border-radius:12px;padding:8px 10px;margin-bottom:6px;font-size:12.5px}.uprow .s{font-size:11.5px;color:var(--cinza)}
+.uprow.ok .dic{background:var(--volt);color:#000}.uprow.erro .dic{background:var(--bad);color:#000}
+@media(max-width:760px){.kv.two{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -533,7 +542,7 @@ const CAT_SAI=[["seller","Cachê de seller","variavel"],["aluguel_imovel","Alugu
 const CAT_NOME=Object.fromEntries([...CAT_ENT,...CAT_SAI].map(c=>[c[0],c[1]]));
 const PACOTES=["Essencial","Crescimento","Escala","Marca + afiliados","Live de lançamento","Aluguel do espaço"];
 const S={me:null,tab:"painel",membros:[],clientes:[],propostas:[],jobs:[],fin:[],amostras:[],
-  week:mondayOf(new Date()),agView:"mes",jobsF:"proximos",propF:"todas",finF:"tudo",finMes:monthKey(new Date()),amF:"saldo",eqF:"todos",finSub:"lanc"};
+  week:mondayOf(new Date()),agView:"mes",jobsF:"proximos",propF:"todas",finF:"tudo",finMes:"tudo",amF:"saldo",eqF:"todos",finSub:"lanc"};
 
 /* ---------- utilidades ---------- */
 function $(s,r=document){return r.querySelector(s)}
@@ -905,7 +914,7 @@ function finItem(f){
   const pend=!f.pago_em,venc=f.vencimento&&parseYmd(f.vencimento)<new Date(new Date().toDateString());
   const st=f.reembolso!=="nao"?`<span class="tag ${f.reembolso==="pago"?"o":f.reembolso==="recusado"?"x":"w"}">reembolso ${f.reembolso}</span>`:pend?`<span class="tag ${venc?"x":"w"}">${f.tipo==="entrada"?"a receber":"a pagar"}${venc?" · atrasado":""}</span>`:`<span class="tag o">${f.tipo==="entrada"?"recebido":"pago"}</span>`;
   return `<div class="item" data-act="fin" data-id="${f.id}"><div class="b"><div class="t">${esc(f.descricao||CAT_NOME[f.categoria]||f.categoria)}</div>
-  <div class="s">${esc(CAT_NOME[f.categoria]||f.categoria)}${f.natureza?" · "+f.natureza:""} · ${dCurta(f.pago_em||f.vencimento||f.created_at)}${f.contraparte?" · "+esc(f.contraparte):""}${f.tem_comprovante?" · 📎":""}</div>${st}</div>
+  <div class="s">${esc(CAT_NOME[f.categoria]||f.categoria)}${f.natureza?" · "+(f.natureza==="variavel"?"variável":f.natureza):""} · ${dCurta(f.pago_em||f.vencimento||f.created_at)}${f.contraparte?" · "+esc(f.contraparte):""}${f.tem_comprovante?" · 📎":""}</div>${st}</div>
   <div class="r ${f.tipo==="entrada"?"pos":"neg"}">${f.tipo==="entrada"?"+":"−"} ${brl(f.valor)}</div></div>`}
 function catOpts(tipo,sel){return (tipo==="entrada"?CAT_ENT:CAT_SAI).map(c=>[c[0],c[1]])}
 function openFin(id,preset={}){
@@ -1181,7 +1190,7 @@ function finFiltrar(l){const f=S.f.fin;l=l.filter(x=>has(f.q,x.descricao,x.contr
 function finRow(x){const pend=!x.pago_em,venc=x.vencimento&&parseYmd(x.vencimento)<new Date(new Date().toDateString());
   const st=x.reembolso!=="nao"?`<span class="tag ${x.reembolso==="pago"?"o":x.reembolso==="recusado"?"x":"w"}">reembolso ${x.reembolso}</span>${x.reembolso_para?`<div class="s">para ${esc(nome(x.reembolso_para))}</div>`:""}`:pend?`<span class="tag ${venc?"x":"w"}">${x.tipo==="entrada"?"a receber":"a pagar"}${venc?" · atrasado":""}</span>`:`<span class="tag o">${x.tipo==="entrada"?"recebido":"pago"}</span>`;
   return `<tr data-act="fin" data-id="${x.id}"><td data-l="Data">${dCurta(x.pago_em||x.vencimento||x.created_at)}</td><td class="m0"><div class="t">${esc(x.descricao||CAT_NOME[x.categoria]||x.categoria)}${x.tem_comprovante?" 📎":""}</div><div class="s">${esc(x.contraparte||"")}${x.forma?" · "+esc(x.forma):""}</div></td>
-  <td data-l="Categoria">${esc(CAT_NOME[x.categoria]||x.categoria)}${x.natureza?`<div class="s">${x.natureza}</div>`:""}</td><td data-l="Situação">${st}</td><td data-l="Valor" class="r ${x.tipo==="entrada"?"pos":"neg"}">${x.tipo==="entrada"?"+":"−"} ${brl(x.valor)}</td></tr>`}
+  <td data-l="Categoria">${esc(CAT_NOME[x.categoria]||x.categoria)}${x.natureza?`<div class="s">${x.natureza==="variavel"?"variável":x.natureza}</div>`:""}</td><td data-l="Situação">${st}</td><td data-l="Valor" class="r ${x.tipo==="entrada"?"pos":"neg"}">${x.tipo==="entrada"?"+":"−"} ${brl(x.valor)}</td></tr>`}
 const FCOLS=[["Data"],["Descrição"],["Categoria"],["Situação"],["Valor","r"]];
 LISTS.fin=()=>{const sub=S.finSub;let l;
   if(sub==="reemb")l=finFiltrar(S.fin.filter(x=>x.status==="ativo"&&x.reembolso!=="nao"));
@@ -1204,7 +1213,7 @@ VIEWS.fin=()=>{const sub=S.finSub;
     return subs+`<div class="grid kpis" style="margin-bottom:14px">${Object.entries(pess).map(([k,v])=>`<div class="card kpi ${k===S.me.id?"vol":""}"><div class="l">A devolver · ${esc(nome(k)||"sem nome")}</div><div class="n">${brl(v.sol+v.apr)}</div><div class="small" style="margin-top:4px">${v.n} itens · aprovado ${brl(v.apr)}</div></div>`).join("")}<div class="card kpi"><div class="l">Já reembolsado</div><div class="n">${brl(soma(l.filter(x=>x.reembolso==="pago")))}</div></div></div>`+finTool()+`<div id="lst">${LISTS.fin()}</div>`}
   const [y,m]=S.finMes==="tudo"?[0,0]:S.finMes.split("-").map(Number);
   const per=finPeriodo(),ent=per.filter(x=>x.tipo==="entrada"),sai=per.filter(x=>x.tipo==="saida");
-  const nav=`<div class="row" style="margin-bottom:12px"><button class="btn sm" data-act="finMes" data-v="-1">‹</button><b style="min-width:120px;text-align:center">${S.finMes==="tudo"?"Todo o período":ML[m-1]+" "+y}</b><button class="btn sm" data-act="finMes" data-v="1">›</button><button class="btn sm" data-act="finMes" data-v="tudo">Tudo</button></div>`;
+  const nav=`<div class="row" style="margin-bottom:12px"><button class="btn sm" data-act="finMes" data-v="-1">‹</button><b style="min-width:120px;text-align:center">${S.finMes==="tudo"?"Todo o período":ML[m-1]+" "+y}</b><button class="btn sm" data-act="finMes" data-v="1">›</button>${S.finMes==="tudo"?`<button class="btn sm" data-act="finMes" data-v="0">Este mês</button>`:`<button class="btn sm" data-act="finMes" data-v="tudo">Tudo</button>`}</div>`;
   const kp=`<div class="grid kpis" style="margin-bottom:14px"><div class="card kpi"><div class="l">Entrou</div><div class="n pos">${brl(soma(ent.filter(x=>x.pago_em)))}</div></div><div class="card kpi"><div class="l">Saiu</div><div class="n neg">${brl(soma(sai.filter(x=>x.pago_em)))}</div></div><div class="card kpi cob"><div class="l">A receber</div><div class="n">${brl(soma(ent.filter(x=>!x.pago_em)))}</div></div><div class="card kpi"><div class="l">A pagar</div><div class="n">${brl(soma(sai.filter(x=>!x.pago_em)))}</div></div></div>`;
   if(sub==="cat"){const g={};sai.forEach(x=>{g[x.categoria]=(g[x.categoria]||0)+(Number(x.valor)||0)});const arr=Object.entries(g).sort((a,b)=>b[1]-a[1]);const mx=arr.length?arr[0][1]:1;
     return subs+nav+kp+`<div class="panel"><h3>Saídas por categoria <span class="muted small" style="font-family:Figtree,system-ui,sans-serif">fixas ${brl(soma(sai.filter(x=>x.natureza==="fixa")))} · variáveis ${brl(soma(sai.filter(x=>x.natureza==="variavel")))}</span></h3><div class="bars">${arr.map(([c,v])=>`<div class="bl"><span>${esc(CAT_NOME[c]||c)}</span><span class="bt"><i style="width:${Math.max(2,v/mx*100)}%"></i></span><span>${brl(v)}</span></div>`).join("")||`<div class="muted small">Sem saídas no período.</div>`}</div></div>`}
@@ -1795,97 +1804,136 @@ const _toggle4=toggleDemo;toggleDemo=async function(){await _toggle4();if(S.demo
     S.orcs.forEach(o=>o.tem_desconto=orcTemDesc(o));render()}};
 
 /* ================= v5: sócios (perfis), empresa e documentos ================= */
-S.socios=[];S.docs=[];S.f.doc={q:"",st:"todos"};
-const QUADRO_CS=[["Caio Cesar Cunha Moreira",3500,35],["Danielle Laure Formiga",3000,30],["Thiago Maghamez Gonçalves",1750,17.5],["Pedro Henrique Sinatora Sallun",1750,17.5]];
-const DOC_CAT={societario:"Societário",fiscal:"Fiscal / CNPJ",contrato:"Contratos",marca:"Marca",bancario:"Bancário",outro:"Outros"};
-const DOC_SUGERIDOS=[["Contrato social assinado","societario"],["Cartão CNPJ","fiscal"],["Acordo de sócios (V29)","societario"],["Brandbook IMPlay","marca"],["Contrato de locação · Paulista","contrato"],["Alvará de funcionamento","fiscal"],["Certidão negativa de débitos","fiscal"]];
+S.socios=[];S.docs=[];S.f.doc={q:"",st:"todos"};S.upl=[];
+const DOC_BUCKET="implay-docs";
+const DOC_CAT={societario:"Societário",fiscal:"Fiscal / CNPJ",contrato:"Contratos",marca:"Marca",bancario:"Bancário",contabil:"Contábil",outro:"Outros"};
+const DOC_SUGERIDOS=["Contrato social assinado","Cartão CNPJ","Acordo de sócios","Brandbook IMPlay","Contrato de locação","Alvará de funcionamento","Certidão negativa de débitos"];
+const DOC_COLS="id,titulo,categoria,arquivo_nome,mime,tamanho,caminho,validade,obs,created_at,created_by";
 const _loadAll5=loadAll;loadAll=async function(){await _loadAll5();if(S.demo)return;
-  const [a,b]=await Promise.all([db.from("imp_socios").select("*").order("ordem",{ascending:true}),isSocio()?db.from("imp_docs").select("id,titulo,categoria,arquivo_nome,mime,tamanho,validade,obs,created_at,created_by").order("created_at",{ascending:false}):Promise.resolve({data:[]})]);
-  S.socioSemSQL=!!a.error;S.socios=a.data||[];S.docs=b.data||[]};
+  const [a,b]=await Promise.all([db.from("imp_socios").select("*").order("ordem",{ascending:true}),isSocio()?db.from("imp_docs").select(DOC_COLS).order("created_at",{ascending:false}):Promise.resolve({data:[]})]);
+  S.socioSemSQL=!!a.error||!!b.error;S.socios=a.data||[];S.docs=b.data||[]};
 MENU[2][1].push(["empresa","Empresa","Dados e documentos","id"]);
-Object.assign(TAB_NOME,{empresa:"Empresa · dados e documentos"});Object.assign(TAB_SUB,{empresa:"Dados oficiais da IMPLAY LIVE COMMERCE LTDA, quadro societário e documentos (contrato social, CNPJ, acordos)"});
-HEADACT.empresa=()=>isSocio()?`<button class="btn p sm" data-act="docNovo">+ Documento</button>`:"";
+Object.assign(TAB_NOME,{empresa:"Empresa · dados e documentos"});Object.assign(TAB_SUB,{empresa:"Dados oficiais da IMPLAY LIVE COMMERCE LTDA e documentos da empresa"});
+HEADACT.empresa=()=>isSocio()?`<button class="btn p sm" data-act="docEscolher">+ Documento</button>`:"";
 function docVenc(d){if(!d.validade)return "";const v=parseYmd(d.validade),h=new Date(new Date().toDateString());const n=Math.round((v-h)/864e5);return n<0?`<span class="tag x">vencido</span>`:n<=30?`<span class="tag w">vence em ${n} d</span>`:""}
-const _badges5=badges;badges=function(){const b=_badges5();b.empresa=isSocio()?S.docs.filter(d=>{if(!d.validade)return false;return (parseYmd(d.validade)-new Date())/864e5<=30}).length:0;return b};
+const _badges5=badges;badges=function(){const b=_badges5();b.empresa=isSocio()?S.docs.filter(d=>d.validade&&(parseYmd(d.validade)-new Date())/864e5<=30).length:0;return b};
 function kb(n){return n>1048576?nf(n/1048576,1)+" MB":Math.max(1,Math.round(n/1024))+" KB"}
+function docIc(d){const m=d.mime||"",n=(d.arquivo_nome||"").toLowerCase();return m.includes("pdf")||n.endsWith(".pdf")?"PDF":m.startsWith("image/")?"IMG":/\.(docx?|odt)$/.test(n)?"DOC":/\.(xlsx?|csv|ods)$/.test(n)?"XLS":/\.(pptx?|key)$/.test(n)?"PPT":"ARQ"}
 VIEWS.empresa=()=>{const E=EMPRESA;
-  const dados=`<div class="grid2"><div class="panel"><h3>Dados oficiais</h3><div class="kv">
-   <div><span>Razão social</span><div><b>${E.razao}</b></div></div><div><span>Nome fantasia</span><div><b>${E.fantasia}</b></div></div><div><span>CNPJ</span><div><b>${E.cnpj}</b> <button class="lnk2" data-act="copiar" data-v="${E.cnpj}">copiar</button></div></div>
-   <div><span>Abertura</span><div><b>${E.abertura}</b> · ${E.porte} · ${E.natureza}</div></div><div><span>Sede</span><div><b>${E.sede}</b></div></div><div><span>E-mail (Receita)</span><div><b>${E.email}</b></div></div>
-   <div><span>Capital social</span><div><b>${E.capital}</b> · 10.000 quotas de R$ 1,00</div></div><div><span>Atividades (CNAE)</span><div><b style="font-weight:500">${E.cnae.replace(/; /g,"<br>")}</b></div></div></div></div>
-   <div class="panel"><h3>Quadro societário</h3><div class="muted small" style="margin-bottom:8px">Contrato Social (registrado)</div>
-   ${QUADRO_CS.map(([n,q,p])=>`<div class="qs"><div><b>${n}</b><span class="muted small">${q.toLocaleString("pt-BR")} quotas · sócio-administrador</span></div><div class="qsbar"><i style="width:${p}%"></i></div><b>${nf(p,p%1?1:0)}%</b></div>`).join("")}
-   <div class="muted small" style="margin:14px 0 8px">Acordo de Sócios (blocos)</div>
-   ${[["Tae & Dani",30],["Caio & Larissa",35],["Pedro & Thiago",35]].map(([n,p])=>`<div class="qs"><div><b>${n}</b></div><div class="qsbar v"><i style="width:${p}%"></i></div><b>${p}%</b></div>`).join("")}
-   <div class="hint">Perfis completos de cada sócio em <a data-act="tab" data-v="equipe" style="color:var(--volt);cursor:pointer">Equipe › Quem é quem</a>.</div></div></div>`;
-  if(!isSocio())return dados+`<div class="sec"><h2>Documentos</h2></div><div class="empty">Os documentos da empresa ficam visíveis só para os sócios.</div>`;
+  const dados=`<div class="panel"><h3>Dados oficiais</h3><div class="kv two">
+   <div><span>Razão social</span><div><b>${E.razao}</b></div></div><div><span>Nome fantasia</span><div><b>${E.fantasia}</b></div></div>
+   <div><span>CNPJ</span><div><b>${E.cnpj}</b> <button class="lnk2" data-act="copiar" data-v="${E.cnpj}">copiar</button></div></div><div><span>Abertura</span><div><b>${E.abertura}</b> · ${E.porte} · ${E.natureza}</div></div>
+   <div><span>Sede</span><div><b>${E.sede}</b></div></div><div><span>E-mail (Receita)</span><div><b>${E.email}</b></div></div>
+   <div><span>Capital social</span><div><b>${E.capital}</b></div></div><div><span>Atividades (CNAE)</span><div><b style="font-weight:500">${E.cnae.replace(/; /g,"<br>")}</b></div></div></div></div>`;
+  if(!isSocio())return dados;
   if(S.socioSemSQL)return `<div class="warnbox">Falta rodar o SQL <b>implay_socios_docs.sql</b> no Supabase. Depois recarregue a página.</div>`+dados;
-  const f=S.f.doc;let l=S.docs.filter(d=>has(f.q,d.titulo,d.arquivo_nome,d.obs));if(f.st!=="todos")l=l.filter(d=>d.categoria===f.st);
-  const falta=DOC_SUGERIDOS.filter(([t])=>!S.docs.some(d=>d.titulo.toLowerCase()===t.toLowerCase()));
-  return dados+`<div class="sec"><h2>Documentos <span class="muted small">só sócios veem</span></h2></div>
-   ${falta.length?`<div class="sugs"><span class="muted small">Faltam:</span>${falta.map(([t,c])=>`<button class="pch" data-act="docNovo" data-t="${esc(t)}" data-c="${c}">+ ${esc(t)}</button>`).join("")}</div>`:""}
+  const f=S.f.doc;let l=docLista();
+  const falta=DOC_SUGERIDOS.filter(t=>!S.docs.some(d=>d.titulo.toLowerCase().startsWith(t.toLowerCase().split(" ").slice(0,2).join(" "))));
+  return `<div class="sec" style="margin-top:0"><h2>Documentos <span class="muted small">🔒 só sócios veem</span></h2></div>
+   <label class="dropz" id="dropz"><input type="file" id="docFiles" multiple hidden accept=".pdf,image/*,.doc,.docx,.xls,.xlsx,.csv,.ppt,.pptx,.txt,.zip"><b>Arraste os arquivos aqui</b><span>ou clique para escolher · PDF, imagem, Word, Excel · até 50 MB cada</span><span class="muted small">O sistema lê o arquivo e já coloca o nome (contrato social, cartão CNPJ, acordo de sócios…)</span></label>
+   <div id="uplst">${uplHtml()}</div>
+   ${falta.length&&S.docs.length<12?`<div class="sugs"><span class="muted small">Ainda não subiu:</span>${falta.map(t=>`<span class="tag">${esc(t)}</span>`).join("")}</div>`:""}
    ${chips("doc",[["todos","Todos",S.docs.length],...Object.entries(DOC_CAT).map(([k,v])=>[k,v,S.docs.filter(d=>d.categoria===k).length]).filter(x=>x[2])],f.st)}
-   <div class="tool">${qbox("doc","Buscar documento…")}</div><div id="lst">${LISTS.doc(l)}</div>`};
-LISTS.doc=(l)=>{if(!l){const f=S.f.doc;l=S.docs.filter(d=>has(f.q,d.titulo,d.arquivo_nome,d.obs));if(f.st!=="todos")l=l.filter(d=>d.categoria===f.st)}
-  return tbl([["Documento"],["Categoria"],["Arquivo"],["Validade"],["Enviado"],[""]],l.map(d=>`<tr><td class="m0"><div class="t">${esc(d.titulo)}</div>${d.obs?`<div class="s">${esc(d.obs)}</div>`:""}</td><td data-l="Categoria">${DOC_CAT[d.categoria]||d.categoria}</td>
-   <td data-l="Arquivo"><span class="small">${esc(d.arquivo_nome||"")}</span><div class="s">${d.tamanho?kb(d.tamanho):""}</div></td><td data-l="Validade">${d.validade?dCurta(d.validade):"—"} ${docVenc(d)}</td><td data-l="Enviado">${dCurta(d.created_at)}</td>
-   <td class="r" style="white-space:nowrap"><button class="btn p sm" data-act="docAbrir" data-id="${d.id}">Abrir</button> <button class="btn sm" data-act="docBaixar" data-id="${d.id}">Baixar</button> <button class="btn d sm" data-act="docApagar" data-id="${d.id}">Excluir</button></td></tr>`),"Nenhum documento ainda. Use os botões acima para subir o contrato social, o cartão CNPJ e o acordo de sócios.")};
-function openDoc(t,c){openSheet(`<form onsubmit="return false"><h3>Novo documento</h3><div class="hint">PDF ou imagem, até 8 MB. Fica guardado no sistema e só sócios veem.</div>
-  ${pick("titulo","Documento",t||"",DOC_SUGERIDOS.slice(0,4).map(x=>x[0]),{ph:"Outro: nome do documento"})}
-  ${pick("categoria","Categoria",c||"societario",Object.entries(DOC_CAT),{ph:"categoria"})}
-  <div class="fld"><label>Arquivo</label><input type="file" id="docFile" accept="application/pdf,image/*"><div class="hint" id="docInfo"></div></div>
-  <div class="cols2">${fld("validade","Validade (se tiver)","","date")}${fld("obs","Observação","")}</div>
-  <div class="acts"><button type="button" class="btn p" data-act="docSalvar">Salvar documento</button><button type="button" class="btn" data-act="fechar">Fechar</button></div></form>`);
-  $("#sheetIn [name=categoria]").type="hidden"}
+   <div class="tool">${qbox("doc","Buscar documento…")}</div><div id="lst">${LISTS.doc(l)}</div>
+   <div class="sec"><h2>Empresa</h2></div>`+dados};
+function docLista(){const f=S.f.doc;let l=S.docs.filter(d=>has(f.q,d.titulo,d.arquivo_nome,d.obs,DOC_CAT[d.categoria]));if(f.st!=="todos")l=l.filter(d=>d.categoria===f.st);return l}
+LISTS.doc=(l)=>{l=l||docLista();
+  return tbl([["Documento"],["Categoria"],["Validade"],["Enviado"],[""]],l.map(d=>`<tr><td class="m0"><div class="row" style="flex-wrap:nowrap;gap:10px"><span class="dic ${docIc(d)}">${docIc(d)}</span><div><a class="t dlink" data-act="docAbrir" data-id="${d.id}">${esc(d.titulo)}</a><div class="s">${esc(d.arquivo_nome||"")}${d.tamanho?" · "+kb(d.tamanho):""}${d.obs?" · "+esc(d.obs):""}</div></div></div></td>
+   <td data-l="Categoria">${DOC_CAT[d.categoria]||esc(d.categoria)}</td><td data-l="Validade">${d.validade?dCurta(d.validade):"—"} ${docVenc(d)}</td><td data-l="Enviado">${dCurta(d.created_at)}</td>
+   <td class="r" style="white-space:nowrap"><button class="btn p sm" data-act="docAbrir" data-id="${d.id}">Abrir</button> <button class="btn sm" data-act="docBaixar" data-id="${d.id}">${ic("dl")}</button> <button class="btn sm" data-act="docEditar" data-id="${d.id}">${ic("pen")}</button> <button class="btn d sm" data-act="docApagar" data-id="${d.id}">Excluir</button></td></tr>`),"Nenhum documento ainda. Arraste os arquivos para o quadro acima.")};
+function uplHtml(){return S.upl.map(u=>`<div class="uprow ${u.st}"><span class="dic">${u.st==="ok"?"✓":u.st==="erro"?"!":"…"}</span><div><b>${esc(u.titulo||u.nome)}</b><div class="s">${esc(u.nome)} · ${kb(u.tam)} · ${u.msg}</div></div></div>`).join("")}
+function uplRefresh(){const e=$("#uplst");if(e)e.innerHTML=uplHtml()}
+/* ---------- ler o arquivo e descobrir do que se trata ---------- */
+let _pdfjs=null;
+function loadPdfJs(){if(_pdfjs)return _pdfjs;_pdfjs=new Promise((ok,er)=>{const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";s.onload=()=>{try{pdfjsLib.GlobalWorkerOptions.workerSrc="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";ok(pdfjsLib)}catch(e){er(e)}};s.onerror=er;document.head.appendChild(s)});return _pdfjs}
+async function pdfTexto(file){try{const lib=await loadPdfJs();const pdf=await lib.getDocument({data:await file.arrayBuffer()}).promise;let t="";for(let p=1;p<=Math.min(3,pdf.numPages);p++){const pg=await pdf.getPage(p);const c=await pg.getTextContent();t+=c.items.map(i=>i.str).join(" ")+"\n"}return t}catch(e){console.warn("pdf",e);return ""}}
+const DOC_REGRAS=[
+ [/ACORDO\s+DE\s+S[ÓO]CIOS/i,"Acordo de sócios","societario"],
+ [/CADASTRO\s+NACIONAL\s+DA\s+PESSOA\s+JUR[ÍI]DICA|COMPROVANTE\s+DE\s+INSCRI[ÇC][ÃA]O/i,"Cartão CNPJ","fiscal"],
+ [/ALTERA[ÇC][ÃA]O\s+CONTRATUAL/i,"Alteração contratual","societario"],
+ [/CONTRATO\s+SOCIAL/i,"Contrato social","societario"],
+ [/brand\s*book|manual\s+de\s+(identidade|marca)/i,"Brandbook IMPlay","marca"],
+ [/LOCA[ÇC][ÃA]O|LOCAT[ÁA]RI[OA]|LOCADOR/i,"Contrato de locação","contrato"],
+ [/ALVAR[ÁA]/i,"Alvará de funcionamento","fiscal"],
+ [/CERTID[ÃA]O\s+NEGATIVA|CERTID[ÃA]O\s+DE\s+D[ÉE]BITOS|CND\b/i,"Certidão negativa de débitos","fiscal"],
+ [/INSCRI[ÇC][ÃA]O\s+(ESTADUAL|MUNICIPAL)|\bCCM\b/i,"Inscrição municipal / estadual","fiscal"],
+ [/PROCURA[ÇC][ÃA]O/i,"Procuração","societario"],
+ [/BALAN[ÇC]O\s+PATRIMONIAL|DEMONSTRA[ÇC][ÃA]O\s+DO\s+RESULTADO/i,"Balanço / DRE","contabil"],
+ [/NOTA\s+FISCAL|DANFE|NFS-?e/i,"Nota fiscal","fiscal"],
+ [/EXTRATO|AG[ÊE]NCIA\s+\d|CONTA\s+CORRENTE/i,"Documento bancário","bancario"],
+ [/PROPOSTA|OR[ÇC]AMENTO/i,"Proposta","contrato"],
+ [/CONTRATO\s+DE\s+PRESTA[ÇC][ÃA]O/i,"Contrato de prestação de serviços","contrato"]];
+function nomeLimpo(n){return n.replace(/\.[^.]+$/,"").replace(/^[0-9a-f]{6,}[-_ ]/i,"").replace(/[_-]+/g," ").replace(/\s+/g," ").trim().replace(/^./,c=>c.toUpperCase())}
+async function docDetectar(file){const nome=file.name;let txt="";
+  if(/pdf/.test(file.type)||/\.pdf$/i.test(nome))txt=await pdfTexto(file);
+  const alvo=(txt.slice(0,4000)+" "+nome.replace(/[_-]+/g," "));let titulo=null,cat="outro";
+  for(const [re,t,c] of DOC_REGRAS){if(re.test(alvo)){titulo=t;cat=c;break}}
+  if(!titulo&&!txt.trim()){if(/cnpj/i.test(nome)){titulo="Cartão CNPJ";cat="fiscal"}else if(/acordo|s[oó]cios/i.test(nome)){titulo="Acordo de sócios";cat="societario"}}
+  if(!titulo)return {titulo:nomeLimpo(nome),categoria:cat};
+  const v=nome.match(/(?:^|[^a-z])V\s?(\d{1,3})(?!\d)/i);if(v&&/Acordo|Contrato/.test(titulo))titulo+=" (V"+v[1]+")";
+  if(/assinad|docusign|clicksign/i.test(alvo)&&/Contrato|Acordo|Alteração|Procuração/.test(titulo))titulo+=" assinado";
+  const em=txt.match(/Emitido\s+no\s+dia\s+(\d{2}\/\d{2}\/\d{4})/i);if(em&&titulo==="Cartão CNPJ")titulo+=" · emitido em "+em[1];
+  return {titulo,categoria:cat}}
+async function docSubir(files){files=[...files];if(!files.length)return;
+  for(const file of files){const u={nome:file.name,tam:file.size,st:"",msg:"lendo…"};S.upl.unshift(u);uplRefresh();
+    if(file.size>50*1048576){u.st="erro";u.msg="maior que 50 MB";uplRefresh();continue}
+    try{const d=await docDetectar(file);u.titulo=d.titulo;u.msg="enviando…";uplRefresh();
+      const safe=file.name.normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^\w.\-]+/g,"_");const path=`${Date.now().toString(36)}_${Math.random().toString(36).slice(2,7)}/${safe}`;
+      const up=await db.storage.from(DOC_BUCKET).upload(path,file,{contentType:file.type||"application/octet-stream",upsert:false});if(up.error)throw up.error;
+      const r=await db.from("imp_docs").insert({titulo:d.titulo,categoria:d.categoria,arquivo_nome:file.name,mime:file.type||"application/octet-stream",tamanho:file.size,caminho:path}).select(DOC_COLS).single();
+      if(r.error){await db.storage.from(DOC_BUCKET).remove([path]);throw r.error}
+      S.docs.unshift(r.data);u.st="ok";u.msg="salvo como “"+d.titulo+"”";uplRefresh();const l=$("#lst");if(l)l.innerHTML=LISTS.doc()}
+    catch(e){console.warn(e);u.st="erro";u.msg=/bucket|not found/i.test(e.message||"")?"falta rodar o SQL dos documentos no Supabase":traduz(e.message||String(e));uplRefresh()}}
+  if(S.tab==="empresa")render();setTimeout(()=>{S.upl=S.upl.filter(x=>x.st!=="ok");if(S.tab==="empresa"&&$("#sheet").hidden)render()},5000)}
+async function docUrl(d,baixar){if(d.caminho){const r=await db.storage.from(DOC_BUCKET).createSignedUrl(d.caminho,3600,baixar?{download:d.arquivo_nome||true}:undefined);if(r.error)throw r.error;return r.data.signedUrl}
+  const r=await run(db.from("imp_docs").select("conteudo").eq("id",d.id).single());return URL.createObjectURL(dataUrlBlob(r.conteudo))}
 function dataUrlBlob(u){const [h,b]=u.split(",");const mime=h.match(/data:([^;]+)/)[1];const bin=atob(b);const a=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)a[i]=bin.charCodeAt(i);return new Blob([a],{type:mime})}
-/* ---------- sócios em Quem é quem ---------- */
+function openDocEdit(id){const d=S.docs.find(x=>x.id===id);openSheet(`<form onsubmit="return false"><h3>Editar documento</h3><div class="hint">${esc(d.arquivo_nome||"")}</div>
+  ${pick("titulo","Nome do documento",d.titulo,DOC_SUGERIDOS.slice(0,4),{ph:"Outro: nome do documento"})}
+  ${pick("categoria","Categoria",d.categoria,Object.entries(DOC_CAT),{ph:""})}
+  <div class="cols2">${fld("validade","Validade (se tiver)",d.validade||"","date")}${fld("obs","Observação",d.obs||"")}</div>
+  <div class="acts"><button type="button" class="btn p" data-act="docSalvarEd" data-id="${id}">Salvar</button><button type="button" class="btn" data-act="fechar">Fechar</button></div></form>`);$("#sheetIn [name=categoria]").type="hidden"}
+/* ---------- sócios em Quem é quem (sem percentuais) ---------- */
 function socioMembro(s){return S.membros.find(m=>s.email&&m.email&&m.email.toLowerCase()===s.email.toLowerCase())}
 function socioCard(s){const m=socioMembro(s);
   return `<div class="pcard sc" data-act="socio" data-id="${s.id}"><div class="av" style="background:var(--volt);color:#131411">${esc(iniciais(s.nome_completo))}</div><div class="t">${esc(s.apelido)}</div><div class="s">${esc(s.nome_completo)}</div>
    <div class="fn">${esc(s.funcao||"")}</div>
-   <div class="pst"><span><b>${s.bloco_perc!=null?nf(s.bloco_perc,0)+"%":"—"}</b>${esc(s.bloco||"bloco")}</span><span><b>${s.cs_perc!=null?nf(s.cs_perc,s.cs_perc%1?1:0)+"%":"via bloco"}</b>contrato social</span></div>
-   <div class="s" style="margin-top:6px">${esc(s.cidade||"")}${s.administrador?" · administrador":""}</div>
+   <div class="s" style="margin-top:6px">${esc(s.cidade||"")}${s.administrador?" · sócio-administrador":""}</div>
    <div style="margin-top:6px">${m?`<span class="tag o">acesso ao ERP</span>`:`<span class="tag">sem acesso ainda</span>`}</div></div>`}
 function openSocio(id){const s=S.socios.find(x=>x.id===id);const ed=isSocio();const m=socioMembro(s);
   openSheet(`<form onsubmit="return false"><div class="row" style="gap:12px;align-items:center"><div class="avatar"><div class="av" style="width:48px;height:48px;font-size:16px">${esc(iniciais(s.nome_completo))}</div></div><div><h3 style="margin:0">${esc(s.apelido)} · ${esc(s.nome_completo)}</h3><div class="muted small">${esc(s.funcao||"")}${s.administrador?" · sócio-administrador":""}</div></div></div>
-  <div class="kv" style="margin-top:14px"><div><span>Acordo de Sócios</span><div><b>Bloco ${esc(s.bloco||"—")} · ${s.bloco_perc!=null?nf(s.bloco_perc,0)+"%":"—"}</b></div></div>
-   <div><span>Contrato Social</span><div><b>${s.cs_quotas?`${s.cs_quotas.toLocaleString("pt-BR")} quotas · ${nf(s.cs_perc,s.cs_perc%1?1:0)}%`:"Não consta (participação pelo bloco)"}</b></div></div>
+  <div class="kv" style="margin-top:14px"><div><span>Cidade</span><div><b>${esc(s.cidade||"—")}</b></div></div>${s.telefone?`<div><span>Telefone</span><div><b>${esc(s.telefone)}</b></div></div>`:""}
    <div><span>Acesso ao ERP</span><div><b>${m?`${esc(m.email)} · ${m.papel==="socio"?"sócio":m.papel}`:"ainda não entrou no ERP"}</b></div></div></div>
   ${s.atribuicoes?`<div class="sec"><h2>Responsabilidades</h2></div><ul class="ulc">${s.atribuicoes.split("\n").filter(Boolean).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
-  ${s.obs?`<div class="hint" style="margin-top:8px">${esc(s.obs)}</div>`:""}
-  ${ed?`<div class="sec"><h2>Editar</h2></div><div class="cols2">${fld("email","E-mail de acesso ao ERP",s.email,"email")}${fld("telefone","Telefone",s.telefone,"tel")}</div><div class="cols2">${fld("cidade","Cidade",s.cidade)}${fld("funcao","Função",s.funcao)}</div>${area("atribuicoes","Responsabilidades (uma por linha)",s.atribuicoes)}${area("obs","Observações",s.obs)}
-   <div class="hint">Dados pessoais (CPF, documento, endereço) ficam no contrato social, em Empresa › Documentos, visível só para sócios.</div>
+  ${ed?`<div class="sec"><h2>Editar</h2></div><div class="cols2">${fld("email","E-mail de acesso ao ERP",s.email,"email")}${fld("telefone","Telefone",s.telefone,"tel")}</div><div class="cols2">${fld("cidade","Cidade",s.cidade)}${fld("funcao","Função",s.funcao)}</div>${area("atribuicoes","Responsabilidades (uma por linha)",s.atribuicoes)}
    <div class="acts"><button type="button" class="btn p" data-act="socioSalvar" data-id="${s.id}">Salvar</button><button type="button" class="btn" data-act="fechar">Fechar</button></div>`:`<div class="acts"><button type="button" class="btn" data-act="fechar">Fechar</button></div>`}</form>`)}
 const _eq5=VIEWS.equipe;VIEWS.equipe=()=>{const h=_eq5();if((S.f.eq.view||"cards")!=="cards"||!S.socios.length)return h;
-  const q=S.f.eq.q;const l=S.socios.filter(s=>has(q,s.apelido,s.nome_completo,s.funcao,s.cidade,s.bloco));
-  const blocos=[...new Set(S.socios.map(s=>s.bloco))];
-  const sec=`<div class="sec"><h2>Sócios <span class="muted small">${S.socios.length} · Acordo de Sócios V29 + Contrato Social</span></h2></div>${blocos.map(b=>{const g=l.filter(s=>s.bloco===b);return g.length?`<div class="bloco"><div class="bh"><b>${esc(b)}</b><span>${nf(g[0].bloco_perc,0)}%</span></div><div class="pgrid">${g.map(socioCard).join("")}</div></div>`:""}).join("")}`;
+  const q=S.f.eq.q;const l=S.socios.filter(s=>has(q,s.apelido,s.nome_completo,s.funcao,s.cidade));
+  const sec=`<div class="sec"><h2>Sócios <span class="muted small">${l.length}</span></h2></div><div class="pgrid">${l.map(socioCard).join("")}</div>`;
   const i=h.indexOf('<div class="sec"><h2>Sócios');if(i<0)return h+sec;const j=h.indexOf('<div class="sec">',i+10);return h.slice(0,i)+sec+(j>0?h.slice(j):"")};
 /* ---------- proposta ↔ contrato ---------- */
 function orcDoContrato(pid){return S.orcs.find(o=>o.proposta_id===pid)}
 /* ---------- eventos ---------- */
-document.addEventListener("change",async e=>{if(e.target.id!=="docFile")return;const f=e.target.files[0];const i=$("#docInfo");if(!f){i.textContent="";return}
-  if(f.size>8*1048576){i.innerHTML=`<span style="color:var(--bad)">Arquivo de ${kb(f.size)}: o limite é 8 MB.</span>`;e.target.value="";return}
-  i.textContent=`${f.name} · ${kb(f.size)}`;const t=$("#sheetIn [name=titulo]");if(t&&!t.value){t.value=f.name.replace(/\.[^.]+$/,"").replace(/[_-]+/g," ");pickSync(t.closest("[data-pick]"))}});
+document.addEventListener("change",e=>{if(e.target.id==="docFiles"){docSubir(e.target.files);e.target.value=""}});
+document.addEventListener("dragover",e=>{if(S.tab!=="empresa"||!isSocio())return;e.preventDefault();const z=$("#dropz");if(z)z.classList.add("on")});
+document.addEventListener("dragleave",e=>{const z=$("#dropz");if(z&&(!e.relatedTarget||!document.body.contains(e.relatedTarget)))z.classList.remove("on")});
+document.addEventListener("drop",e=>{if(S.tab!=="empresa"||!isSocio())return;e.preventDefault();const z=$("#dropz");if(z)z.classList.remove("on");if(e.dataTransfer&&e.dataTransfer.files.length)docSubir(e.dataTransfer.files)});
 document.addEventListener("input",e=>{if(e.target.dataset.q==="doc"){S.f.doc.q=e.target.value;$("#lst").innerHTML=LISTS.doc()}},true);
 document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]");if(!a)return;const act=a.dataset.act,id=a.dataset.id,v=a.dataset.v;const H=()=>e.stopImmediatePropagation();
  try{switch(act){
   case"socio":H();openSocio(id);break;
-  case"socioSalvar":H();{const f=formData();const row={email:f.email||null,telefone:f.telefone||null,cidade:f.cidade||null,funcao:f.funcao||null,atribuicoes:f.atribuicoes||null,obs:f.obs||null,updated_at:new Date().toISOString()};
+  case"socioSalvar":H();{const f=formData();const row={email:f.email||null,telefone:f.telefone||null,cidade:f.cidade||null,funcao:f.funcao||null,atribuicoes:f.atribuicoes||null,updated_at:new Date().toISOString()};
     const r=await run(db.from("imp_socios").update(row).eq("id",id).select().single(),"Perfil salvo");S.socios[S.socios.findIndex(x=>x.id===id)]=r;closeSheet();render()}break;
-  case"docNovo":H();openDoc(a.dataset.t,a.dataset.c);break;
-  case"docSalvar":H();{const f=formData();const fi=$("#docFile").files[0];if(!f.titulo)return toast("Escreva o nome do documento",true);if(!fi)return toast("Escolha o arquivo",true);
-    a.disabled=true;a.textContent="Enviando…";
-    const url=await new Promise((ok,er)=>{const r=new FileReader();r.onload=()=>ok(r.result);r.onerror=er;r.readAsDataURL(fi)});
-    try{const d=await run(db.from("imp_docs").insert({titulo:f.titulo,categoria:f.categoria||"outro",arquivo_nome:fi.name,mime:fi.type||"application/octet-stream",tamanho:fi.size,conteudo:url,validade:f.validade||null,obs:f.obs||null}).select("id,titulo,categoria,arquivo_nome,mime,tamanho,validade,obs,created_at,created_by").single(),"Documento salvo");
-      S.docs.unshift(d);closeSheet();render()}catch(err){a.disabled=false;a.textContent="Salvar documento"}}break;
-  case"docAbrir":case"docBaixar":H();{const w=act==="docAbrir"?window.open("","_blank"):null;const r=await run(db.from("imp_docs").select("conteudo,arquivo_nome,mime").eq("id",id).single());
-    const u=URL.createObjectURL(dataUrlBlob(r.conteudo));if(w){w.location.href=u}else{const l=document.createElement("a");l.href=u;l.download=r.arquivo_nome||"documento";document.body.appendChild(l);l.click();l.remove()}}break;
-  case"docApagar":H();{if(!armed(a))return;await run(db.from("imp_docs").delete().eq("id",id),"Documento excluído");S.docs=S.docs.filter(d=>d.id!==id);render()}break;
+  case"docEscolher":H();{const i=$("#docFiles");if(i)i.click()}break;
+  case"docAbrir":H();{const d=S.docs.find(x=>x.id===id);const w=window.open("","_blank");try{const u=await docUrl(d,false);if(w)w.location.href=u;else location.href=u}catch(err){if(w)w.close();toast(traduz(err.message||""),true)}}break;
+  case"docBaixar":H();{const d=S.docs.find(x=>x.id===id);const u=await docUrl(d,true);const l=document.createElement("a");l.href=u;l.download=d.arquivo_nome||"documento";document.body.appendChild(l);l.click();l.remove()}break;
+  case"docEditar":H();openDocEdit(id);break;
+  case"docSalvarEd":H();{const f=formData();if(!f.titulo)return toast("Escreva o nome do documento",true);const r=await run(db.from("imp_docs").update({titulo:f.titulo,categoria:f.categoria||"outro",validade:f.validade||null,obs:f.obs||null}).eq("id",id).select(DOC_COLS).single(),"Documento atualizado");S.docs[S.docs.findIndex(x=>x.id===id)]=r;closeSheet();render()}break;
+  case"docApagar":H();{if(!armed(a))return;const d=S.docs.find(x=>x.id===id);if(d&&d.caminho)await db.storage.from(DOC_BUCKET).remove([d.caminho]);await run(db.from("imp_docs").delete().eq("id",id),"Documento excluído");S.docs=S.docs.filter(x=>x.id!==id);render()}break;
   case"copiar":H();try{await navigator.clipboard.writeText(v);toast("Copiado")}catch(_){toast(v)}break;
  }}catch(err){console.warn(err)}},true);
 /* ---------- demonstração ---------- */
-const _toggle5=toggleDemo;toggleDemo=async function(){await _toggle5();if(S.demo&&!S.socios.length){S.socios=[["Tae","Bruno Tae Wook Koo","Tae & Dani",30,null,null,false,"Estratégica e institucional","São Paulo/SP"],["Dani","Danielle Laure Formiga","Tae & Dani",30,3000,30,true,"Estratégica e institucional","São Paulo/SP"],["Caio","Caio Cesar Cunha Moreira","Caio & Larissa",35,3500,35,true,"Técnica e operacional","Niterói/RJ"],["Larissa","Larissa Amarante Raposo Moreira","Caio & Larissa",35,null,null,false,"Técnica e operacional","Niterói/RJ"],["Pedro","Pedro Henrique Sinatora Sallun","Pedro & Thiago",35,1750,17.5,true,"Executiva · dedicação integral","São Paulo/SP"],["Thiago","Thiago Maghamez Gonçalves","Pedro & Thiago",35,1750,17.5,true,"Executiva · dedicação integral","Petrópolis/RJ"]].map((x,i)=>({id:"s"+i,apelido:x[0],nome_completo:x[1],bloco:x[2],bloco_perc:x[3],cs_quotas:x[4],cs_perc:x[5],administrador:x[6],funcao:x[7],cidade:x[8],ordem:i}));render()}};
+const _toggle5=toggleDemo;toggleDemo=async function(){await _toggle5();if(S.demo&&!S.socios.length){S.socios=[["Tae","Bruno Tae Wook Koo","Estratégica e institucional","São Paulo/SP",false],["Dani","Danielle Laure Formiga","Estratégica e institucional","São Paulo/SP",true],["Caio","Caio Cesar Cunha Moreira","Técnica e operacional","Niterói/RJ",true],["Larissa","Larissa Amarante Raposo Moreira","Técnica e operacional","Niterói/RJ",false],["Pedro","Pedro Henrique Sinatora Sallun","Executiva · dedicação integral","São Paulo/SP",true],["Thiago","Thiago Maghamez Gonçalves","Executiva · dedicação integral","Petrópolis/RJ",true]].map((x,i)=>({id:"s"+i,apelido:x[0],nome_completo:x[1],funcao:x[2],cidade:x[3],administrador:x[4],ordem:i}));render()}};
 
 /* ================= interações ================= */
 function syncShow(){const fm=$("#sheetIn form");if(!fm)return;fm.querySelectorAll("[data-show]").forEach(el=>{const[k,val]=el.dataset.show.split("=");const inp=fm.querySelector(`[name="${k}"]`);el.hidden=!inp||inp.value!==val})}
