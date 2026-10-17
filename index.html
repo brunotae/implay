@@ -1561,7 +1561,7 @@ VIEWS.funil=comOrcs(VIEWS.funil);VIEWS.painel=comOrcs(VIEWS.painel);
 const _pend5=pendencias;pendencias=function(){return _pend5().filter(x=>x.act!=="goProp")};
 Object.assign(TAB_NOME,{orcamentos:"Orçamentos"});Object.assign(TAB_SUB,{orcamentos:"Escolha cliente, categorias e pacotes; ajuste valores; aprove e gere a proposta em PDF"});
 HEADACT.orcamentos=()=>`<button class="btn p sm" data-act="orcNovo">+ Novo orçamento</button>`;
-function orcPendentes(){if(!isSocio())return [];return S.orcs.filter(o=>o.status==="aguardando"&&!(o.tem_desconto&&o.created_by===S.me.user_id))}
+function orcPendentes(){if(!isSocio())return [];return S.orcs.filter(o=>o.status==="aguardando")}
 const _badges4=badges;badges=function(){const b=_badges4();b.orcamentos=orcPendentes().length;return b};
 const _pend4=pendencias;pendencias=function(){const p=_pend4();const o=orcPendentes();if(o.length)p.unshift({t:`${o.length} orçamento${o.length>1?"s":""} aguardando sua aprovação`,v:"",act:"tab",a:"orcamentos"});return p};
 
@@ -1573,7 +1573,7 @@ LISTS.orc=()=>{const f=S.f.orc;let l=orcLista();if(f.st==="meus")l=l.filter(o=>o
    <td data-l="Itens">${esc(orcResumo(o))}${o.tem_desconto?` <span class="tag f">desconto</span>`:""}</td>
    <td data-l="Valor" class="r">${orcValorTxt(o)}</td>
    <td data-l="Elaborado">${esc(o.elaborado_nome||"—")}<div class="s">${o.elaborado_em?dCurta(o.elaborado_em):""}</div></td>
-   <td data-l="Aprovação">${o.aprovado_nome?`${esc(o.aprovado_nome)}<div class="s">${dCurta(o.aprovado_em)}</div>`:o.status==="aguardando"?`<span class="muted small">${o.tem_desconto?"outro sócio":"um sócio"}</span>`:"—"}</td>
+   <td data-l="Aprovação">${o.aprovado_nome?`${esc(o.aprovado_nome)}<div class="s">${dCurta(o.aprovado_em)}</div>`:o.status==="aguardando"?`<span class="muted small">um sócio</span>`:"—"}</td>
    <td data-l="Situação"><span class="tag ${OST[o.status][1]}">${OST[o.status][0]}</span></td></tr>`),"Nenhum orçamento ainda. Clique em + Novo orçamento.")};
 VIEWS.orcamentos=()=>{const f=S.f.orc;
   if(S.orcSemSQL&&!S.demo)return `<div class="warnbox">Falta rodar o SQL <b>implay_orcamentos.sql</b> no Supabase (SQL Editor → New query → Run). Depois recarregue a página.</div>`;
@@ -1625,17 +1625,16 @@ function oePriceHtml(k){const p=preco(k),it=oeItem(k);const mud=Number(it.valor)
 function oeSumHtml(){const o=S.oe;const it=o.itens.filter(i=>i.on);const desc=orcTemDesc(o);
   let regra;if(!it.length)regra=`<div class="warnbox">Ligue pelo menos uma categoria, pacote ou a Live Drop.</div>`;
   else if(!isSocio())regra=`<div class="warnbox">Você é da equipe: este orçamento vai para <b>aprovação de um sócio</b> antes de gerar a versão final.</div>`;
-  else if(desc)regra=`<div class="warnbox">Tem <b>desconto</b>: precisa da aprovação de <b>outro sócio</b> antes de gerar a versão final.</div>`;
+  else if(desc)regra=`<div class="okbox">Tem <b>desconto</b>. Como sócio, você pode aprovar e gerar na hora (fica registrado que foi você).</div>`;
   else regra=`<div class="okbox">Preços de tabela: você pode aprovar e gerar na hora.</div>`;
   return `<div class="osum"><div><span class="muted small">Itens ligados</span><b>${it.length}</b></div><div><span class="muted small">Resumo</span><b>${esc(orcResumo(o))}</b></div><div><span class="muted small">Valor</span><b>${orcValorTxt(o)}</b></div></div>${regra}`}
 function oeActs(o){const id=o.id;const me=S.me;const desc=orcTemDesc(o);const meu=!id||o.created_by===me.user_id;const out=[];
   if(!["enviado","aceito"].includes(o.status)||true)out.push(`<button type="button" class="btn" data-act="orcSalvar" data-v="rascunho">Salvar rascunho</button>`);
   if(!["aprovado","enviado","aceito"].includes(o.status)){
-    if(isSocio()&&!desc)out.push(`<button type="button" class="btn p" data-act="orcSalvar" data-v="aprovado">Aprovar e gerar</button>`);
+    if(isSocio())out.push(`<button type="button" class="btn p" data-act="orcSalvar" data-v="aprovado">Aprovar e gerar</button>`);
     else if(o.status!=="aguardando")out.push(`<button type="button" class="btn p" data-act="orcSalvar" data-v="aguardando">Enviar para aprovação</button>`);
   }
-  if(id&&o.status==="aguardando"&&isSocio()&&!(desc&&meu)){out.push(`<button type="button" class="btn p" data-act="orcAprovar" data-id="${id}">Aprovar</button>`,`<button type="button" class="btn d" data-act="orcRecusar" data-id="${id}">Recusar</button>`)}
-  if(id&&o.status==="aguardando"&&desc&&meu)out.push(`<span class="muted small">Aguardando outro sócio aprovar</span>`);
+  if(id&&o.status==="aguardando"&&isSocio()){out.push(`<button type="button" class="btn d" data-act="orcRecusar" data-id="${id}">Recusar</button>`)}
   out.push(`<button type="button" class="btn f" data-act="orcPdf">${["aprovado","enviado","aceito"].includes(o.status)?"Gerar PDF":"Prévia (rascunho)"}</button>`);
   if(id&&o.status==="aprovado")out.push(`<button type="button" class="btn" data-act="orcStatus" data-id="${id}" data-v="enviado">Marcar como enviado</button>`);
   if(id&&["aprovado","enviado"].includes(o.status))out.push(`<button type="button" class="btn" data-act="orcAceito" data-id="${id}">Cliente aceitou → contrato</button>`);
