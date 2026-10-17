@@ -1568,13 +1568,14 @@ const _pend4=pendencias;pendencias=function(){const p=_pend4();const o=orcPenden
 /* ---------- lista ---------- */
 function orcLista(){const f=S.f.orc;let l=S.orcs.filter(o=>has(f.q,o.marca,on(o.numero),o.elaborado_nome,cliNome(o.cliente_id)));return l}
 LISTS.orc=()=>{const f=S.f.orc;let l=orcLista();if(f.st==="meus")l=l.filter(o=>o.created_by===S.me.user_id);else if(f.st==="pendentes")l=orcPendentes();else if(f.st!=="todos")l=l.filter(o=>o.status===f.st);
-  return tbl([["Nº"],["Cliente"],["Itens"],["Valor"],["Elaborado"],["Aprovação"],["Situação"]],l.map(o=>`<tr data-act="orcAbrir" data-id="${o.id}"><td data-l="Nº"><b>${on(o.numero)}</b></td>
+  return tbl([["Nº"],["Cliente"],["Itens"],["Valor"],["Elaborado"],["Aprovação"],["Situação"],[""]],l.map(o=>`<tr data-act="orcAbrir" data-id="${o.id}"><td data-l="Nº"><b>${on(o.numero)}</b></td>
    <td class="m0"><div class="t">${esc(o.marca)}</div><div class="s">${esc(cliNome(o.cliente_id)||"")}</div></td>
    <td data-l="Itens">${esc(orcResumo(o))}${o.tem_desconto?` <span class="tag f">desconto</span>`:""}</td>
    <td data-l="Valor" class="r">${orcValorTxt(o)}</td>
    <td data-l="Elaborado">${esc(o.elaborado_nome||"—")}<div class="s">${o.elaborado_em?dCurta(o.elaborado_em):""}</div></td>
    <td data-l="Aprovação">${o.aprovado_nome?`${esc(o.aprovado_nome)}<div class="s">${dCurta(o.aprovado_em)}</div>`:o.status==="aguardando"?`<span class="muted small">um sócio</span>`:"—"}</td>
-   <td data-l="Situação"><span class="tag ${OST[o.status][1]}">${OST[o.status][0]}</span></td></tr>`),"Nenhum orçamento ainda. Clique em + Novo orçamento.")};
+   <td data-l="Situação"><span class="tag ${OST[o.status][1]}">${OST[o.status][0]}</span></td>
+   <td class="r"><button class="btn sm ${["aprovado","enviado","aceito"].includes(o.status)?"p":""}" data-act="orcPdfRow" data-id="${o.id}" title="Abre em aba nova para salvar em PDF ou imprimir">${ic("dl")} ${["aprovado","enviado","aceito"].includes(o.status)?"PDF":"Prévia"}</button></td></tr>`),"Nenhum orçamento ainda. Clique em + Novo orçamento.")};
 VIEWS.orcamentos=()=>{const f=S.f.orc;
   if(S.orcSemSQL&&!S.demo)return `<div class="warnbox">Falta rodar o SQL <b>implay_orcamentos.sql</b> no Supabase (SQL Editor → New query → Run). Depois recarregue a página.</div>`;
   const tabs=`<div class="chips" style="margin-bottom:10px"><button data-act="orcView" data-v="lista" class="${f.view!=="precos"?"on":""}">Orçamentos</button><button data-act="orcView" data-v="precos" class="${f.view==="precos"?"on":""}">Tabela de preços</button></div>`;
@@ -1749,6 +1750,7 @@ document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]
    case"prop":if(id&&id.startsWith("o:")){H();openOrc(id.slice(2))}break;
    case"goProp":H();if(v==="aceita"){S.tab="contratos"}else{S.tab="orcamentos";S.f.orc.view="lista";S.f.orc.st=v==="enviada"?"enviado":"todos"}render();break;
    case"orcAbrir":H();openOrc(id);break;
+   case"orcPdfRow":H();{const o=S.orcs.find(x=>x.id===id);if(o&&!orcTab(o,window.open("","_blank")))showOrcDoc(o)}break;
    case"orcView":H();S.f.orc.view=v;render();break;
    case"oeTog":H();{const it=oeItem(k);it.on=!it.on;oeRefresh(k)}break;
    case"oeEdit":H();{const it=oeItem(k);it.edit=!it.edit;oeRefresh(k);if(it.edit){const i=$(`#sheetIn [data-oe=valor][data-k="${k}"]`);if(i)i.focus()}}break;
