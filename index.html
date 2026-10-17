@@ -1604,12 +1604,14 @@ function openOrc(id){
    <div class="cols2 t2">${fld("marca","Marca (aparece na proposta)",o.marca,"text","required")}${fld("mes_ref","Mês da proposta",o.mes_ref)}</div>
    <div id="oeItens">${GRUPOS.map(([g,t,d])=>`<div class="ogrp"><div class="ogh"><b>${t}</b><span class="muted small">${d}</span></div><div class="ocards">${precosList().filter(p=>p.grupo===g).map(p=>oeCard(p.chave)).join("")}</div></div>`).join("")}</div>
    <div class="sec"><h2>Condições</h2></div>
-   <div class="cols2 t2">${pick("validade_dias","Proposta válida por",o.validade_dias,OP_VALIDADE,{num:1,ph:"Outro: nº de dias"})}${pick("vigencia_meses","Vigência dos pacotes",o.vigencia_meses,OP_VIGENCIA,{num:1,ph:"Outro: nº de meses"})}</div>
+   <div class="cols2 t2"><div>${pick("validade_dias","Proposta válida por",o.validade_dias,OP_VALIDADE,{num:1,ph:"Outro: nº de dias"})}<div class="hint v" id="oeVenc">${oeVencTxt(o)}</div></div>${pick("vigencia_meses","Vigência dos pacotes",o.vigencia_meses,OP_VIGENCIA,{num:1,ph:"Outro: nº de meses"})}</div>
    ${pick("pagamento","Pagamento: forma e data",o.pagamento,OP_PAGTO,{ph:"Outra forma: escreva aqui"})}${area("obs","Observações (aparecem no orçamento)",o.obs)}
    <label class="chk"><input type="checkbox" id="oeCompleto" ${o.completo!==false?"checked":""}> Incluir a apresentação completa (mercado, cases, método) antes do orçamento</label>
    <div id="oeSum">${oeSumHtml()}</div>
    <div class="acts" id="oeActs">${oeActs(o)}</div></form>`);
 }
+function oeVencTxt(o){const n=parseInt(o.validade_dias);if(!n)return "";const d=new Date(o.elaborado_em||Date.now());d.setDate(d.getDate()+n);return "→ vale até "+DL[d.getDay()]+", "+d.toLocaleDateString("pt-BR")}
+document.addEventListener("input",e=>{if(e.target.name==="validade_dias"&&e.target.closest("#sheetIn")&&S.oe){S.oe.validade_dias=e.target.value;const h=$("#oeVenc");if(h)h.textContent=oeVencTxt(S.oe)}});
 function oeItem(k){return S.oe.itens.find(i=>i.k===k)}
 function oeCard(k){const p=preco(k),it=oeItem(k);const mud=Number(it.valor)!==Number(p.valor),mudp=Number(it.perc)!==Number(p.perc);
   return `<div class="ocard ${it.on?"on":""}" data-k="${k}"><button type="button" class="otog" data-act="oeTog" data-k="${k}"><span class="sw"></span><b>${esc(p.categoria)}</b></button>
@@ -1661,11 +1663,11 @@ const CONTATOS="Caio Riccio · (21) 96590-7894 · Pedro Sallun · (16) 99116-766
 function v1page(cls,html,num){return {cls,html,num}}
 function orcDoc(o){const P=[];const M=esc(o.marca||"Marca");const final=["aprovado","enviado","aceito"].includes(o.status);
   const it=(o.itens||[]).filter(i=>i.on);const grp=g=>it.filter(i=>(preco(i.k)||{}).grupo===g);
-  const venc=new Date(o.elaborado_em||Date.now());venc.setDate(venc.getDate()+(o.validade_dias||10));
+  const emis=new Date(o.elaborado_em||Date.now());const venc=new Date(emis);venc.setDate(venc.getDate()+(o.validade_dias||10));const dBR=d=>d.toLocaleDateString("pt-BR");
   const pr=(i,suf="")=>{const p=preco(i.k);const mud=Number(i.valor)!==Number(p.valor);return `${mud?`<s>${brl(p.valor)}</s> `:""}<b>${brl(i.valor)}</b>${suf}`};
   const pc=i=>{const p=preco(i.k);const m=Number(i.perc)!==Number(p.perc);return `${m?`<s>${numIn(p.perc)}%</s> `:""}<b>${numIn(i.perc)}%</b>`};
   P.push(v1page("dark",`<img class="vlogo" src="prop/logo.png"><div class="vchip">Proposta de operação de Live Shop</div><h1 class="vt">Operação de Live<br>Shop para a <span class="hl">${M}</span></h1>
-   <div class="vfoot">${esc(o.mes_ref||"")} · proposta válida por ${o.validade_dias||10} dias corridos<br><span>${on(o.numero)}</span></div>
+   <div class="vfoot">Emitida em ${dBR(emis)} · válida até <b>${dBR(venc)}</b> (${o.validade_dias||10} dias corridos)<br><span>${on(o.numero)}</span></div>
    <div class="vphone"><img src="prop/capa.jpg"><span class="vnoar">● no ar</span></div><div class="vb1">Qual promo?</div><div class="vb2">só até as 21h!</div>`));
   if(orcCompleto(o)){
   P.push(v1page("dark",`<div class="vk">O mercado</div><h2>Na China, a live já vende um terço do varejo online. Nos EUA, o TikTok Shop dobrou em um ano</h2>
@@ -1719,7 +1721,7 @@ function orcDoc(o){const P=[];const M=esc(o.marca||"Marca");const final=["aprova
    <table class="vtb sm"><tr><th>Item</th><th>Descrição</th><th>Valor</th><th>Variável</th></tr>${it.map(i=>{const p=preco(i.k);const nm={pontual:"Live Pontual",pacote:"Pacote mensal",drop:"Live Drop"}[p.grupo];
     return `<tr><td><b>${nm} · ${esc(p.categoria)}</b></td><td>${esc(p.descricao)}${p.grupo==="pontual"?` · ${i.qtd||1} live(s)`:p.grupo==="pacote"?` · ${p.lives} lives/mês`:""}</td><td>${pr(i,p.grupo==="pacote"?"/mês":p.grupo==="pontual"?"/live":"")}</td><td>${pc(i)} sobre vendas</td></tr>`}).join("")}</table>
    <div class="vcond"><div><b>Condições</b><ul><li>Pagamento: ${esc(o.pagamento||"a combinar")}</li><li>Vigência dos pacotes: ${o.vigencia_meses||3} meses, renovável</li><li>Percentual calculado sobre as vendas das lives, sem pedidos cancelados ou devolvidos</li><li>Início conforme agenda do estúdio</li></ul></div><div><b>Fica por conta da marca</b><ul><li>Verba de mídia (GMV Max) e comissão dos afiliados</li><li>Produtos, fretes, envios, atendimento e logística</li><li>Cenário com a identidade visual da marca, orçado à parte</li><li>Lives de 12 horas ou mais, orçadas como lançamento</li></ul></div></div>
-   ${orcObs(o)?`<p class="vnote dk"><b>Observações:</b> ${esc(orcObs(o))}</p>`:""}<div class="vsrc dk">IMP DIGITAL LTDA · CNPJ 44.189.776/0001-77 · Proposta válida por ${o.validade_dias||10} dias corridos. Depois disso, valores e disponibilidade podem mudar.</div>`));
+   ${orcObs(o)?`<p class="vnote dk"><b>Observações:</b> ${esc(orcObs(o))}</p>`:""}<div class="vsrc dk">IMP DIGITAL LTDA · CNPJ 44.189.776/0001-77 · Proposta válida por ${o.validade_dias||10} dias corridos, até ${dBR(venc)}. Depois disso, valores e disponibilidade podem mudar.</div>`));
   P.push(v1page("dark",`<div class="vbora">bora!</div><h2>Escolha o pacote e<br>marcamos a primeira live</h2><div class="vg2 w"><div class="vc cream"><b>O que a marca envia</b><ul><li>Lista de produtos e condições comerciais</li><li>Amostras</li><li>Acesso à loja no TikTok Shop</li></ul></div><div class="vc volt"><b>Fale com a gente</b><ul class="vct"><li><b>Caio Riccio</b>(21) 96590-7894</li><li><b>Pedro Sallun</b>(16) 99116-7669</li><li><b>Bruno Tae</b>(11) 98964-4378</li></ul><p><b>@implayhub · implaylive.com.br</b></p><p style="font-size:12px;opacity:.75">Orçamento ${on(o.numero)} · elaborado por ${esc(o.elaborado_nome||S.me.nome)}</p></div></div>
    <p class="vnote">Com o pacote aprovado, reservamos a agenda do estúdio e começamos a preparação assim que os produtos chegam. As informações desta proposta são confidenciais e destinadas apenas aos envolvidos.</p><img class="vlogo3" src="prop/logo.png">`));
   return P.map((p,i)=>`<div class="pgw"><div class="pg v1 ${p.cls}">${i?`<div class="vnum">${String(i+1).padStart(2,"0")}</div>`:""}${p.html}${!final&&i?`<div class="vdraft">RASCUNHO</div>`:""}</div></div>`).join("")}
