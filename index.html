@@ -17,7 +17,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{--noite:#000000;--bg2:#0A0A0A;--card:#141414;--card2:#1C1C1C;--linha:#262626;--linha2:#333333;--chalk:#F3F3EC;--cinza:#A3A3AB;--grafite:#5F5F67;
---volt:#D5FF3F;--flash:#EF8FC4;--cobalt:#561D45;--ameixa:#561D45;--oliva:#C9DB82;--ok:#7CE38B;--warn:#FFB547;--bad:#FF5C6C;
+--volt:#D5FF3F;--voltx:var(--volt);--flash:#EF8FC4;--cobalt:#561D45;--ameixa:#561D45;--oliva:#C9DB82;--ok:#7CE38B;--warn:#FFB547;--bad:#FF5C6C;
 --fh:Figtree,system-ui,-apple-system,sans-serif;--fb:"Bricolage Grotesque",Figtree,sans-serif;--safe-t:env(safe-area-inset-top);--safe-b:env(safe-area-inset-bottom);--side:244px;--rail:310px}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--noite);color:var(--chalk);font-family:Figtree,system-ui,-apple-system,sans-serif;font-size:13.5px;line-height:1.45;overflow-x:hidden}
@@ -27,7 +27,7 @@ h1,h2,h3,.uh{font-family:var(--fh);letter-spacing:-.01em;margin:0;font-weight:70
 a{color:inherit}
 svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 /* logo */
-.logo{font-family:var(--fh);font-weight:800;font-size:24px;color:var(--volt);text-shadow:2px 2px 0 var(--flash);position:relative;display:inline-block;line-height:1}
+.logo{font-family:var(--fh);font-weight:800;font-size:24px;color:var(--voltx);text-shadow:2px 2px 0 var(--flash);position:relative;display:inline-block;line-height:1}
 .logo .sp{color:var(--flash);font-size:12px;position:absolute;left:27px;top:-8px;text-shadow:none}
 .live{font-size:10px;font-weight:700;letter-spacing:.16em;color:var(--flash);text-transform:uppercase}
 /* ===== shell ===== */
@@ -44,7 +44,7 @@ svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stro
 .sitem.on{background:var(--volt);color:#000}
 .sitem.on svg,.sitem.on small{color:#2a3300}
 .sbad{background:var(--flash);color:#131411;border-radius:999px;font-size:10.5px;font-weight:700;padding:1px 7px}
-.sitem.on .sbad{background:#000;color:var(--volt)}
+.sitem.on .sbad{background:#000;color:var(--voltx)}
 .sfoot{margin-top:auto;padding:14px 10px 0;border-top:1px solid var(--linha);font-size:12px;color:var(--cinza)}
 .scrim{display:none}
 .main{margin-left:var(--side);min-height:100vh}
@@ -89,7 +89,7 @@ svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stro
 .hero{position:relative;overflow:hidden;background:var(--card);border:1px solid var(--linha);border-radius:22px;padding:26px 28px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;align-items:center}
 .hero .kick{font-size:10.5px;font-weight:700;letter-spacing:.2em;color:var(--cinza);text-transform:uppercase}
 .hero h2{font-size:30px;line-height:1.08;margin-top:12px;font-weight:800}
-.hero h2 em{font-style:normal;color:var(--volt)}
+.hero h2 em{font-style:normal;color:var(--voltx)}
 .hero p{color:var(--cinza);margin:12px 0 0;font-size:13px;max-width:440px}
 .hero .stk{position:absolute;right:22px;top:18px;background:var(--flash);color:#131411;font-family:var(--fh);font-weight:800;font-size:12px;padding:6px 12px;border-radius:10px;transform:rotate(-5deg)}
 .floor{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px}
@@ -126,7 +126,7 @@ svg.i{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.7;stro
 .tool .q input{width:100%;background:var(--card);border:1px solid var(--linha);border-radius:999px;padding:9px 12px 9px 34px;min-height:38px;font-size:13px}
 .tool .q svg{position:absolute;left:11px;top:10px;width:16px;height:16px;color:var(--cinza)}
 .tool select{background:var(--card);border:1px solid var(--linha);border-radius:999px;padding:8px 12px;min-height:38px;font-size:12.5px;max-width:200px}
-.tool select.on{border-color:var(--volt);color:var(--volt)}
+.tool select.on{border-color:var(--volt);color:var(--voltx)}
 .chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .chips button{border:1px solid var(--linha);background:transparent;border-radius:999px;padding:7px 12px;font-size:12.5px;font-weight:600;min-height:34px;cursor:pointer;color:var(--chalk)}
 .chips button .c{color:var(--cinza);margin-left:4px;font-weight:600}
@@ -210,7 +210,7 @@ table.tb .r{text-align:right;white-space:nowrap;font-weight:700}
 @media(min-width:761px){.fld input:not([type=checkbox]):not([type=file]),.fld select,.fld textarea{font-size:13.5px}}
 .fld textarea{min-height:72px;resize:vertical}
 .fld input[type=date]{-webkit-appearance:none;appearance:none}
-.hint{font-size:11.5px;color:var(--cinza);margin-top:6px}.hint.v{color:var(--volt)}
+.hint{font-size:11.5px;color:var(--cinza);margin-top:6px}.hint.v{color:var(--voltx)}
 .seg{display:flex;gap:6px;flex-wrap:wrap}
 .seg button{border:1px solid var(--linha);background:var(--card);border-radius:999px;padding:8px 12px;min-height:38px;font-weight:600;font-size:12.5px;cursor:pointer}
 .seg button.on{background:var(--volt);color:#000;border-color:var(--volt)}
@@ -259,7 +259,7 @@ table.t th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:
 .pg h1{font-size:54px;line-height:1.05;font-weight:800;margin-top:14px}
 .pg h2{font-size:38px;line-height:1.1;font-weight:800;margin-top:10px}
 .pg .lead{font-size:20px;color:var(--cinza);margin-top:16px;max-width:760px}
-.pg .big{font-family:var(--fh);font-weight:800;font-size:46px;color:var(--volt)}
+.pg .big{font-family:var(--fh);font-weight:800;font-size:46px;color:var(--voltx)}
 .pg .box{background:var(--card);border-radius:20px;padding:22px}
 .pg .boxv{background:var(--volt);color:#000;border-radius:20px;padding:22px}
 .pg .boxc{background:var(--cobalt);color:#fff;border-radius:20px;padding:22px}
@@ -270,7 +270,7 @@ table.t th{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:
 .pg table.res td{padding:14px 0;border-bottom:1px solid var(--linha);vertical-align:top}
 .pg table.res td:first-child{width:260px;color:var(--cinza);font-size:14px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding-top:18px}
 .pg ul{margin:10px 0 0;padding-left:18px;line-height:1.55}
-.pg .plogo{position:absolute;left:64px;bottom:44px;font-family:var(--fh);font-weight:800;font-size:28px;color:var(--volt);text-shadow:3px 3px 0 var(--flash)}
+.pg .plogo{position:absolute;left:64px;bottom:44px;font-family:var(--fh);font-weight:800;font-size:28px;color:var(--voltx);text-shadow:3px 3px 0 var(--flash)}
 .pg .foot2{position:absolute;right:64px;bottom:48px;font-size:12px;color:var(--grafite)}
 .pg .sticker{position:absolute;right:70px;top:120px;background:var(--flash);color:#131411;font-family:var(--fh);font-weight:800;font-size:22px;padding:14px 22px;border-radius:16px;transform:rotate(-6deg)}
 .pg .rec{outline:4px solid var(--volt)}
@@ -378,7 +378,7 @@ table.tb td{font-size:13.5px}table.tb .s{font-size:12px}
 .item .s,.hint{font-size:12.5px}
 .logo,.pg h1,.pg h2,.pg .big,.pg .num,.pg .plogo,.pg .sticker,.pg .uh,.ctr .clogo{font-family:var(--fb)!important}
 .dbtn{display:flex;align-items:center;gap:10px;width:100%;background:var(--card);border:1px solid var(--linha);border-radius:11px;padding:10px 12px;min-height:44px;font-size:14.5px;font-weight:600;cursor:pointer;text-align:left;color:var(--chalk)}
-.dbtn svg{color:var(--volt)}.dbtn.vazio{color:var(--cinza);font-weight:500}.dbtn:hover{border-color:var(--linha2)}
+.dbtn svg{color:var(--voltx)}.dbtn.vazio{color:var(--cinza);font-weight:500}.dbtn:hover{border-color:var(--linha2)}
 .cal{margin-top:8px;background:var(--card2);border:1px solid var(--linha2);border-radius:14px;padding:10px;max-width:340px;box-shadow:0 14px 30px rgba(0,0,0,.45)}
 .cal .ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .cal .ch b{font-size:14px;text-transform:capitalize}
@@ -391,8 +391,8 @@ table.tb td{font-size:13.5px}table.tb .s{font-size:12px}
 .cal .cd i{position:absolute;right:3px;top:2px;font-style:normal;font-size:9px;font-weight:800;background:var(--flash);color:#131411;border-radius:99px;padding:0 4px;line-height:13px}
 .cal .cf{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:8px;font-size:11px}
 .cal .cf button{border:1px solid var(--linha);background:var(--card);border-radius:99px;padding:5px 10px;font-size:12px;font-weight:600;cursor:pointer}
-.dsel{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700;margin-bottom:6px;color:var(--volt)}
-.dsel svg{color:var(--volt)}.dsel.vazio{color:var(--cinza);font-weight:500}
+.dsel{display:flex;align-items:center;gap:8px;font-size:14.5px;font-weight:700;margin-bottom:6px;color:var(--voltx)}
+.dsel svg{color:var(--voltx)}.dsel.vazio{color:var(--cinza);font-weight:500}
 .cal{margin-top:0;box-shadow:none;background:var(--card)}
 .espg{display:flex;flex-direction:column;gap:6px}
 .erow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -410,7 +410,7 @@ table.tb td{font-size:13.5px}table.tb .s{font-size:12px}
 .mdh{display:flex;justify-content:space-between;align-items:center}
 .mdh b{font-size:14px;cursor:pointer;padding:2px 4px;border-radius:6px}.mdh b:hover{background:var(--card2)}
 .md.today .mdh b{background:var(--volt);color:#000}
-.madd{opacity:0;border:1px solid var(--linha);background:var(--card2);border-radius:6px;width:22px;height:22px;font-weight:800;cursor:pointer;color:var(--volt);line-height:1}
+.madd{opacity:0;border:1px solid var(--linha);background:var(--card2);border-radius:6px;width:22px;height:22px;font-weight:800;cursor:pointer;color:var(--voltx);line-height:1}
 .md:hover .madd{opacity:1}
 @media(hover:none){.madd{opacity:.7}}
 .mj{font-size:11.5px;background:var(--card2);border-left:3px solid var(--volt);border-radius:6px;padding:3px 6px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -432,7 +432,7 @@ table.tb td{font-size:13.5px}table.tb .s{font-size:12px}
 .oprice .op{font-size:11.5px;color:var(--cinza);margin-top:2px}.oprice .op b{color:var(--chalk)}
 .oprice .dn{color:var(--flash)!important}.oprice .up{color:var(--ok)!important}
 .oqtd{display:flex;align-items:center;gap:8px}.oqtd button{width:26px;height:26px;border-radius:8px;border:1px solid var(--linha2);background:var(--card2);color:var(--chalk);cursor:pointer}
-.ocard .open{background:none;border:1px dashed var(--linha2);color:var(--cinza);border-radius:10px;padding:6px 8px;font:inherit;font-size:11.5px;cursor:pointer;text-align:left}.ocard .open:hover{color:var(--volt);border-color:var(--volt)}
+.ocard .open{background:none;border:1px dashed var(--linha2);color:var(--cinza);border-radius:10px;padding:6px 8px;font:inherit;font-size:11.5px;cursor:pointer;text-align:left}.ocard .open:hover{color:var(--voltx);border-color:var(--volt)}
 .ocard .lnk{background:none;border:0;color:var(--cinza);text-decoration:underline;font:inherit;font-size:11px;cursor:pointer;padding:4px 0}
 .osum{display:grid;grid-template-columns:auto 1fr auto;gap:16px;background:var(--card2);border-radius:14px;padding:12px 14px;margin-top:16px}.osum>div{display:flex;flex-direction:column;gap:2px}.osum b{font-size:14px}
 .chk{display:flex;gap:8px;align-items:center;font-size:12.5px;margin-top:12px;color:var(--cinza)}
@@ -501,20 +501,20 @@ table.tb td{font-size:13.5px}table.tb .s{font-size:12px}
 .pg img.plogo{height:34px;width:auto;text-shadow:none}.ctr img.clogo{height:26px;width:auto}
 h1,h2,.pagehead h1{font-family:var(--fb);letter-spacing:-.01em}
 .kv{display:flex;flex-direction:column;gap:9px}.kv>div{display:grid;grid-template-columns:130px 1fr;gap:10px;font-size:12.5px;align-items:baseline}.kv span{color:var(--cinza);font-size:11.5px}
-.lnk2{background:none;border:0;color:var(--volt);font:inherit;font-size:11px;cursor:pointer;text-decoration:underline}
+.lnk2{background:none;border:0;color:var(--voltx);font:inherit;font-size:11px;cursor:pointer;text-decoration:underline}
 .qs{display:grid;grid-template-columns:1fr 120px 52px;gap:10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--linha)}.qs>div:first-child{display:flex;flex-direction:column}.qs>b{text-align:right}
 .qsbar{height:8px;background:var(--card2);border-radius:99px;overflow:hidden}.qsbar i{display:block;height:100%;background:var(--flash);border-radius:99px}.qsbar.v i{background:var(--volt)}
 .sugs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:12px}
-.bloco{background:var(--bg2);border:1px solid var(--linha);border-radius:16px;padding:12px;margin-bottom:12px}.bloco .bh{display:flex;justify-content:space-between;margin:0 4px 10px;font-size:13px}.bloco .bh span{color:var(--volt);font-weight:800;font-family:var(--fb);font-size:16px}
-.pcard .fn{font-size:11.5px;color:var(--volt);margin-top:6px;font-weight:600}
+.bloco{background:var(--bg2);border:1px solid var(--linha);border-radius:16px;padding:12px;margin-bottom:12px}.bloco .bh{display:flex;justify-content:space-between;margin:0 4px 10px;font-size:13px}.bloco .bh span{color:var(--voltx);font-weight:800;font-family:var(--fb);font-size:16px}
+.pcard .fn{font-size:11.5px;color:var(--voltx);margin-top:6px;font-weight:600}
 .ulc{margin:6px 0 0;padding-left:18px;font-size:12.5px;line-height:1.6}
 @media(max-width:760px){.kv>div{grid-template-columns:1fr;gap:2px}.qs{grid-template-columns:1fr 70px 44px}}
 .kv.two{display:grid;grid-template-columns:1fr 1fr;gap:10px 28px}
 .dropz{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center;border:2px dashed var(--linha2);border-radius:18px;padding:26px 16px;cursor:pointer;background:var(--bg2);transition:.15s;margin-bottom:12px}
-.dropz b{font-family:var(--fb);font-size:18px}.dropz span{font-size:12.5px;color:var(--cinza)}.dropz:hover,.dropz.on{border-color:var(--volt);background:rgba(213,255,63,.06)}.dropz.on b{color:var(--volt)}
+.dropz b{font-family:var(--fb);font-size:18px}.dropz span{font-size:12.5px;color:var(--cinza)}.dropz:hover,.dropz.on{border-color:var(--volt);background:rgba(213,255,63,.06)}.dropz.on b{color:var(--voltx)}
 .dic{flex:none;width:38px;height:38px;border-radius:10px;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:var(--cinza)}
 .dic.PDF{background:#3a1416;color:#ff8b8b}.dic.IMG{background:#14283a;color:#8bc5ff}.dic.DOC{background:#14203a;color:#8ba8ff}.dic.XLS{background:#143a1e;color:#8bffa8}.dic.PPT{background:#3a2a14;color:#ffc58b}
-#lst .m0 .s{word-break:break-all}.dlink{cursor:pointer;color:var(--chalk);text-decoration:none}.dlink:hover{color:var(--volt);text-decoration:underline}
+#lst .m0 .s{word-break:break-all}.dlink{cursor:pointer;color:var(--chalk);text-decoration:none}.dlink:hover{color:var(--voltx);text-decoration:underline}
 .uprow{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--linha);border-radius:12px;padding:8px 10px;margin-bottom:6px;font-size:12.5px}.uprow .s{font-size:11.5px;color:var(--cinza)}
 .uprow.ok .dic{background:var(--volt);color:#000}.uprow.erro .dic{background:var(--bad);color:#000}
 @media(max-width:760px){.kv.two{grid-template-columns:1fr}}
@@ -526,6 +526,18 @@ h1,h2,.pagehead h1{font-family:var(--fb);letter-spacing:-.01em}
 textarea.ta{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--linha2);border-radius:12px;color:var(--chalk);font:inherit;padding:10px 12px;margin-top:10px}
 .eqprev{max-height:220px;overflow:auto;margin-top:8px;font-size:12.5px;display:flex;flex-direction:column;gap:4px}
 .side>*{flex-shrink:0}.sitem{flex-shrink:0}
+.sitem .sl small{display:none}.sitem{min-height:34px;padding:5px 12px;margin-bottom:1px}.sitem .sl b{font-size:13.5px}.sgrp{margin-top:10px}
+.pg,.ctr{--voltx:var(--volt)}
+html[data-tema=hibisco]{--volt:#EF8FC4;--flash:#D5FF3F}
+html[data-tema=ameixa]{--noite:#12070F;--bg2:#1A0C16;--card:#231521;--card2:#2D1B2A;--linha:#3A2536;--linha2:#4A3045;--volt:#D5FF3F;--flash:#EF8FC4}
+html[data-tema=oliva]{--noite:#0B0D07;--bg2:#12150D;--card:#191D12;--card2:#21261A;--linha:#2B3122;--linha2:#3A4230;--volt:#C9DB82;--flash:#EF8FC4}
+html[data-tema=papel]{--noite:#F3F3EC;--bg2:#EAEAE1;--card:#FFFFFF;--card2:#F1F1EA;--linha:#DADAD0;--linha2:#C6C6BA;--chalk:#131411;--cinza:#5B5C56;--grafite:#8A8B84;--volt:#D5FF3F;--voltx:#561D45;--flash:#B8327A;color-scheme:light}
+html[data-tema=papel] .sheet{background:rgba(19,20,17,.6)}html[data-tema=papel] .tag.o{background:#e3f5e6;color:#1b6b2c;border-color:#bfe5c6}html[data-tema=papel] .tag.w{background:#fff1d6;color:#8a5a00;border-color:#f2d89c}html[data-tema=papel] .tag.x{background:#fde3e6;color:#a1202f;border-color:#f5bcc4}
+html[data-tema=papel] .warnbox{background:#fff1d6;color:#7a4f00;border-color:#f2d89c}html[data-tema=papel] .okbox{background:#e3f5e6;color:#1b6b2c;border-color:#bfe5c6}
+.temas{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px;margin-top:12px}.tema{border:2px solid var(--linha);border-radius:16px;padding:10px;cursor:pointer;background:var(--card);text-align:left;color:var(--chalk);font:inherit}.tema.on{border-color:var(--voltx)}
+.tema .sw{height:54px;border-radius:10px;display:flex;align-items:flex-end;gap:5px;padding:7px;margin-bottom:8px}.tema .sw i{width:16px;height:16px;border-radius:99px;display:block}.tema b{font-size:13px}.tema small{display:block;font-size:11px;color:var(--cinza)}
+html[data-tema=papel] :is(.railv,.kpi.cob,.stage.c,.mk.c){--voltx:#D5FF3F;--chalk:#F3F3EC;--cinza:#d9c9d4;color:#F3F3EC}
+.sfoot .btn{white-space:nowrap}
 </style>
 </head>
 <body>
@@ -883,14 +895,14 @@ function propDoc(p){
   const aluguel=p.modalidade==="aluguel"||p.pacote==="Aluguel do espaço";
   const inv=aluguel?`${pr(p.valor_fixo)} de aluguel do espaço`:`${pr(p.valor_fixo)} por mês + ${perc} sobre vendas das lives`;
   const pages=[];
-  pages.push(`<div class="kick">● no ar · Proposta de operação no TikTok Shop</div><h1 style="font-size:64px;margin-top:60px">Operação de Live<br>Shop para a<br><span style="color:var(--volt)">${v(p.marca,"Marca")}</span></h1>
+  pages.push(`<div class="kick">● no ar · Proposta de operação no TikTok Shop</div><h1 style="font-size:64px;margin-top:60px">Operação de Live<br>Shop para a<br><span style="color:var(--voltx)">${v(p.marca,"Marca")}</span></h1>
    <div class="lead">${v(p.mes_ref,"mês")} · proposta válida por ${p.validade_dias||10} dias corridos</div><div class="sticker">tem cupom hoje?</div>`);
   pages.push(`<div class="kick">Resumo da proposta</div><h2>Nossa recomendação<br>para a ${v(p.marca,"Marca")}</h2>
    <table class="res"><tr><td>Objetivo</td><td>${v(p.objetivo,"objetivo")}</td></tr>
    <tr><td>Pacote</td><td>${aluguel?"Aluguel do estúdio IMPlay":esc(p.pacote||"")+({Essencial:": 10 lives de 4 h por mês",Crescimento:": 15 lives de 4 h por mês",Escala:": 20 lives de 4 h por mês"}[p.pacote]||"")+" no estúdio IMPlay"}</td></tr>
    <tr><td>Produtos iniciais</td><td>${v(p.produtos,"SKUs ou categorias")}</td></tr>
    ${p.complementos?`<tr><td>Complementos</td><td>${esc(p.complementos)}</td></tr>`:""}
-   <tr><td>Investimento</td><td><b style="color:var(--volt)">${inv}</b></td></tr>
+   <tr><td>Investimento</td><td><b style="color:var(--voltx)">${inv}</b></td></tr>
    <tr><td>Primeira live</td><td>${p.primeira_live?dExt(p.primeira_live):'<span style="color:var(--flash)">data</span>'}, depois da implantação</td></tr></table>`);
   pages.push(`<div class="kick">O mercado</div><h2>Na China, a live já vende um terço do varejo online. Nos EUA, o TikTok Shop dobrou em um ano</h2>
    <div class="g3"><div class="box"><div class="big">≈ 1/3</div><p>do varejo online chinês vem de live commerce: mais de ¥ 5 trilhões.</p><div class="small">China · 2025</div></div>
@@ -924,7 +936,7 @@ function propDoc(p){
   pages.push(`<div class="kick">Condições</div><h2>O que não está no pacote e como contratar</h2>
    <div class="g2"><div class="box"><b>Fica por conta da marca</b><ul><li>Verba de mídia (GMV Max)</li><li>Comissão dos afiliados</li><li>Produtos, fretes e envios</li><li>Atendimento ao cliente e logística</li><li>Cenário com a identidade visual da marca, orçado à parte</li><li>Lives de 12 horas ou mais, orçadas como lançamento</li></ul></div>
    <div class="box"><b>Condições</b><ul><li>Vigência de ${p.vigencia_meses||3} meses, renovável</li><li>Pagamento: ${v(p.pagamento,"forma e data")}</li><li>Percentual calculado sobre as vendas das lives, sem pedidos cancelados ou devolvidos</li><li>Início conforme agenda do estúdio</li><li>Proposta válida por ${p.validade_dias||10} dias corridos. Depois disso, valores e disponibilidade podem mudar.</li><li>Cachê dos apresentadores pode ser faturado diretamente pelo profissional à marca.</li></ul></div></div>`);
-  pages.push(`<h1 style="font-size:96px;color:var(--volt);margin-top:30px">bora!</h1><h2>Escolha o pacote e<br>marcamos a primeira live</h2>
+  pages.push(`<h1 style="font-size:96px;color:var(--voltx);margin-top:30px">bora!</h1><h2>Escolha o pacote e<br>marcamos a primeira live</h2>
    <div class="g2"><div class="box"><b>O que a marca envia</b><ul><li>Pacote escolhido</li><li>Lista de produtos e condições comerciais</li><li>Amostras</li><li>Acesso à loja no TikTok Shop</li></ul></div>
    <div class="boxc"><b>Fale com a gente</b><ul><li>${esc(p.contato1||"")}</li><li>${esc(p.contato2||"")}</li><li>@implay.shop</li></ul></div></div>
    <div class="small" style="margin-top:18px">Com o pacote aprovado, reservamos a agenda do estúdio e começamos a preparação assim que os produtos chegam. As informações desta proposta são confidenciais e destinadas apenas aos envolvidos.</div>`);
@@ -1089,9 +1101,9 @@ function render(){
   const b=badges();const pend=pendencias();const rail=S.tab==="painel";
   $("#app").innerHTML=`<div class="shell">
    <aside class="side">
-    <div class="sbrand"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay" data-act="tab" data-v="painel" title="Ir para o Painel" style="cursor:pointer"><div class="live" style="margin-top:12px">gestão · live commerce</div><div class="tagline">A marca que fala de volta.</div></div>
+    <div class="sbrand"><img class="logoimg" src="${S.tema==="papel"?LOGO_CARVAO:LOGO_LIMA}" alt="IMPlay" data-act="tab" data-v="painel" title="Ir para o Painel" style="cursor:pointer"><div class="live" style="margin-top:12px">gestão · live commerce</div><div class="tagline">A marca que fala de volta.</div></div>
     ${MENU.map(([g,items])=>`<div class="sgrp">${g}</div>${items.map(([k,l,sub,i])=>`<button class="sitem ${S.tab===k?"on":""}" data-act="tab" data-v="${k}">${ic(i)}<span class="sl"><b>${l}</b><small>${sub}</small></span>${b[k]?`<span class="sbad">${b[k]}</span>`:""}</button>`).join("")}`).join("")}
-    <div class="sfoot">${esc(S.email)}<br><a href="#" data-act="backup" style="color:var(--volt)">Copiar backup</a> · <a href="#" data-act="sair">Sair</a></div>
+    <div class="sfoot">${esc(S.email)}<br><a href="#" data-act="backup" style="color:var(--voltx)">Copiar backup</a> · <a href="#" data-act="sair">Sair</a></div>
    </aside><div class="scrim" data-act="sideClose"></div>
    <div class="main">
     <div class="topbar"><button class="burger" data-act="sideOpen" aria-label="Menu">${ic("menu")}</button>
@@ -1496,7 +1508,7 @@ VIEWS.painel=()=>{const now=new Date(),mesK=monthKey(now);const R=rangeOf("mes")
   if(st==="hoje")l=l.filter(j=>sameDay(new Date(j.inicio),now));else if(st==="vagas")l=vagas;else l=l.filter(j=>new Date(j.fim)>now&&new Date(j.inicio)<fimSem);
   const gm={};lm.forEach(j=>{const k=j.marca||"—";gm[k]=(gm[k]||0)+(Number(j.gmv)||0)});const gs={};lm.forEach(j=>{if(j.principal_id)gs[j.principal_id]=(gs[j.principal_id]||0)+(Number(j.gmv)||0)});
   const mes=lastMonths(6).map(([k,lb])=>[lb,S.jobs.filter(j=>j.status==="realizado"&&monthKey(new Date(j.inicio))===k).reduce((s,j)=>s+(Number(j.gmv)||0),0)]);
-  return `<div class="welcome"><div><div class="kick">● ${hojeTxt()} · Implay Studio Paulista</div><h1>Olá, ${esc(S.me.nome)} <span style="color:var(--volt)">✦</span></h1></div><div class="row"><button class="btn p sm" data-act="novoJob">+ Nova live</button><button class="btn sm" data-act="propNova">+ Proposta</button><button class="btn sm" data-act="tab" data-v="relatorios">Relatórios</button></div></div>
+  return `<div class="welcome"><div><div class="kick">● ${hojeTxt()} · Implay Studio Paulista</div><h1>Olá, ${esc(S.me.nome)} <span style="color:var(--voltx)">✦</span></h1></div><div class="row"><button class="btn p sm" data-act="novoJob">+ Nova live</button><button class="btn sm" data-act="propNova">+ Proposta</button><button class="btn sm" data-act="tab" data-v="relatorios">Relatórios</button></div></div>
   <div class="mks six">${mini("GMV do mês",brlK(gmv),lm.length+" lives realizadas","v")}${mini("Receita do mês",brlK(rec),"sem aportes")}${mini("Resultado do mês",brlK(rec-des),"receita − despesas",rec-des<0?"f":"")}${mini("Contratos ativos",ativos.length,brlK(soma(ativos.map(p=>({valor:p.valor_fixo}))))+"/mês fixo","c")}${mini("Lives em 7 dias",cnt.semana,cnt.hoje+" hoje")}${mini("Vagas abertas",vagas.length,"sem seller",vagas.length?"f":"")}</div>
   <div class="grid3">
    <div class="panel"><h3>Funil comercial <a data-act="tab" data-v="funil">abrir ›</a></h3><div class="fbar">${FUNIL.map(([k,lb])=>`<div class="fb" data-act="tab" data-v="funil"><b>${fun[k]}</b><span>${lb.split(" /")[0]}</span></div>`).join("")}</div></div>
@@ -1558,7 +1570,13 @@ async function toggleDemo(){if(S.demo){S.demo=false;S.ev=null;await loadAll();to
   const d=demoData();Object.assign(S,d);S.demo=true;toast("Modo demonstração: dados fictícios, nada é salvo");render()}
 const _run=run;run=async function(p,ok){if(S.demo){toast("Modo demonstração: nada é salvo",true);throw new Error("demo")}return _run(p,ok)};
 const _refresh=refresh;refresh=async function(){if(S.demo)return;return _refresh()};
-const _render=render;render=function(){_render();const sf=$(".sfoot");if(sf)sf.insertAdjacentHTML("afterbegin",`<button class="btn sm ${S.demo?"f":""}" data-act="demo" style="width:100%;margin-bottom:10px">${S.demo?"Sair da demonstração":"Modo demonstração"}</button>`);
+const TEMAS=[["implay","IMPlay","Preto e lima","#000","#D5FF3F","#EF8FC4"],["hibisco","Hibisco","Preto e rosa","#000","#EF8FC4","#D5FF3F"],["ameixa","Ameixa","Vinho escuro","#1A0C16","#D5FF3F","#EF8FC4"],["oliva","Oliva","Verde escuro","#12150D","#C9DB82","#EF8FC4"],["papel","Papel","Claro, para o dia","#F3F3EC","#561D45","#D5FF3F"]];
+function temaKey(){return "implay-tema-"+(S.email||"")}
+function temaAplica(){if(S.tema===undefined){try{S.tema=localStorage.getItem(temaKey())||"implay"}catch(_){S.tema="implay"}}document.documentElement.dataset.tema=S.tema;const m=document.querySelector('meta[name=theme-color]');if(m)m.content=getComputedStyle(document.documentElement).getPropertyValue("--noite").trim()||"#000"}
+function openTemas(){openSheet(`<h3>Cores do sistema</h3><div class="hint">Escolha a sua. Vale só para você, neste aparelho.</div><div class="temas">${TEMAS.map(([k,n,d,bg,a,b])=>`<button type="button" class="tema ${S.tema===k?"on":""}" data-act="temaSet" data-v="${k}"><div class="sw" style="background:${bg};border:1px solid var(--linha)"><i style="background:${a}"></i><i style="background:${b}"></i></div><b>${n}</b><small>${d}</small></button>`).join("")}</div><div class="acts"><button type="button" class="btn" data-act="fechar">Fechar</button></div>`)}
+document.addEventListener("click",e=>{const a=e.target.closest("[data-act=temaSet],[data-act=temas]");if(!a)return;e.preventDefault();e.stopImmediatePropagation();
+  if(a.dataset.act==="temas")return openTemas();S.tema=a.dataset.v;try{localStorage.setItem(temaKey(),S.tema)}catch(_){};temaAplica();closeSheet();render();openTemas()},true);
+const _render=render;render=function(){if(S.me)temaAplica();_render();const sf=$(".sfoot");if(sf)sf.insertAdjacentHTML("afterbegin",`<div class="row" style="gap:6px;margin-bottom:10px;flex-wrap:nowrap"><button class="btn sm ${S.demo?"f":""}" data-act="demo" style="flex:1" title="Mostra dados fictícios para apresentar o sistema. Nada é salvo.">${S.demo?"Sair da demonstração":"Demonstração"}</button><button class="btn sm" data-act="temas" title="Cores do sistema">🎨 Cores</button></div>`);
   if(S.demo){const c=$(".content");if(c)c.insertAdjacentHTML("beforebegin",`<div class="demobar">MODO DEMONSTRAÇÃO · dados fictícios para apresentação · nada é salvo <button class="btn sm" data-act="demo">Sair</button></div>`)}};
 const _showDoc=showDoc;showDoc=function(p){setPage("landscape");_showDoc(p)};
 
@@ -1985,6 +2003,7 @@ HEADACT.equip=()=>`<button class="btn sm" data-act="eqColar">Colar lista</button
 const _loadAll6=loadAll;loadAll=async function(){await _loadAll6();if(S.demo)return;const r=await db.from("imp_equip").select("id,numero,nome,categoria,marca,modelo,serie,quantidade,local,estado,status,responsavel_id,com_quem,valor,compra_em,nota_fiscal,obs,created_at,updated_at").order("categoria",{ascending:true});S.eqSemSQL=!!r.error;S.equip=r.data||[]};
 function eqn(n){return "EQ-"+String(n||0).padStart(3,"0")}
 function eqTag(st){const x=EQ_STATUS.find(s=>s[0]===st)||["?",""];return `<span class="tag ${x[1]}">${esc(st||"—")}</span>`}
+function eqCats(){const extra=[...new Set(S.equip.map(e=>e.categoria).filter(c=>c&&!EQ_CATS.includes(c)))].sort();return [...EQ_CATS.slice(0,-1),...extra,"Outro"]}
 function eqCatAuto(t){t=(t||"").toLowerCase();
   if(/iphone|celular|smartphone|galaxy|xiaomi|motorola|redmi|pixel/.test(t))return "Celular";
   if(/microfone|mic\b|lapela|rode|shure|boya|hollyland|dji mic/.test(t))return "Microfone";
@@ -2007,7 +2026,7 @@ LISTS.eqp=()=>{const l=eqLista();
    +(l.length?`<div class="hint" style="margin-top:8px">${l.reduce((s,e)=>s+(e.quantidade||1),0)} unidades · ${l.length} itens${l.some(e=>e.valor)?" · valor "+brl(l.reduce((s,e)=>s+(Number(e.valor)||0)*(e.quantidade||1),0)):""}</div>`:"")};
 VIEWS.equip=()=>{if(S.eqSemSQL&&!S.demo)return `<div class="warnbox">Falta rodar o SQL <b>implay_equipamentos.sql</b> no Supabase (SQL Editor → New query → Run). Depois recarregue.</div>`;
   const f=S.f.eqp,A=S.equip.filter(e=>e.status!=="Baixado");const un=l=>l.reduce((s,e)=>s+(e.quantidade||1),0);
-  const cats=EQ_CATS.filter(c=>A.some(e=>e.categoria===c));const locs=[...new Set(S.equip.map(e=>e.local).filter(Boolean))].sort();
+  const cats=eqCats().filter(c=>A.some(e=>e.categoria===c));const locs=[...new Set(S.equip.map(e=>e.local).filter(Boolean))].sort();
   const prob=A.filter(e=>["Precisa de reparo","Quebrado"].includes(e.estado)||e.status==="Manutenção");
   return `<div class="mks">${mini("Unidades",un(A))}${mini("Celulares",un(A.filter(e=>e.categoria==="Celular")),"","v")}${mini("Fones",un(A.filter(e=>e.categoria==="Fone de ouvido")))}${mini("Fora do estúdio",un(A.filter(e=>["Emprestado","Em uso"].includes(e.status))))}${mini("Com problema",un(prob),"reparo, quebrado ou manutenção",prob.length?"f":"")}</div>`
    +chips("eqp",[["todos","Ativos",A.length],...EQ_STATUS.map(([s])=>[s,s,S.equip.filter(e=>e.status===s).length]),["problema","Com problema",prob.length]],f.st)
@@ -2016,7 +2035,7 @@ function openEq(id){const e=id?S.equip.find(x=>x.id===id):{categoria:"Celular",q
   const membros=S.membros.filter(m=>m.status==="ativo"&&m.papel!=="seller");
   openSheet(`<form onsubmit="return false"><h3>${id?esc(e.nome)+" · "+eqn(e.numero):"Novo equipamento"}</h3>
    ${fld("nome","O que é",e.nome,"text",'placeholder="Ex.: iPhone 15 Pro, AirPods Pro, Ring light 18”" required')}
-   ${pick("categoria","Categoria",e.categoria,EQ_CATS,{ph:"Outra categoria"})}
+   ${pick("categoria","Categoria",e.categoria,eqCats(),{ph:"+ Nova categoria: escreva aqui (ex.: Teleprompter)"})}<div class="hint" style="margin-top:-4px">A categoria nova vira botão para os próximos cadastros.</div>
    <div class="cols2">${fld("marca","Marca",e.marca)}${fld("modelo","Modelo",e.modelo)}</div>
    <div class="cols2">${fld("serie","Nº de série / IMEI / patrimônio",e.serie)}${pick("quantidade","Quantidade",String(e.quantidade||1),["1","2","3","4","5","10"],{num:1,ph:"Outro número"})}</div>
    <div class="sec"><h2>Onde e com quem</h2></div>
