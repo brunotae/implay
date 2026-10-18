@@ -86,6 +86,9 @@ h1,h2,h3{font-weight:800}
 .diah{font-size:16px;margin:16px 0 8px}.diah::first-letter{text-transform:uppercase}
 @media(max-width:560px){.cd{min-height:60px;padding:2px}.cd .lv{font-size:8.5px;padding:2px;letter-spacing:-.02em}.cd .lv i{display:none}.cd .lv em{font-size:9.5px}}
 .contrato{background:#f3f3ec;color:#131411;border-radius:14px;padding:16px 18px;max-height:360px;overflow-y:auto;font-size:13px;line-height:1.55}.contrato h4{font-size:13px;margin:14px 0 4px;text-transform:uppercase;letter-spacing:.03em}.contrato p{margin:4px 0}.contrato .muted{color:#555}.ctrfim{text-align:center;font-size:11px;color:#777;margin-top:12px}
+.steps{display:flex;gap:4px;margin:4px 0 14px}.steps div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--cinza);text-align:center}.steps b{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;border:1px solid var(--linha);font-size:12px}.steps .on{color:var(--chalk)}.steps .on b{background:var(--volt);color:#000;border-color:var(--volt)}.steps .ok b{background:#1f3a12;color:var(--volt);border-color:#2c5419}
+.kh{font-size:15px;margin:0 0 4px}.ftile{display:flex;gap:12px;align-items:center;border:1px dashed var(--linha);border-radius:14px;padding:10px;margin-top:10px;cursor:pointer}.ftile.ok{border-style:solid;border-color:#2c5419}.ftile.up{opacity:.5;pointer-events:none}.ftile img,.ftile .fph{width:84px;height:84px;flex:none;border-radius:10px;object-fit:cover;background:#111;display:grid;place-items:center;font-size:30px}
+.kvs{display:grid;grid-template-columns:100px 1fr;gap:6px 10px;font-size:13px;margin-top:10px}.kvs span{color:var(--cinza)}.btn.sm{padding:6px 12px;min-height:0;font-size:13px;width:auto}
 .tchk{display:flex;gap:10px;align-items:flex-start;margin-top:10px;font-size:13.5px;background:var(--card);border:1px solid var(--linha);border-radius:14px;padding:12px;cursor:pointer}.tchk input{width:20px;height:20px;flex:none;accent-color:var(--volt);margin-top:1px}.tchk.dis{opacity:.5;cursor:not-allowed}
 #ctrSheet{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:60;overflow:auto;padding:20px}#ctrSheet .in{margin:0 auto}
 </style>
@@ -101,7 +104,7 @@ const LOGO_LIMA="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAACJCAYAAAABi
 const SB_URL="https://agdqlnaedojcgivwluty.supabase.co";
 const SB_KEY="sb_publishable_PKGxxrfpduzI7xY1_DWQyQ_cnJA9isP";
 const db=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:"implay-seller-auth"}});
-const TERMO_VERSAO="v3-2026-10";
+const TERMO_VERSAO="v4-2026-10";
 const ESTUDIO="Estúdio IMPlay · Av. Paulista, 2198, salas 161/162 · São Paulo";
 const S={me:null,tab:"mural",mural:[],meus:[],hist:[]};
 function $(s){return document.querySelector(s)}
@@ -141,8 +144,11 @@ async function boot(){
   S.email=session.user.email;
   const {data:me,error}=await db.rpc("imp_entrar",{p_app:"seller"});
   if(error)return renderLogin("Erro: "+erro(error));
-  S.me=me&&me.id?me:null;
+  S.me=me&&me.id?me:null;S.uid=session.user.id;
   if(!S.me)return renderCadastro();
+  if(S.me.papel==="seller"){await loadKyc();const ks=S.kyc&&S.kyc.status;
+    if(!ks||ks==="rascunho"||ks==="recusado")return renderIdent();
+    if(ks==="enviado")return renderAnalise();}
   if(S.me.status==="pendente")return renderPendente();
   if(S.me.status!=="ativo")return renderMsg("Seu acesso está inativo. Fale com a Implay.");
   if(!S.me.termo_aceito_em||S.me.termo_versao!==TERMO_VERSAO)return renderTermo();
@@ -150,8 +156,8 @@ async function boot(){
 }
 function renderMsg(t){$("#app").innerHTML=`<div class="wrap"><div class="card"><p>${t}</p><button class="btn" data-act="sair">Sair</button></div></div>`}
 function renderCadastro(){const m=S.me||{};
-  $("#app").innerHTML=`<div class="wrap"><div class="top"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay"></div>
-  <form class="card" id="cf"><h3 style="font-size:18px">Seu cadastro</h3><p class="small muted">Preencha uma vez. A equipe da Implay aprova e você já pode escolher jobs.</p>
+  $("#app").innerHTML=`<div class="wrap"><div class="top"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay"></div>${S.me&&S.kyc&&S.kyc.status==="aprovado"?"":passos(1)}
+  <form class="card" id="cf"><h3 style="font-size:18px">Seu cadastro</h3><p class="small muted">${S.me?"Seus dados de contato e pagamento.":"Primeiro, seus contatos. Depois vêm o documento e a selfie, a aprovação de um sócio e o contrato."}</p>
   <div class="fld"><label>Nome completo</label><input name="nome" required value="${esc(m.nome||"")}"></div>
   <div class="fld"><label>WhatsApp</label><input name="tel" type="tel" required value="${esc(m.telefone||"")}"></div>
   <div class="fld"><label>Cidade</label><input name="cidade" value="${esc(m.cidade||"")}"></div>
@@ -160,7 +166,7 @@ function renderCadastro(){const m=S.me||{};
   <div class="fld"><label>Chave Pix</label><input name="pix" value="${esc(m.pix||"")}"></div>
   <div class="row"><div class="fld"><label>Instagram</label><input name="instagram" value="${esc(m.instagram||"")}" placeholder="@"></div><div class="fld"><label>TikTok</label><input name="tiktok" value="${esc(m.tiktok||"")}" placeholder="@"></div></div>
   <div class="fld"><label>Nichos que você domina</label><input name="nicho" value="${esc(m.nicho||"")}" placeholder="beleza, alimentos, pet…"></div>
-  <button class="btn p" style="margin-top:16px">${S.me?"Salvar":"Enviar cadastro"}</button>${S.me?`<button type="button" class="btn" style="margin-top:8px" data-act="voltar">Voltar</button>`:""}</form>
+  <button class="btn p" style="margin-top:16px">${S.me?"Salvar":"Continuar"}</button>${S.me?`<button type="button" class="btn" style="margin-top:8px" data-act="voltar">Voltar</button>`:""}</form>
   <div class="foot">Conectado como ${esc(S.email)} · <a href="#" data-act="sair" style="color:var(--cinza)">Sair</a></div></div>`;
   $("#cf").onsubmit=async e=>{e.preventDefault();const f=Object.fromEntries(new FormData(e.target));if(!f.vinculo)return toast("Escolha como você presta serviço",true);
     const {error}=await db.rpc("imp_cadastro_seller",{p_nome:f.nome,p_tel:f.tel,p_cidade:f.cidade,p_vinculo:f.vinculo,p_cnpj:f.cnpj,p_pix:f.pix,p_instagram:f.instagram,p_tiktok:f.tiktok,p_nicho:f.nicho});
@@ -179,11 +185,11 @@ const TERMO_ITENS=[
  ["cancelar","Posso cancelar","Cancelar com pelo menos 24 horas de antecedência não traz prejuízo. Depois disso, o cancelamento só fica registrado."],
  ["tributos","Nota fiscal e impostos são comigo","Quando aplicável (MEI/PJ), emito nota fiscal direto para quem me paga, inclusive a marca cliente, e recolho meus próprios tributos."],
  ["registro","Tudo fica registrado","Minhas escolhas, cancelamentos e este aceite ficam registrados neste app com data e hora."]];
-function contratoHtml(m){let n=0;const cl=(t,x)=>`<h4>Cláusula ${++n}ª · ${t}</h4>${x}`;const hoje=new Date(m.termo_aceito_em&&m.termo_versao===TERMO_VERSAO?m.termo_aceito_em:Date.now()).toLocaleDateString("pt-BR");
+function contratoHtml(m){const k=S.kyc||{};let n=0;const cl=(t,x)=>`<h4>Cláusula ${++n}ª · ${t}</h4>${x}`;const hoje=new Date(m.termo_aceito_em&&m.termo_versao===TERMO_VERSAO?m.termo_aceito_em:Date.now()).toLocaleDateString("pt-BR");
  return `<h3 style="font-size:15px;margin:0 0 6px;text-align:center">CONTRATO DE PRESTAÇÃO DE SERVIÇOS AUTÔNOMOS DE APRESENTAÇÃO AO VIVO (LIVE SELLER)</h3>
  <p class="small muted" style="text-align:center;margin-top:0">Versão ${TERMO_VERSAO}</p>
  ${cl("Das partes",`<p><b>CONTRATANTE:</b> IMPLAY LIVE COMMERCE LTDA ("IMPLAY"), inscrita no CNPJ sob nº 69.448.022/0001-15, com sede na Av. Paulista, 2198, sala 161/162, Bela Vista, São Paulo/SP, CEP 01310-300.</p>
-  <p><b>PRESTADOR(A):</b> ${esc(m.nome||"")}${m.cnpj?`, inscrito(a) no CNPJ/MEI sob nº ${esc(m.cnpj)}`:""}, e-mail ${esc(m.email||S.email||"")}${m.telefone?`, telefone ${esc(m.telefone)}`:""}${m.cidade?`, com domicílio em ${esc(m.cidade)}`:""}, doravante "PRESTADOR".</p>`)}
+  <p><b>PRESTADOR(A):</b> <b>${esc(k.nome_doc||m.nome||"")}</b>${k.cpf?`, inscrito(a) no CPF sob nº <b>${cpfFmt(k.cpf)}</b>`:""}${k.doc_tipo?`, portador(a) do documento ${esc(k.doc_tipo)} nº ${esc(k.doc_numero||"")}`:""}${k.nascimento?`, nascido(a) em ${dBR(k.nascimento)}`:""}${k.logradouro?`, residente e domiciliado(a) em ${esc(endTxt(k))}`:m.cidade?`, com domicílio em ${esc(m.cidade)}`:""}${m.cnpj?`, ${m.vinculo==="mei"?"titular do MEI":"representando a empresa"} inscrito(a) no CNPJ sob nº ${esc(m.cnpj)}`:""}, e-mail ${esc(m.email||S.email||"")}${m.telefone?`, telefone ${esc(m.telefone)}`:""}, doravante "PRESTADOR".</p>`)}
  ${cl("Do objeto",`<p>1. O presente contrato tem por objeto a prestação de serviços autônomos e eventuais de apresentação, demonstração e venda de produtos em transmissões ao vivo ("lives") de marcas atendidas pela IMPLAY, exclusivamente nas lives que o PRESTADOR escolher realizar.</p><p>2. Este contrato estabelece as condições gerais. As condições específicas de cada live (data, horário, duração, local, marca, valor e requisitos) são informadas no aplicativo antes da escolha e passam a integrar este contrato para aquela live.</p>`)}
  ${cl("Da natureza da relação e da ausência de vínculo de emprego",`<p>1. O PRESTADOR atua como profissional autônomo, com total independência técnica e organizacional. Este contrato <b>não gera vínculo empregatício</b> de qualquer natureza, nos termos dos arts. 442-B e 593 a 609 do Código Civil e da legislação aplicável, não se aplicando as disposições da Consolidação das Leis do Trabalho (CLT).</p>
   <p>2. Não existe <b>subordinação</b>: a IMPLAY não dá ordens sobre a forma de execução do serviço. As informações repassadas limitam-se a dados de produto, preço, ofertas e identidade da marca, necessários ao resultado contratado.</p>
@@ -204,14 +210,15 @@ function contratoHtml(m){let n=0;const cl=(t,x)=>`<h4>Cláusula ${++n}ª · ${t}
  ${cl("Da vigência e da rescisão",`<p>1. Este contrato vigora por prazo indeterminado a partir do aceite.</p><p>2. Qualquer das partes pode encerrá-lo a qualquer tempo, sem multa, mediante aviso pelo aplicativo ou por e-mail, respeitadas as lives já escolhidas ou o seu cancelamento conforme a cláusula de cancelamento.</p>`)}
  ${cl("Da assinatura eletrônica",`<p>As partes reconhecem como válida a contratação por meio eletrônico, mediante o aceite do PRESTADOR no aplicativo com identificação por login e senha, nos termos do art. 10, §2º, da Medida Provisória nº 2.200-2/2001 e do art. 107 do Código Civil.</p>`)}
  ${cl("Do foro",`<p>Fica eleito o foro da Comarca de São Paulo/SP para dirimir quaisquer questões oriundas deste contrato.</p>`)}
- <p style="margin-top:14px">São Paulo, ${hoje}.</p><p><b>IMPLAY LIVE COMMERCE LTDA</b> · CONTRATANTE<br><b>${esc(m.nome||"")}</b> · PRESTADOR(A) · aceite eletrônico no aplicativo</p>`}
+ <p style="margin-top:14px">São Paulo, ${hoje}.</p><p><b>IMPLAY LIVE COMMERCE LTDA</b> · CONTRATANTE<br><b>${esc(k.nome_doc||m.nome||"")}</b>${k.cpf?` · CPF ${cpfFmt(k.cpf)}`:""} · PRESTADOR(A) · aceite eletrônico no aplicativo${k.verif_em?`, com identidade conferida (documento e selfie) em ${new Date(k.verif_em).toLocaleDateString("pt-BR")}`:""}</p>`}
 const TERMO_EMPRESA="IMPLAY LIVE COMMERCE LTDA, CNPJ 69.448.022/0001-15";
 S.termoOk=S.termoOk||{};
-function termoProgresso(){const n=TERMO_ITENS.filter(t=>S.termoOk[t[0]]).length;const nome=($("#tNome")||{}).value||"";const okNome=nome.trim().split(/\s+/).length>=2;
+function termoProgresso(){const n=TERMO_ITENS.filter(t=>S.termoOk[t[0]]).length;const nome=($("#tNome")||{}).value||"";const alvo=(S.kyc&&S.kyc.nome_doc)||"";const okNome=alvo?normNome(nome)===normNome(alvo):nome.trim().split(/\s+/).length>=2;
   const p=$("#tProg");if(p)p.textContent=`${n} de ${TERMO_ITENS.length} confirmados`;const bar=$("#tBar");if(bar)bar.style.width=(n/TERMO_ITENS.length*100)+"%";
-  const leu=($("#tChk")||{}).checked;const b=$("#tAceitar");if(b){b.disabled=!(n===TERMO_ITENS.length&&okNome&&leu);b.textContent=n<TERMO_ITENS.length?`Confirme os ${TERMO_ITENS.length-n} itens que faltam`:!leu?"Leia o contrato e marque a caixinha":!okNome?"Escreva seu nome completo":"Assinar e entrar"}}
+  const leu=($("#tChk")||{}).checked;const b=$("#tAceitar");if(b){b.disabled=!(n===TERMO_ITENS.length&&okNome&&leu);b.textContent=n<TERMO_ITENS.length?`Confirme os ${TERMO_ITENS.length-n} itens que faltam`:!leu?"Leia o contrato e marque a caixinha":!okNome?(alvo?"Escreva o nome igual ao documento":"Escreva seu nome completo"):"Assinar e entrar"}}
 function renderTermo(){const re=S.me.termo_aceito_em&&S.me.termo_versao!==TERMO_VERSAO;
-  $("#app").innerHTML=`<div class="wrap"><div class="top"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay"></div>
+  $("#app").innerHTML=`<div class="wrap"><div class="top"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay"></div>${S.me.papel==="seller"?passos(4):""}
+  ${S.kyc&&S.kyc.status==="aprovado"?`<div class="okbox">✓ Identidade aprovada. Contrato em nome de <b>${esc(S.kyc.nome_doc)}</b> · CPF <b>${cpfFmt(S.kyc.cpf)}</b></div>`:""}
   <h2 style="font-size:20px;margin:6px 0 4px">Antes de começar: como funciona</h2>
   <p class="muted small" style="margin-bottom:10px">${re?"Atualizamos o termo. ":""}Leia cada ponto e toque em <b>Entendi</b>. É rapidinho e deixa tudo claro entre você e a ${TERMO_EMPRESA}.</p>
   <div class="tprog"><div class="tpb"><i id="tBar"></i></div><span id="tProg"></span></div>
@@ -219,11 +226,89 @@ function renderTermo(){const re=S.me.termo_aceito_em&&S.me.termo_versao!==TERMO_
   <h3 style="font-size:16px;margin:20px 0 6px">Contrato completo</h3><p class="small muted" style="margin-top:0">Os 11 pontos acima são o resumo. Este é o contrato inteiro. Role até o fim para liberar a confirmação.</p>
   <div class="contrato" id="tCtr">${contratoHtml(S.me)}<div class="ctrfim">— fim do contrato —</div></div>
   <label class="tchk dis" id="tChkL"><input type="checkbox" id="tChk" disabled> <span>Li o contrato completo de prestação de serviços e concordo com todas as cláusulas.</span></label>
-  <div class="card" style="margin-top:12px"><div class="fld" style="margin-top:0"><label>Assinatura · escreva seu nome completo</label><input id="tNome" autocomplete="name" value="${esc(S.me.nome||"")}"></div>
+  <div class="card" style="margin-top:12px"><div class="fld" style="margin-top:0"><label>Assinatura · escreva seu nome completo${S.kyc&&S.kyc.nome_doc?" igual ao documento":""}</label><input id="tNome" autocomplete="name" value="" placeholder="${esc((S.kyc&&S.kyc.nome_doc)||"")}"></div>
   <p class="small muted" style="margin-top:8px">Declaro que li e entendi cada ponto acima e que presto serviço à ${TERMO_EMPRESA} como profissional autônomo(a). Versão ${TERMO_VERSAO}.</p></div>
   <button class="btn p" style="margin-top:12px" data-act="aceitar" id="tAceitar" disabled>Assinar e entrar</button><button class="btn" style="margin-top:8px" data-act="sair">Agora não (sair)</button></div>`;
   termoProgresso();$("#tNome").addEventListener("input",termoProgresso);$("#tChk").addEventListener("change",termoProgresso);
   const c=$("#tCtr");const lib=()=>{if(c.scrollTop+c.clientHeight>=c.scrollHeight-30){const k=$("#tChk");if(k.disabled){k.disabled=false;$("#tChkL").classList.remove("dis")}}};c.addEventListener("scroll",lib);lib()}
+/* ---------- identidade (antes do contrato) ---------- */
+const DOC_TIPOS=[["RG","RG"],["CNH","CNH"],["RNE","RNE / CRNM"],["Passaporte","Passaporte"]];
+const so=s=>String(s||"").replace(/\D/g,"");
+const cpfFmt=s=>{s=so(s).slice(0,11);return s.replace(/^(\d{3})(\d)/,"$1.$2").replace(/^(\d{3})\.(\d{3})(\d)/,"$1.$2.$3").replace(/\.(\d{3})(\d)/,".$1-$2")};
+const cepFmt=s=>{s=so(s).slice(0,8);return s.length>5?s.slice(0,5)+"-"+s.slice(5):s};
+function cpfOk(c){c=so(c);if(c.length!==11||/^(\d)\1{10}$/.test(c))return false;const dv=n=>{let s=0;for(let i=0;i<n;i++)s+=+c[i]*(n+1-i);const d=s*10%11;return d===10?0:d};return dv(9)===+c[9]&&dv(10)===+c[10]}
+function idade(d){if(!d)return 0;const n=new Date(d+"T12:00"),h=new Date();let a=h.getFullYear()-n.getFullYear();if(h.getMonth()<n.getMonth()||(h.getMonth()===n.getMonth()&&h.getDate()<n.getDate()))a--;return a}
+const normNome=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/\s+/g," ").trim();
+const dBR=d=>d?new Date(d+(String(d).length===10?"T12:00":"")).toLocaleDateString("pt-BR"):"";
+function endTxt(k){return [k.logradouro&&(k.logradouro+(k.numero?", "+k.numero:"")),k.complemento,k.bairro,k.cidade&&(k.cidade+(k.uf?"/"+k.uf:"")),k.cep&&("CEP "+cepFmt(k.cep))].filter(Boolean).join(", ")}
+function passos(n){const P=["Seus dados","Identidade","Aprovação","Contrato"];return `<div class="steps">${P.map((p,i)=>`<div class="${i+1<n?"ok":i+1===n?"on":""}"><b>${i+1<n?"✓":i+1}</b><span>${p}</span></div>`).join("")}</div>`}
+async function loadKyc(){if(!S.me)return S.kyc=null;const {data}=await db.from("imp_kyc").select("*").eq("membro_id",S.me.id);S.kyc=(data||[])[0]||null;return S.kyc}
+S.kf=null;S.fotoUrl={};
+function kycForm(){const k=S.kyc||{};if(!S.kf)S.kf={nome_doc:k.nome_doc||S.me.nome||"",cpf:k.cpf?cpfFmt(k.cpf):"",nascimento:k.nascimento||"",doc_tipo:k.doc_tipo||"",doc_numero:k.doc_numero||"",cep:k.cep?cepFmt(k.cep):"",logradouro:k.logradouro||"",numero:k.numero||"",complemento:k.complemento||"",bairro:k.bairro||"",cidade:k.cidade||S.me.cidade||"",uf:k.uf||"",doc_frente:k.doc_frente||"",doc_verso:k.doc_verso||"",selfie:k.selfie||"",lgpd:!!k.lgpd_em};return S.kf}
+function kycLer(){const f=S.kf;document.querySelectorAll("#kf [name]").forEach(i=>{f[i.name]=i.type==="checkbox"?i.checked:i.value});return f}
+function kycFaltas(){const f=S.kf,F=[];
+  if(normNome(f.nome_doc).split(" ").length<2)F.push("nome completo");if(!cpfOk(f.cpf))F.push("CPF válido");if(!f.nascimento)F.push("data de nascimento");else if(idade(f.nascimento)<18)F.push("ter 18 anos ou mais");
+  if(!f.doc_tipo)F.push("tipo de documento");if(!f.doc_numero.trim())F.push("número do documento");
+  if(so(f.cep).length!==8)F.push("CEP");if(!f.logradouro.trim())F.push("rua");if(!f.numero.trim())F.push("número da casa");if(!f.bairro.trim())F.push("bairro");if(!f.cidade.trim())F.push("cidade");if(!/^[A-Za-z]{2}$/.test(f.uf.trim()))F.push("UF");
+  if(!f.doc_frente)F.push("foto da frente do documento");if(f.doc_tipo==="RG"&&!f.doc_verso)F.push("foto do verso do RG");if(!f.selfie)F.push("selfie");if(!f.lgpd)F.push("autorização dos dados");return F}
+function fotoTile(campo,titulo,dica,cam,opc){const p=S.kf[campo],u=S.fotoUrl[campo];
+  return `<label class="ftile ${p?"ok":""}" for="fi_${campo}">${p?(u?`<img src="${u}" alt="">`:`<div class="fph">✓ enviada</div>`):`<div class="fph">${campo==="selfie"?"🤳":"🪪"}</div>`}
+   <div><b>${titulo}${opc?` <span class="muted small">(${opc})</span>`:""}</b><div class="small muted">${dica}</div><span class="btn f sm" style="margin-top:8px;display:inline-block">${p?"Tirar de novo":"Tirar foto"}</span></div>
+   <input type="file" id="fi_${campo}" accept="image/*" capture="${cam}" data-foto="${campo}" hidden></label>`}
+function renderIdent(){const f=kycForm(),k=S.kyc||{};
+  $("#app").innerHTML=`<div class="wrap"><div class="top"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay"></div>${passos(2)}
+  <h2 style="font-size:20px;margin:6px 0 4px">Confirme quem é você</h2>
+  <p class="muted small">Antes do contrato, precisamos dos seus dados pessoais e de duas fotos: o documento e uma selfie. Um sócio da IMPlay compara a selfie com a foto do documento e aprova. Seus dados ficam protegidos: só você e os sócios veem.</p>
+  ${k.status==="recusado"?`<div class="warnbox"><b>Precisa corrigir:</b> ${esc(k.verif_motivo||"")}</div>`:""}
+  <form id="kf" onsubmit="return false">
+  <div class="card"><h3 class="kh">1 · Documento</h3>
+   <div class="fld"><label>Nome completo (igual ao documento)</label><input name="nome_doc" required autocomplete="name" value="${esc(f.nome_doc)}"></div>
+   <div class="row"><div class="fld"><label>CPF</label><input name="cpf" inputmode="numeric" placeholder="000.000.000-00" value="${esc(f.cpf)}" data-mask="cpf"><div class="small" id="cpfMsg"></div></div>
+   <div class="fld"><label>Data de nascimento</label><input name="nascimento" type="date" value="${esc(f.nascimento)}" max="${new Date().toISOString().slice(0,10)}"><div class="small" id="nascMsg"></div></div></div>
+   <div class="fld"><label>Documento com foto</label><input type="hidden" name="doc_tipo" value="${esc(f.doc_tipo)}"><div class="seg" data-seg="doc_tipo">${DOC_TIPOS.map(([v,l])=>`<button type="button" data-v="${v}" class="${f.doc_tipo===v?"on":""}">${l}</button>`).join("")}</div></div>
+   <div class="fld"><label>Número do documento</label><input name="doc_numero" value="${esc(f.doc_numero)}"></div></div>
+  <div class="card"><h3 class="kh">2 · Endereço</h3>
+   <div class="row"><div class="fld"><label>CEP</label><input name="cep" inputmode="numeric" placeholder="00000-000" value="${esc(f.cep)}" data-mask="cep"><div class="small muted" id="cepMsg">Digite o CEP e o resto se preenche.</div></div><div class="fld"><label>Número</label><input name="numero" value="${esc(f.numero)}"></div></div>
+   <div class="fld"><label>Rua / avenida</label><input name="logradouro" value="${esc(f.logradouro)}"></div>
+   <div class="row"><div class="fld"><label>Complemento</label><input name="complemento" value="${esc(f.complemento)}" placeholder="apto, bloco…"></div><div class="fld"><label>Bairro</label><input name="bairro" value="${esc(f.bairro)}"></div></div>
+   <div class="row"><div class="fld" style="flex:3"><label>Cidade</label><input name="cidade" value="${esc(f.cidade)}"></div><div class="fld" style="flex:1"><label>UF</label><input name="uf" maxlength="2" value="${esc(f.uf)}" style="text-transform:uppercase"></div></div></div>
+  <div class="card"><h3 class="kh">3 · Fotos</h3><p class="small muted" style="margin-top:0">Boa luz, sem reflexo, documento inteiro e legível na foto.</p>
+   ${fotoTile("doc_frente","Frente do documento","O lado com a sua foto.","environment")}
+   ${fotoTile("doc_verso","Verso do documento","O outro lado.","environment",f.doc_tipo==="RG"?"obrigatório no RG":"se tiver")}
+   ${fotoTile("selfie","Selfie","Rosto de frente, sem óculos escuros, boné ou filtro. É comparada com a foto do documento.","user")}</div>
+  <label class="tchk" style="margin-top:12px"><input type="checkbox" name="lgpd" ${f.lgpd?"checked":""}> <span>Autorizo a IMPLAY LIVE COMMERCE LTDA a usar estes dados e fotos só para confirmar minha identidade, fazer o contrato de prestação de serviços e os pagamentos (Lei 13.709/2018, LGPD). Posso pedir para ver, corrigir ou apagar meus dados quando o contrato terminar.</span></label>
+  <div class="warnbox" id="kFalta" hidden></div>
+  <button type="button" class="btn p" style="margin-top:12px" data-act="kEnviar" id="kEnviar">Enviar para aprovação</button>
+  <button type="button" class="btn" style="margin-top:8px" data-act="kRascunho">Salvar e continuar depois</button></form>
+  <div class="foot">${esc(S.email)} · <a href="#" data-act="editar" style="color:var(--cinza)">Editar contato</a> · <a href="#" data-act="sair" style="color:var(--cinza)">Sair</a></div></div>`;
+  kycValida();["doc_frente","doc_verso","selfie"].forEach(c=>{if(S.kf[c]&&!S.fotoUrl[c])db.storage.from("implay-kyc").createSignedUrl(S.kf[c],600).then(r=>{if(r.data){S.fotoUrl[c]=r.data.signedUrl;const t=document.querySelector(`label[for=fi_${c}] .fph`);if(t)t.outerHTML=`<img src="${r.data.signedUrl}" alt="">`}})})}
+function kycValida(){if(!$("#kf"))return;kycLer();const f=S.kf;const cm=$("#cpfMsg"),nm=$("#nascMsg");
+  if(cm){const c=so(f.cpf);cm.textContent=c.length<11?"":cpfOk(c)?"✓ CPF válido":"CPF inválido, confira";cm.style.color=cpfOk(c)?"var(--volt)":"#FF6B6B"}
+  if(nm){nm.textContent=f.nascimento&&idade(f.nascimento)<18?"É preciso ter 18 anos ou mais":"";nm.style.color="#FF6B6B"}
+  const F=kycFaltas(),b=$("#kEnviar");if(b)b.textContent=F.length?`Faltam ${F.length} ${F.length===1?"item":"itens"}`:"Enviar para aprovação"}
+async function kycSalvar(enviar){kycLer();const f=S.kf;const p=Object.assign({},f,{cpf:so(f.cpf),cep:so(f.cep)});if(!enviar&&p.cpf&&!cpfOk(p.cpf))p.cpf="";
+  const {data,error}=await db.rpc("imp_kyc_salvar",{p,p_enviar:!!enviar});if(error){toast(erro(error),true);return false}S.kyc=Array.isArray(data)?data[0]:data;return true}
+async function comprimir(file){try{const bmp=await createImageBitmap(file);const M=1600,r=Math.min(1,M/Math.max(bmp.width,bmp.height));const c=document.createElement("canvas");c.width=Math.round(bmp.width*r);c.height=Math.round(bmp.height*r);c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);return await new Promise(ok=>c.toBlob(b=>ok(b||file),"image/jpeg",.85))}catch(e){return file}}
+async function kycFoto(inp){const file=inp.files&&inp.files[0];if(!file)return;const campo=inp.dataset.foto;kycLer();const t=inp.closest(".ftile");t.classList.add("up");
+  const blob=await comprimir(file);if(blob.size>10*1024*1024){t.classList.remove("up");return toast("Foto muito grande. Tente de novo.",true)}
+  const path=`${S.uid}/${campo}-${Date.now()}.jpg`;const {error}=await db.storage.from("implay-kyc").upload(path,blob,{contentType:blob.type||"image/jpeg",upsert:false});
+  t.classList.remove("up");if(error)return toast("Não consegui enviar a foto: "+erro(error),true);
+  S.kf[campo]=path;S.fotoUrl[campo]=URL.createObjectURL(blob);await kycSalvar(false);renderIdent();toast("Foto salva ✓")}
+async function cepBusca(){const c=so(S.kf.cep);if(c.length!==8)return;const m=$("#cepMsg");if(m)m.textContent="Buscando…";
+  try{const r=await fetch(`https://viacep.com.br/ws/${c}/json/`);const j=await r.json();if(j.erro)throw 0;
+    const set=(n,v)=>{const i=document.querySelector(`#kf [name=${n}]`);if(i&&v){i.value=v}};set("logradouro",j.logradouro);set("bairro",j.bairro);set("cidade",j.localidade);set("uf",j.uf);
+    if(m)m.textContent="✓ Endereço encontrado. Confira e coloque o número.";const n=document.querySelector("#kf [name=numero]");if(n&&!n.value)n.focus()}catch(e){if(m)m.textContent="Não achei esse CEP. Preencha à mão."}kycValida()}
+function renderAnalise(){const k=S.kyc||{};
+  $("#app").innerHTML=`<div class="wrap"><div class="top"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay"></div>${passos(3)}
+  <div class="card"><h3 style="font-size:18px">Dados enviados ✦</h3><p class="muted">Um sócio da IMPlay vai conferir seu documento e sua selfie. Quando aprovar, o contrato já aparece aqui com seu nome e CPF, para você assinar.</p>
+  <div class="kvs"><span>Nome</span><b>${esc(k.nome_doc)}</b><span>CPF</span><b>${cpfFmt(k.cpf)}</b><span>Nascimento</span><b>${dBR(k.nascimento)}</b><span>Documento</span><b>${esc(k.doc_tipo)} ${esc(k.doc_numero)}</b><span>Endereço</span><b>${esc(endTxt(k))}</b><span>Enviado em</span><b>${k.enviado_em?new Date(k.enviado_em).toLocaleString("pt-BR"):""}</b></div>
+  <button class="btn" style="margin-top:12px" data-act="recarregar">Atualizar</button><button class="btn" style="margin-top:8px" data-act="editar">Editar contato (WhatsApp, Pix…)</button>
+  <p class="small muted">Errou algum dado? Fale com a IMPlay: um sócio libera para você corrigir.</p></div>
+  <div class="foot">${esc(S.email)} · <a href="#" data-act="sair" style="color:var(--cinza)">Sair</a></div></div>`}
+document.addEventListener("input",e=>{const i=e.target;if(!i.closest||!i.closest("#kf"))return;
+  if(i.dataset.mask==="cpf"){i.value=cpfFmt(i.value)}if(i.dataset.mask==="cep"){i.value=cepFmt(i.value);S.kf.cep=i.value;if(so(i.value).length===8&&i.dataset.ult!==so(i.value)){i.dataset.ult=so(i.value);cepBusca()}}kycValida()});
+document.addEventListener("change",e=>{const i=e.target;if(i.dataset&&i.dataset.foto)kycFoto(i);else if(i.closest&&i.closest("#kf"))kycValida()});
+
 /* ---------- dados ---------- */
 async function load(){
   const [a,b]=await Promise.all([db.rpc("imp_mural"),db.rpc("imp_meus_jobs")]);
@@ -288,12 +373,12 @@ const EV={escolheu_principal:"Você escolheu ser principal",escolheu_substituto:
   empresa_definiu_principal:"A empresa te colocou como principal",empresa_definiu_substituto:"A empresa te colocou como substituto",empresa_removeu_principal:"A empresa te tirou do principal",empresa_removeu_substituto:"A empresa te tirou do substituto"};
 function perfil(){const m=S.me;
   return `<div class="card"><b>${esc(m.nome)}</b><div class="small muted">${esc(m.email)} · ${esc(m.telefone||"")}</div><div class="small muted">${esc(m.vinculo||"")}${m.cnpj?" · "+esc(m.cnpj):""}${m.pix?" · Pix "+esc(m.pix):""}</div>
-  <div class="okbox">Termo ${esc(m.termo_versao||"")} assinado em ${new Date(m.termo_aceito_em).toLocaleString("pt-BR")}</div><button class="btn" style="margin-top:12px" data-act="verContrato">Ver o contrato que assinei</button><button class="btn" style="margin-top:12px" data-act="editar">Editar meus dados</button></div>
+  ${S.kyc&&S.kyc.status==="aprovado"?`<div class="okbox">✓ Identidade conferida${S.kyc.verif_nome?" por "+esc(S.kyc.verif_nome):""} · ${esc(S.kyc.nome_doc)} · CPF ${cpfFmt(S.kyc.cpf)}</div>`:""}<div class="okbox">Termo ${esc(m.termo_versao||"")} assinado em ${new Date(m.termo_aceito_em).toLocaleString("pt-BR")}</div><button class="btn" style="margin-top:12px" data-act="verContrato">Ver o contrato que assinei</button><button class="btn" style="margin-top:12px" data-act="editar">Editar meus dados</button></div>
   <h3 style="font-size:15px;margin:18px 0 10px">Meu histórico</h3><div id="hist"><button class="btn" data-act="hist">Ver meu histórico</button></div>`}
 
 /* ---------- ações ---------- */
 document.addEventListener("click",async e=>{
-  const sb=e.target.closest("[data-seg] button");if(sb){const g=sb.parentElement;g.querySelectorAll("button").forEach(b=>b.classList.remove("on"));sb.classList.add("on");g.previousElementSibling.value=sb.dataset.v;return}
+  const sb=e.target.closest("[data-seg] button");if(sb){const g=sb.parentElement;g.querySelectorAll("button").forEach(b=>b.classList.remove("on"));sb.classList.add("on");g.previousElementSibling.value=sb.dataset.v;if(g.closest("#kf")){if(g.dataset.seg==="doc_tipo"){kycLer();renderIdent()}else kycValida()}return}
   if(e.target===$("#sheet")){const i=$("#sheetIn");i.classList.remove("shake");void i.offsetWidth;i.classList.add("shake");return}
   const a=e.target.closest("[data-act]");if(!a)return;if(a.tagName==="A")e.preventDefault();const id=a.dataset.id,v=a.dataset.v;
   switch(a.dataset.act){
@@ -305,6 +390,9 @@ document.addEventListener("click",async e=>{
     case"calMes":{const m=new Date(S.cal.mes);m.setMonth(m.getMonth()+Number(v));S.cal.mes=m.toISOString();S.cal.dia=null;render();break}
     case"calDia":S.cal.dia=v;render();{const h=document.querySelector(".diah");if(h)h.scrollIntoView({behavior:"smooth",block:"start"})}break;
     case"recarregar":boot();break;
+    case"kRascunho":if(await kycSalvar(false))toast("Salvo. Pode continuar depois.");break;
+    case"kEnviar":{kycLer();const F=kycFaltas();const w=$("#kFalta");if(F.length){w.hidden=false;w.innerHTML="<b>Falta:</b> "+F.join(", ")+".";w.scrollIntoView({behavior:"smooth",block:"center"});return}
+      a.disabled=true;a.textContent="Enviando…";if(await kycSalvar(true)){S.kf=null;toast("Enviado ✦");renderAnalise()}else{a.disabled=false;kycValida()}break}
     case"editar":renderCadastro();break;
     case"voltar":boot();break;
     case"tItem":{S.termoOk[v]=!S.termoOk[v];const it=a.closest(".titem");it.classList.toggle("ok",!!S.termoOk[v]);a.textContent=S.termoOk[v]?"✓ Entendi":"Entendi";termoProgresso();if(S.termoOk[v]){const nx=[...document.querySelectorAll(".titem:not(.ok)")][0];if(nx)nx.scrollIntoView({behavior:"smooth",block:"center"})}break}
