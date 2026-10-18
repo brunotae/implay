@@ -1,2 +1,2 @@
-{"name":"Implay Seller","short_name":"Implay Seller","start_url":"./","scope":"./","display":"standalone","background_color":"#0B0B0C","theme_color":"#0B0B0C",
- "icons":[{"src":"icon-seller-v1.png","sizes":"512x512","type":"image/png","purpose":"any"},{"src":"apple-touch-icon-seller-v1.png","sizes":"180x180","type":"image/png"}]}
+{"name":"IMPlay Seller","short_name":"IMPlay Seller","start_url":"./","scope":"./","display":"standalone","background_color":"#000000","theme_color":"#000000",
+ "icons":[{"src":"icon-seller-v2.png","sizes":"512x512","type":"image/png","purpose":"any"},{"src":"apple-touch-icon-seller-v2.png","sizes":"180x180","type":"image/png"}]}
