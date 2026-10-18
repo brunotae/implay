@@ -85,6 +85,9 @@ h1,h2,h3{font-weight:800}
 .cd .lv{display:block;background:var(--volt);color:#000;border-radius:6px;padding:3px 5px;font-size:10.5px;line-height:1.25;white-space:normal}.cd .lv.meu{background:var(--flash)}.cd .lv em{display:block;font-style:normal;font-weight:800}.cd .lv i{font-style:normal}.cd .mais{font-size:10px;color:var(--cinza)}
 .diah{font-size:16px;margin:16px 0 8px}.diah::first-letter{text-transform:uppercase}
 @media(max-width:560px){.cd{min-height:60px;padding:2px}.cd .lv{font-size:8.5px;padding:2px;letter-spacing:-.02em}.cd .lv i{display:none}.cd .lv em{font-size:9.5px}}
+.contrato{background:#f3f3ec;color:#131411;border-radius:14px;padding:16px 18px;max-height:360px;overflow-y:auto;font-size:13px;line-height:1.55}.contrato h4{font-size:13px;margin:14px 0 4px;text-transform:uppercase;letter-spacing:.03em}.contrato p{margin:4px 0}.contrato .muted{color:#555}.ctrfim{text-align:center;font-size:11px;color:#777;margin-top:12px}
+.tchk{display:flex;gap:10px;align-items:flex-start;margin-top:10px;font-size:13.5px;background:var(--card);border:1px solid var(--linha);border-radius:14px;padding:12px;cursor:pointer}.tchk input{width:20px;height:20px;flex:none;accent-color:var(--volt);margin-top:1px}.tchk.dis{opacity:.5;cursor:not-allowed}
+#ctrSheet{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:60;overflow:auto;padding:20px}#ctrSheet .in{margin:0 auto}
 </style>
 </head>
 <body>
@@ -98,7 +101,7 @@ const LOGO_LIMA="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAACJCAYAAAABi
 const SB_URL="https://agdqlnaedojcgivwluty.supabase.co";
 const SB_KEY="sb_publishable_PKGxxrfpduzI7xY1_DWQyQ_cnJA9isP";
 const db=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:"implay-seller-auth"}});
-const TERMO_VERSAO="v2-2026-10";
+const TERMO_VERSAO="v3-2026-10";
 const ESTUDIO="Estúdio IMPlay · Av. Paulista, 2198, salas 161/162 · São Paulo";
 const S={me:null,tab:"mural",mural:[],meus:[],hist:[]};
 function $(s){return document.querySelector(s)}
@@ -165,7 +168,7 @@ function renderCadastro(){const m=S.me||{};
 }
 function renderPendente(){$("#app").innerHTML=`<div class="wrap"><div class="top"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay"></div><div class="card"><h3 style="font-size:18px">Cadastro recebido ✦</h3><p class="muted">A equipe da Implay vai aprovar seu cadastro. Depois disso, as lives aparecem aqui.</p><button class="btn" data-act="recarregar">Atualizar</button><button class="btn" style="margin-top:8px" data-act="editar">Editar meus dados</button></div><div class="foot">${esc(S.email)} · <a href="#" data-act="sair" style="color:var(--cinza)">Sair</a></div></div>`}
 const TERMO_ITENS=[
- ["nao_clt","Não sou empregado(a) da IMPlay","Sou prestador(a) de serviço autônomo(a). Não existe vínculo de emprego (CLT): sem carteira assinada, salário fixo, férias ou 13º."],
+ ["nao_clt","Não sou funcionário(a) CLT da IMPlay","Sou prestador(a) de serviço autônomo(a). Não tenho carteira assinada, salário fixo, férias nem 13º: não existe vínculo de emprego."],
  ["sem_chefe","Ninguém da IMPlay é meu chefe","Recebo só as informações da marca e do produto para a live. Como eu apresento é com a minha técnica e o meu jeito."],
  ["escolho","Eu escolho se e quando trabalho","Não existe escala, plantão nem número mínimo de lives. Posso passar semanas sem pegar nenhuma, sem qualquer consequência."],
  ["local","Eu aceito o local de cada live","Cada live mostra o local antes. Só vou se eu escolher aquela live. Não tenho local fixo de trabalho."],
@@ -176,21 +179,51 @@ const TERMO_ITENS=[
  ["cancelar","Posso cancelar","Cancelar com pelo menos 24 horas de antecedência não traz prejuízo. Depois disso, o cancelamento só fica registrado."],
  ["tributos","Nota fiscal e impostos são comigo","Quando aplicável (MEI/PJ), emito nota fiscal direto para quem me paga, inclusive a marca cliente, e recolho meus próprios tributos."],
  ["registro","Tudo fica registrado","Minhas escolhas, cancelamentos e este aceite ficam registrados neste app com data e hora."]];
+function contratoHtml(m){let n=0;const cl=(t,x)=>`<h4>Cláusula ${++n}ª · ${t}</h4>${x}`;const hoje=new Date(m.termo_aceito_em&&m.termo_versao===TERMO_VERSAO?m.termo_aceito_em:Date.now()).toLocaleDateString("pt-BR");
+ return `<h3 style="font-size:15px;margin:0 0 6px;text-align:center">CONTRATO DE PRESTAÇÃO DE SERVIÇOS AUTÔNOMOS DE APRESENTAÇÃO AO VIVO (LIVE SELLER)</h3>
+ <p class="small muted" style="text-align:center;margin-top:0">Versão ${TERMO_VERSAO}</p>
+ ${cl("Das partes",`<p><b>CONTRATANTE:</b> IMPLAY LIVE COMMERCE LTDA ("IMPLAY"), inscrita no CNPJ sob nº 69.448.022/0001-15, com sede na Av. Paulista, 2198, sala 161/162, Bela Vista, São Paulo/SP, CEP 01310-300.</p>
+  <p><b>PRESTADOR(A):</b> ${esc(m.nome||"")}${m.cnpj?`, inscrito(a) no CNPJ/MEI sob nº ${esc(m.cnpj)}`:""}, e-mail ${esc(m.email||S.email||"")}${m.telefone?`, telefone ${esc(m.telefone)}`:""}${m.cidade?`, com domicílio em ${esc(m.cidade)}`:""}, doravante "PRESTADOR".</p>`)}
+ ${cl("Do objeto",`<p>1. O presente contrato tem por objeto a prestação de serviços autônomos e eventuais de apresentação, demonstração e venda de produtos em transmissões ao vivo ("lives") de marcas atendidas pela IMPLAY, exclusivamente nas lives que o PRESTADOR escolher realizar.</p><p>2. Este contrato estabelece as condições gerais. As condições específicas de cada live (data, horário, duração, local, marca, valor e requisitos) são informadas no aplicativo antes da escolha e passam a integrar este contrato para aquela live.</p>`)}
+ ${cl("Da natureza da relação e da ausência de vínculo de emprego",`<p>1. O PRESTADOR atua como profissional autônomo, com total independência técnica e organizacional. Este contrato <b>não gera vínculo empregatício</b> de qualquer natureza, nos termos dos arts. 442-B e 593 a 609 do Código Civil e da legislação aplicável, não se aplicando as disposições da Consolidação das Leis do Trabalho (CLT).</p>
+  <p>2. Não existe <b>subordinação</b>: a IMPLAY não dá ordens sobre a forma de execução do serviço. As informações repassadas limitam-se a dados de produto, preço, ofertas e identidade da marca, necessários ao resultado contratado.</p>
+  <p>3. Não existe <b>habitualidade obrigatória</b>: não há escala, plantão, jornada, horário fixo, número mínimo de lives ou controle de ponto.</p>
+  <p>4. Não existe <b>pessoalidade exclusiva</b>: as vagas não são reservadas ao PRESTADOR, que pode desistir e ser substituído por outro profissional.</p>
+  <p>5. A remuneração é por <b>serviço realizado</b> (por live), e não por tempo à disposição.</p>`)}
+ ${cl("Da escolha das lives",`<p>1. As lives são publicadas no aplicativo da IMPLAY. O PRESTADOR escolhe livremente se e quais lives deseja realizar, como apresentador principal ou substituto, podendo recusar qualquer uma, sem justificativa e sem qualquer consequência.</p><p>2. A vaga fica com o primeiro profissional que a escolher no aplicativo. O substituto assume apenas se o principal não puder realizar a live e se assim desejar.</p>`)}
+ ${cl("Do local e do horário",`<p>1. O local e o horário de cada live são definidos pela marca cliente e informados antes da escolha. Ao escolher a live, o PRESTADOR aceita o local e o horário daquela live específica.</p><p>2. O PRESTADOR não possui local fixo de trabalho nem horário fixo, e não está sujeito a controle de jornada.</p>`)}
+ ${cl("Do cancelamento",`<p>1. O PRESTADOR pode cancelar sua participação em qualquer live a qualquer momento, pelo aplicativo.</p><p>2. Cancelamentos realizados com pelo menos 24 (vinte e quatro) horas de antecedência não geram qualquer consequência. Cancelamentos com menos de 24 horas apenas ficam registrados no histórico, sem multa ou desconto.</p>`)}
+ ${cl("Da remuneração e da nota fiscal",`<p>1. O PRESTADOR recebe, por live efetivamente realizada, o valor publicado no aplicativo no momento da escolha.</p><p>2. Quando aplicável, o PRESTADOR emitirá nota fiscal própria (MEI ou PJ) diretamente a quem efetuar o pagamento, que poderá ser a IMPLAY ou a marca cliente, conforme indicado na live.</p><p>3. O pagamento será feito no prazo informado na publicação da live, por Pix ou transferência para a conta informada pelo PRESTADOR.</p><p>4. O PRESTADOR é o único responsável pelo recolhimento de seus tributos, contribuições previdenciárias e demais encargos.</p>`)}
+ ${cl("Dos equipamentos e da estrutura",`<p>1. Quando a live ocorrer no estúdio da IMPLAY, a estrutura técnica (câmeras, iluminação, internet e cenário) é disponibilizada pela IMPLAY ou pela marca, sem custo ao PRESTADOR.</p><p>2. O PRESTADOR zelará pelos equipamentos que utilizar durante a live e responderá por danos causados por dolo ou culpa grave.</p>`)}
+ ${cl("Da não exclusividade",`<p>O PRESTADOR pode prestar serviços a quaisquer outras pessoas ou empresas, inclusive concorrentes da IMPLAY ou de suas marcas clientes, sem necessidade de autorização. Recomenda-se apenas não divulgar informações confidenciais de uma marca para outra.</p>`)}
+ ${cl("Da conduta",`<p>1. Durante a live, o PRESTADOR compromete-se a apresentar informações verdadeiras sobre os produtos, respeitar o Código de Defesa do Consumidor, as regras das plataformas (TikTok Shop, Shopee e outras) e não utilizar linguagem ofensiva ou discriminatória.</p><p>2. Ofertas, preços e cupons devem seguir exatamente o que a marca informou.</p>`)}
+ ${cl("Do uso de imagem e voz",`<p>O PRESTADOR autoriza, de forma gratuita, o uso de sua imagem, nome e voz captados nas lives que realizar, e em seus cortes e trechos, exclusivamente para divulgação das marcas atendidas e da IMPLAY, durante a vigência deste contrato e por 12 (doze) meses após o seu término, em qualquer mídia digital.</p>`)}
+ ${cl("Da confidencialidade",`<p>Preços, ofertas ainda não lançadas, estratégias, dados de vendas e de clientes e quaisquer informações comerciais a que o PRESTADOR tiver acesso são confidenciais e não poderão ser divulgados, inclusive após o término deste contrato.</p>`)}
+ ${cl("Da proteção de dados (LGPD)",`<p>1. A IMPLAY tratará os dados pessoais do PRESTADOR (nome, contato, documentos, dados bancários e histórico no aplicativo) apenas para executar este contrato, realizar pagamentos e cumprir obrigações legais, nos termos da Lei nº 13.709/2018.</p><p>2. O PRESTADOR pode solicitar a qualquer tempo acesso, correção ou exclusão de seus dados, ressalvados os que precisem ser mantidos por obrigação legal.</p>`)}
+ ${cl("Dos registros no aplicativo",`<p>As escolhas, cancelamentos, lives realizadas e o aceite deste contrato ficam registrados no aplicativo com data e hora, sem possibilidade de edição, e podem ser consultados pelo PRESTADOR a qualquer momento.</p>`)}
+ ${cl("Da vigência e da rescisão",`<p>1. Este contrato vigora por prazo indeterminado a partir do aceite.</p><p>2. Qualquer das partes pode encerrá-lo a qualquer tempo, sem multa, mediante aviso pelo aplicativo ou por e-mail, respeitadas as lives já escolhidas ou o seu cancelamento conforme a cláusula de cancelamento.</p>`)}
+ ${cl("Da assinatura eletrônica",`<p>As partes reconhecem como válida a contratação por meio eletrônico, mediante o aceite do PRESTADOR no aplicativo com identificação por login e senha, nos termos do art. 10, §2º, da Medida Provisória nº 2.200-2/2001 e do art. 107 do Código Civil.</p>`)}
+ ${cl("Do foro",`<p>Fica eleito o foro da Comarca de São Paulo/SP para dirimir quaisquer questões oriundas deste contrato.</p>`)}
+ <p style="margin-top:14px">São Paulo, ${hoje}.</p><p><b>IMPLAY LIVE COMMERCE LTDA</b> · CONTRATANTE<br><b>${esc(m.nome||"")}</b> · PRESTADOR(A) · aceite eletrônico no aplicativo</p>`}
 const TERMO_EMPRESA="IMPLAY LIVE COMMERCE LTDA, CNPJ 69.448.022/0001-15";
 S.termoOk=S.termoOk||{};
 function termoProgresso(){const n=TERMO_ITENS.filter(t=>S.termoOk[t[0]]).length;const nome=($("#tNome")||{}).value||"";const okNome=nome.trim().split(/\s+/).length>=2;
   const p=$("#tProg");if(p)p.textContent=`${n} de ${TERMO_ITENS.length} confirmados`;const bar=$("#tBar");if(bar)bar.style.width=(n/TERMO_ITENS.length*100)+"%";
-  const b=$("#tAceitar");if(b){b.disabled=!(n===TERMO_ITENS.length&&okNome);b.textContent=n<TERMO_ITENS.length?`Confirme os ${TERMO_ITENS.length-n} itens que faltam`:!okNome?"Escreva seu nome completo":"Assinar e entrar"}}
+  const leu=($("#tChk")||{}).checked;const b=$("#tAceitar");if(b){b.disabled=!(n===TERMO_ITENS.length&&okNome&&leu);b.textContent=n<TERMO_ITENS.length?`Confirme os ${TERMO_ITENS.length-n} itens que faltam`:!leu?"Leia o contrato e marque a caixinha":!okNome?"Escreva seu nome completo":"Assinar e entrar"}}
 function renderTermo(){const re=S.me.termo_aceito_em&&S.me.termo_versao!==TERMO_VERSAO;
   $("#app").innerHTML=`<div class="wrap"><div class="top"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay"></div>
   <h2 style="font-size:20px;margin:6px 0 4px">Antes de começar: como funciona</h2>
   <p class="muted small" style="margin-bottom:10px">${re?"Atualizamos o termo. ":""}Leia cada ponto e toque em <b>Entendi</b>. É rapidinho e deixa tudo claro entre você e a ${TERMO_EMPRESA}.</p>
   <div class="tprog"><div class="tpb"><i id="tBar"></i></div><span id="tProg"></span></div>
   <div class="titens">${TERMO_ITENS.map(([k,t,d],i)=>`<div class="titem ${S.termoOk[k]?"ok":""}" data-k="${k}"><div class="tn">${i+1}</div><div class="tt"><b>${t}</b><p>${d}</p></div><button type="button" class="tbtn" data-act="tItem" data-v="${k}">${S.termoOk[k]?"✓ Entendi":"Entendi"}</button></div>`).join("")}</div>
+  <h3 style="font-size:16px;margin:20px 0 6px">Contrato completo</h3><p class="small muted" style="margin-top:0">Os 11 pontos acima são o resumo. Este é o contrato inteiro. Role até o fim para liberar a confirmação.</p>
+  <div class="contrato" id="tCtr">${contratoHtml(S.me)}<div class="ctrfim">— fim do contrato —</div></div>
+  <label class="tchk dis" id="tChkL"><input type="checkbox" id="tChk" disabled> <span>Li o contrato completo de prestação de serviços e concordo com todas as cláusulas.</span></label>
   <div class="card" style="margin-top:12px"><div class="fld" style="margin-top:0"><label>Assinatura · escreva seu nome completo</label><input id="tNome" autocomplete="name" value="${esc(S.me.nome||"")}"></div>
   <p class="small muted" style="margin-top:8px">Declaro que li e entendi cada ponto acima e que presto serviço à ${TERMO_EMPRESA} como profissional autônomo(a). Versão ${TERMO_VERSAO}.</p></div>
   <button class="btn p" style="margin-top:12px" data-act="aceitar" id="tAceitar" disabled>Assinar e entrar</button><button class="btn" style="margin-top:8px" data-act="sair">Agora não (sair)</button></div>`;
-  termoProgresso();$("#tNome").addEventListener("input",termoProgresso)}
+  termoProgresso();$("#tNome").addEventListener("input",termoProgresso);$("#tChk").addEventListener("change",termoProgresso);
+  const c=$("#tCtr");const lib=()=>{if(c.scrollTop+c.clientHeight>=c.scrollHeight-30){const k=$("#tChk");if(k.disabled){k.disabled=false;$("#tChkL").classList.remove("dis")}}};c.addEventListener("scroll",lib);lib()}
 /* ---------- dados ---------- */
 async function load(){
   const [a,b]=await Promise.all([db.rpc("imp_mural"),db.rpc("imp_meus_jobs")]);
@@ -255,7 +288,7 @@ const EV={escolheu_principal:"Você escolheu ser principal",escolheu_substituto:
   empresa_definiu_principal:"A empresa te colocou como principal",empresa_definiu_substituto:"A empresa te colocou como substituto",empresa_removeu_principal:"A empresa te tirou do principal",empresa_removeu_substituto:"A empresa te tirou do substituto"};
 function perfil(){const m=S.me;
   return `<div class="card"><b>${esc(m.nome)}</b><div class="small muted">${esc(m.email)} · ${esc(m.telefone||"")}</div><div class="small muted">${esc(m.vinculo||"")}${m.cnpj?" · "+esc(m.cnpj):""}${m.pix?" · Pix "+esc(m.pix):""}</div>
-  <div class="okbox">Termo ${esc(m.termo_versao||"")} assinado em ${new Date(m.termo_aceito_em).toLocaleString("pt-BR")}</div><button class="btn" style="margin-top:12px" data-act="editar">Editar meus dados</button></div>
+  <div class="okbox">Termo ${esc(m.termo_versao||"")} assinado em ${new Date(m.termo_aceito_em).toLocaleString("pt-BR")}</div><button class="btn" style="margin-top:12px" data-act="verContrato">Ver o contrato que assinei</button><button class="btn" style="margin-top:12px" data-act="editar">Editar meus dados</button></div>
   <h3 style="font-size:15px;margin:18px 0 10px">Meu histórico</h3><div id="hist"><button class="btn" data-act="hist">Ver meu histórico</button></div>`}
 
 /* ---------- ações ---------- */
@@ -266,6 +299,8 @@ document.addEventListener("click",async e=>{
   switch(a.dataset.act){
     case"sair":await db.auth.signOut();S.me=null;renderLogin();break;
     case"tab":S.tab=v;render();break;
+    case"verContrato":{const w=document.createElement("div");w.className="sheet";w.id="ctrSheet";w.innerHTML=`<div class="in" style="max-width:760px"><div class="contrato" style="max-height:none">${contratoHtml(S.me)}<p class="small muted">Assinado eletronicamente por ${esc(S.me.termo_assinatura||S.me.nome)} em ${new Date(S.me.termo_aceito_em).toLocaleString("pt-BR")}.</p></div><button class="btn" style="margin-top:10px" data-act="fecharCtr">Fechar</button></div>`;document.body.appendChild(w);break}
+    case"fecharCtr":{const w=$("#ctrSheet");if(w)w.remove();break}
     case"calView":S.cal.view=v;render();break;
     case"calMes":{const m=new Date(S.cal.mes);m.setMonth(m.getMonth()+Number(v));S.cal.mes=m.toISOString();S.cal.dia=null;render();break}
     case"calDia":S.cal.dia=v;render();{const h=document.querySelector(".diah");if(h)h.scrollIntoView({behavior:"smooth",block:"start"})}break;
@@ -273,7 +308,7 @@ document.addEventListener("click",async e=>{
     case"editar":renderCadastro();break;
     case"voltar":boot();break;
     case"tItem":{S.termoOk[v]=!S.termoOk[v];const it=a.closest(".titem");it.classList.toggle("ok",!!S.termoOk[v]);a.textContent=S.termoOk[v]?"✓ Entendi":"Entendi";termoProgresso();if(S.termoOk[v]){const nx=[...document.querySelectorAll(".titem:not(.ok)")][0];if(nx)nx.scrollIntoView({behavior:"smooth",block:"center"})}break}
-    case"aceitar":{if(a.disabled)return;const itens=TERMO_ITENS.map(t=>({k:t[0],t:t[1],ok:!!S.termoOk[t[0]]}));const {error}=await db.rpc("imp_aceitar_termo",{p_versao:TERMO_VERSAO,p_itens:itens,p_assinatura:$("#tNome").value.trim()});if(error)return toast(erro(error),true);toast("Pronto! Bem-vindo(a) ✦");boot();break}
+    case"aceitar":{if(a.disabled)return;const itens=[...TERMO_ITENS.map(t=>({k:t[0],t:t[1],ok:!!S.termoOk[t[0]]})),{k:"contrato_completo",t:"Contrato de prestação de serviços (íntegra) "+TERMO_VERSAO,ok:!!$("#tChk").checked}];const {error}=await db.rpc("imp_aceitar_termo",{p_versao:TERMO_VERSAO,p_itens:itens,p_assinatura:$("#tNome").value.trim()});if(error)return toast(erro(error),true);toast("Pronto! Bem-vindo(a) ✦");boot();break}
     case"pegar":{a.disabled=true;const {error}=await db.rpc("imp_pegar",{p_job:id,p_vaga:v});if(error){toast(erro(error),true);await refresh();return}
       toast(v==="principal"?"Vaga de principal é sua ✦":"Você é o substituto ✦");S.tab="meus";await refresh();break}
     case"cancelar":{const j=S.meus.find(x=>x.id===id);const perto=new Date(j.inicio)-new Date()<24*36e5;
