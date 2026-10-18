@@ -71,6 +71,12 @@ html,body{font-size:15.5px}
 h1,h2,h3{font-weight:800}
 @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}.sheet .in.shake{animation:shk .25s}
 .logoimg{height:46px;width:auto;display:block;margin:0 auto}
+.tprog{display:flex;align-items:center;gap:10px;margin:6px 0 12px;font-size:12px;color:var(--cinza)}.tpb{flex:1;height:6px;background:var(--card);border-radius:99px;overflow:hidden}.tpb i{display:block;height:100%;width:0;background:var(--volt);transition:.25s}
+.titens{display:flex;flex-direction:column;gap:8px}.titem{display:grid;grid-template-columns:28px 1fr;gap:4px 10px;background:var(--card);border:1px solid var(--linha);border-radius:16px;padding:12px;transition:.15s}
+.titem .tn{width:26px;height:26px;border-radius:99px;background:var(--linha);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}.titem .tt b{font-size:14.5px}.titem .tt p{margin:3px 0 0;font-size:13px;color:var(--cinza);line-height:1.45}
+.titem .tbtn{grid-column:2;justify-self:start;margin-top:8px;border:1px solid var(--linha);background:transparent;color:var(--chalk);border-radius:99px;padding:8px 16px;font:inherit;font-weight:700;font-size:13px;cursor:pointer}
+.titem.ok{border-color:var(--volt)}.titem.ok .tn{background:var(--volt);color:#000}.titem.ok .tbtn{background:var(--volt);color:#000;border-color:var(--volt)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
 </style>
 </head>
 <body>
@@ -84,7 +90,7 @@ const LOGO_LIMA="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAACJCAYAAAABi
 const SB_URL="https://agdqlnaedojcgivwluty.supabase.co";
 const SB_KEY="sb_publishable_PKGxxrfpduzI7xY1_DWQyQ_cnJA9isP";
 const db=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:"implay-seller-auth"}});
-const TERMO_VERSAO="v1-2026-10";
+const TERMO_VERSAO="v2-2026-10";
 const ESTUDIO="Estúdio IMPlay · Av. Paulista, 2198, salas 161/162 · São Paulo";
 const S={me:null,tab:"mural",mural:[],meus:[],hist:[]};
 function $(s){return document.querySelector(s)}
@@ -128,7 +134,7 @@ async function boot(){
   if(!S.me)return renderCadastro();
   if(S.me.status==="pendente")return renderPendente();
   if(S.me.status!=="ativo")return renderMsg("Seu acesso está inativo. Fale com a Implay.");
-  if(!S.me.termo_aceito_em)return renderTermo();
+  if(!S.me.termo_aceito_em||S.me.termo_versao!==TERMO_VERSAO)return renderTermo();
   await load();render();
 }
 function renderMsg(t){$("#app").innerHTML=`<div class="wrap"><div class="card"><p>${t}</p><button class="btn" data-act="sair">Sair</button></div></div>`}
@@ -150,27 +156,40 @@ function renderCadastro(){const m=S.me||{};
     if(error)return toast(erro(error),true);toast("Cadastro salvo");boot()};
 }
 function renderPendente(){$("#app").innerHTML=`<div class="wrap"><div class="top"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay"></div><div class="card"><h3 style="font-size:18px">Cadastro recebido ✦</h3><p class="muted">A equipe da Implay vai aprovar seu cadastro. Depois disso, as lives aparecem aqui.</p><button class="btn" data-act="recarregar">Atualizar</button><button class="btn" style="margin-top:8px" data-act="editar">Editar meus dados</button></div><div class="foot">${esc(S.email)} · <a href="#" data-act="sair" style="color:var(--cinza)">Sair</a></div></div>`}
-function renderTermo(){
-  $("#app").innerHTML=`<div class="wrap"><div class="top"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay"></div><h2 style="font-size:20px;margin-bottom:12px">Termo de prestação de serviço autônomo</h2>
-  <div class="termo"><p>Eu, <b>${esc(S.me.nome)}</b>, declaro que presto serviços à IMP DIGITAL LTDA (Implay), CNPJ 44.189.776/0001-77, como profissional autônomo, de forma independente, e que:</p>
-  <ol><li>Escolho livremente, por este app, as lives que quero fazer. Não sou obrigado a aceitar nenhuma live nem a cumprir número mínimo de lives.</li>
-  <li>Posso cancelar uma live que escolhi a qualquer momento. Cancelar com pelo menos 24 horas de antecedência não traz nenhum prejuízo; cancelamentos depois disso apenas ficam registrados.</li>
-  <li>Não tenho horário fixo, escala, controle de ponto nem local fixo de trabalho. Cada live informa antes o local, o horário e o valor.</li>
-  <li>Não tenho exclusividade: posso prestar serviço para outras empresas, inclusive concorrentes, quando quiser.</li>
-  <li>Executo o serviço com minha técnica e autonomia, seguindo apenas as informações do produto e da marca necessárias para a live.</li>
-  <li>Recebo por live realizada. Quando aplicável, emito nota fiscal (MEI/PJ) diretamente para quem me paga, inclusive para a marca cliente.</li>
-  <li>Sou responsável pelos meus tributos e contribuições como autônomo.</li>
-  <li>Sei que minhas escolhas, cancelamentos e lives ficam registrados neste app, com data e hora, e posso consultá-los em "Meu histórico".</li></ol>
-  <p class="small muted">Versão ${TERMO_VERSAO}. Este termo não substitui o contrato de prestação de serviço, quando houver.</p></div>
-  <button class="btn p" style="margin-top:14px" data-act="aceitar">Li e aceito</button><button class="btn" style="margin-top:8px" data-act="sair">Agora não (sair)</button></div>`}
-
+const TERMO_ITENS=[
+ ["nao_clt","Não sou empregado(a) da IMPlay","Sou prestador(a) de serviço autônomo(a). Não existe vínculo de emprego (CLT): sem carteira assinada, salário fixo, férias ou 13º."],
+ ["sem_chefe","Ninguém da IMPlay é meu chefe","Recebo só as informações da marca e do produto para a live. Como eu apresento é com a minha técnica e o meu jeito."],
+ ["escolho","Eu escolho se e quando trabalho","Não existe escala, plantão nem número mínimo de lives. Posso passar semanas sem pegar nenhuma, sem qualquer consequência."],
+ ["local","Eu aceito o local de cada live","Cada live mostra o local antes. Só vou se eu escolher aquela live. Não tenho local fixo de trabalho."],
+ ["horario","Eu aceito o horário de cada live","Cada live mostra dia e horário antes. Não tenho horário fixo, ponto nem controle de jornada."],
+ ["valor","Eu aceito o valor de cada live","O cachê aparece antes de eu escolher. Recebo por live realizada, não por mês."],
+ ["substituto","A vaga não é exclusiva minha","Se eu não puder, cancelo e outra pessoa assume. Não preciso ser sempre eu."],
+ ["exclusividade","Posso trabalhar para outras empresas","Não tenho exclusividade. Posso prestar serviço para quem eu quiser, inclusive concorrentes."],
+ ["cancelar","Posso cancelar","Cancelar com pelo menos 24 horas de antecedência não traz prejuízo. Depois disso, o cancelamento só fica registrado."],
+ ["tributos","Nota fiscal e impostos são comigo","Quando aplicável (MEI/PJ), emito nota fiscal direto para quem me paga, inclusive a marca cliente, e recolho meus próprios tributos."],
+ ["registro","Tudo fica registrado","Minhas escolhas, cancelamentos e este aceite ficam registrados neste app com data e hora."]];
+const TERMO_EMPRESA="IMPLAY LIVE COMMERCE LTDA, CNPJ 69.448.022/0001-15";
+S.termoOk=S.termoOk||{};
+function termoProgresso(){const n=TERMO_ITENS.filter(t=>S.termoOk[t[0]]).length;const nome=($("#tNome")||{}).value||"";const okNome=nome.trim().split(/\s+/).length>=2;
+  const p=$("#tProg");if(p)p.textContent=`${n} de ${TERMO_ITENS.length} confirmados`;const bar=$("#tBar");if(bar)bar.style.width=(n/TERMO_ITENS.length*100)+"%";
+  const b=$("#tAceitar");if(b){b.disabled=!(n===TERMO_ITENS.length&&okNome);b.textContent=n<TERMO_ITENS.length?`Confirme os ${TERMO_ITENS.length-n} itens que faltam`:!okNome?"Escreva seu nome completo":"Assinar e entrar"}}
+function renderTermo(){const re=S.me.termo_aceito_em&&S.me.termo_versao!==TERMO_VERSAO;
+  $("#app").innerHTML=`<div class="wrap"><div class="top"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay"></div>
+  <h2 style="font-size:20px;margin:6px 0 4px">Antes de começar: como funciona</h2>
+  <p class="muted small" style="margin-bottom:10px">${re?"Atualizamos o termo. ":""}Leia cada ponto e toque em <b>Entendi</b>. É rapidinho e deixa tudo claro entre você e a ${TERMO_EMPRESA}.</p>
+  <div class="tprog"><div class="tpb"><i id="tBar"></i></div><span id="tProg"></span></div>
+  <div class="titens">${TERMO_ITENS.map(([k,t,d],i)=>`<div class="titem ${S.termoOk[k]?"ok":""}" data-k="${k}"><div class="tn">${i+1}</div><div class="tt"><b>${t}</b><p>${d}</p></div><button type="button" class="tbtn" data-act="tItem" data-v="${k}">${S.termoOk[k]?"✓ Entendi":"Entendi"}</button></div>`).join("")}</div>
+  <div class="card" style="margin-top:12px"><div class="fld" style="margin-top:0"><label>Assinatura · escreva seu nome completo</label><input id="tNome" autocomplete="name" value="${esc(S.me.nome||"")}"></div>
+  <p class="small muted" style="margin-top:8px">Declaro que li e entendi cada ponto acima e que presto serviço à ${TERMO_EMPRESA} como profissional autônomo(a). Versão ${TERMO_VERSAO}.</p></div>
+  <button class="btn p" style="margin-top:12px" data-act="aceitar" id="tAceitar" disabled>Assinar e entrar</button><button class="btn" style="margin-top:8px" data-act="sair">Agora não (sair)</button></div>`;
+  termoProgresso();$("#tNome").addEventListener("input",termoProgresso)}
 /* ---------- dados ---------- */
 async function load(){
   const [a,b]=await Promise.all([db.rpc("imp_mural"),db.rpc("imp_meus_jobs")]);
   if(a.error||b.error){toast(erro(a.error||b.error),true)}
   S.mural=a.data||[];S.meus=b.data||[];
 }
-async function refresh(){if(!S.me||S.me.status!=="ativo"||!S.me.termo_aceito_em)return;await load();if($("#sheet").hidden)render()}
+async function refresh(){if(!S.me||S.me.status!=="ativo"||!S.me.termo_aceito_em||S.me.termo_versao!==TERMO_VERSAO)return;await load();if($("#sheet").hidden)render()}
 
 /* ---------- telas ---------- */
 function render(){
@@ -206,7 +225,7 @@ const EV={escolheu_principal:"Você escolheu ser principal",escolheu_substituto:
   empresa_definiu_principal:"A empresa te colocou como principal",empresa_definiu_substituto:"A empresa te colocou como substituto",empresa_removeu_principal:"A empresa te tirou do principal",empresa_removeu_substituto:"A empresa te tirou do substituto"};
 function perfil(){const m=S.me;
   return `<div class="card"><b>${esc(m.nome)}</b><div class="small muted">${esc(m.email)} · ${esc(m.telefone||"")}</div><div class="small muted">${esc(m.vinculo||"")}${m.cnpj?" · "+esc(m.cnpj):""}${m.pix?" · Pix "+esc(m.pix):""}</div>
-  <div class="okbox">Termo aceito em ${new Date(m.termo_aceito_em).toLocaleString("pt-BR")}</div><button class="btn" style="margin-top:12px" data-act="editar">Editar meus dados</button></div>
+  <div class="okbox">Termo ${esc(m.termo_versao||"")} assinado em ${new Date(m.termo_aceito_em).toLocaleString("pt-BR")}</div><button class="btn" style="margin-top:12px" data-act="editar">Editar meus dados</button></div>
   <h3 style="font-size:15px;margin:18px 0 10px">Meu histórico</h3><div id="hist"><button class="btn" data-act="hist">Ver meu histórico</button></div>`}
 
 /* ---------- ações ---------- */
@@ -220,7 +239,8 @@ document.addEventListener("click",async e=>{
     case"recarregar":boot();break;
     case"editar":renderCadastro();break;
     case"voltar":boot();break;
-    case"aceitar":{const {error}=await db.rpc("imp_aceitar_termo",{p_versao:TERMO_VERSAO});if(error)return toast(erro(error),true);toast("Pronto! Bem-vindo(a) ✦");boot();break}
+    case"tItem":{S.termoOk[v]=!S.termoOk[v];const it=a.closest(".titem");it.classList.toggle("ok",!!S.termoOk[v]);a.textContent=S.termoOk[v]?"✓ Entendi":"Entendi";termoProgresso();if(S.termoOk[v]){const nx=[...document.querySelectorAll(".titem:not(.ok)")][0];if(nx)nx.scrollIntoView({behavior:"smooth",block:"center"})}break}
+    case"aceitar":{if(a.disabled)return;const itens=TERMO_ITENS.map(t=>({k:t[0],t:t[1],ok:!!S.termoOk[t[0]]}));const {error}=await db.rpc("imp_aceitar_termo",{p_versao:TERMO_VERSAO,p_itens:itens,p_assinatura:$("#tNome").value.trim()});if(error)return toast(erro(error),true);toast("Pronto! Bem-vindo(a) ✦");boot();break}
     case"pegar":{a.disabled=true;const {error}=await db.rpc("imp_pegar",{p_job:id,p_vaga:v});if(error){toast(erro(error),true);await refresh();return}
       toast(v==="principal"?"Vaga de principal é sua ✦":"Você é o substituto ✦");S.tab="meus";await refresh();break}
     case"cancelar":{const j=S.meus.find(x=>x.id===id);const perto=new Date(j.inicio)-new Date()<24*36e5;
