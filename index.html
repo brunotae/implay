@@ -538,6 +538,7 @@ html[data-tema=papel] .warnbox{background:#fff1d6;color:#7a4f00;border-color:#f2
 .tema .sw{height:54px;border-radius:10px;display:flex;align-items:flex-end;gap:5px;padding:7px;margin-bottom:8px}.tema .sw i{width:16px;height:16px;border-radius:99px;display:block}.tema b{font-size:13px}.tema small{display:block;font-size:11px;color:var(--cinza)}
 html[data-tema=papel] :is(.railv,.kpi.cob,.stage.c,.mk.c){--voltx:#D5FF3F;--chalk:#F3F3EC;--cinza:#d9c9d4;color:#F3F3EC}
 .sfoot .btn{white-space:nowrap}
+details.adv{margin-top:8px}details.adv summary{cursor:pointer;font-size:12.5px;color:var(--cinza);padding:6px 0}
 </style>
 </head>
 <body>
@@ -775,15 +776,14 @@ function openJob(id,preset={}){
     <div class="hint v" id="jobQuando"></div></div></div>
    <div data-show="modalidade=servico">
    <div class="sec"><h2>Seller</h2></div>
-   <div class="row" style="gap:8px">${tglBtn("seller_clt","Seller IMPlay (CLT)",j.seller_clt||(!id&&false))}${tglBtn("seller_fora","Seller de fora",j.seller_fora!==undefined?j.seller_fora:!!(j.principal_id||j.publicado&&id))}</div>
+   <div class="row" style="gap:8px">${tglBtn("seller_clt","Seller IMPlay (CLT)",!!j.seller_clt)}${tglBtn("seller_app","Vaga no app dos sellers",id?!!j.publicado:false)}${tglBtn("seller_conv","Convidado / influenciador",!!j.convidados)}</div>
    <div data-show="seller_clt=1" class="sbox"><label class="lb">Quem da equipe IMPlay vai</label>${msel("clt_ids",S.membros.filter(m=>m.status==="ativo"&&(m.vinculo==="clt"||m.papel==="basico")),j.clt_ids||[])}</div>
-   <div data-show="seller_fora=1" class="sbox">
-    ${fld("convidados","Convidados / influenciadores (fora do sistema)",j.convidados,"text",'placeholder="Ex.: Mari Menezes (influenciadora)"')}
-    <div class="fld"><label>Vaga no app dos sellers</label>${seg("publicado",[["true","Publicar no mural"],["false","Não publicar"]],String(id?j.publicado!==false:false))}</div>
-    <div class="cols2"><div class="fld"><label>Seller principal (A)</label><select name="principal_id">${sellerOpts(j.principal_id)}</select></div><div class="fld"><label>Substituto (B)</label><select name="substituto_id">${sellerOpts(j.substituto_id)}</select></div></div>
+   <div data-show="seller_app=1" class="sbox"><label class="lb">Vaga no app · aparece para os sellers cadastrados escolherem</label>
     <div class="cols2">${moneyFld("valor_seller","Cachê do seller (R$)",j.valor_seller)}<div class="fld"><label>Quem paga o seller</label>${seg("seller_pago_por",[["cliente","Cliente direto"],["implay","IMPlay"]],j.seller_pago_por)}</div></div>
-    <div class="hint">"Cliente direto": o seller emite a nota para o cliente e o valor não passa pelo caixa da IMPlay.</div>
-    ${area("requisitos","Requisitos / observações para o seller",j.requisitos)}</div>
+    ${area("requisitos","Requisitos / observações para o seller",j.requisitos)}
+    <details class="adv"><summary>Já sabe quem vai? Definir seller agora (opcional)</summary><div class="cols2"><div class="fld"><label>Seller principal (A)</label><select name="principal_id">${sellerOpts(j.principal_id)}</select></div><div class="fld"><label>Substituto (B)</label><select name="substituto_id">${sellerOpts(j.substituto_id)}</select></div></div></details>
+    <div class="hint">"Cliente direto": o seller emite a nota para o cliente e o valor não passa pelo caixa da IMPlay.</div></div>
+   <div data-show="seller_conv=1" class="sbox">${fld("convidados","Convidados / influenciadores (fora do sistema)",j.convidados,"text",'placeholder="Ex.: Mari Menezes (influenciadora)"')}</div>
    </div>
    ${id?`<div class="sec"><h2>Depois da live</h2></div>
    <div class="cols2 t2"><div class="fld"><label>Começou de fato</label>${timeSel("ireal",j.inicio_real?new Date(j.inicio_real):ini)}</div><div class="fld"><label>Terminou de fato</label>${timeSel("freal",j.fim_real?new Date(j.fim_real):fim)}</div></div>
@@ -805,11 +805,11 @@ function combine(dateStr,h,m){const d=parseYmd(dateStr);d.setHours(Number(h),Num
 async function saveJob(id){
   const f=formData();if(!f.data)return toast("Escolha a data",true);
   const nh=num(f.horas);if(!f.hora)return toast("Escolha a hora de início",true);if(!nh||nh<=0)return toast("Diga quantas horas a live vai durar",true);const ini=combine(f.data,f.hora,0);const fim=new Date(ini.getTime()+nh*36e5);
-  const srv=f.modalidade==="servico",fora=srv&&!!f.seller_fora,clt=srv&&!!f.seller_clt;if(f.local_tipo==="cliente"&&!f.local_endereco)return toast("Escreva onde é a live (terceiros)",true);
-  const row={proposta_id:f.proposta_id||null,cliente_id:f.cliente_id||null,marca:f.marca||cliNome(f.cliente_id)||null,equipamento:srv?(f.equipamento||null):null,seller_clt:clt,seller_fora:fora,clt_ids:clt&&f.clt_ids?f.clt_ids.split(","):[],convidados:fora?(f.convidados||null):null,modalidade:f.modalidade,local_tipo:f.local_tipo,
+  const srv=f.modalidade==="servico",app=srv&&!!f.seller_app,conv=srv&&!!f.seller_conv,fora=app||conv,clt=srv&&!!f.seller_clt;if(app&&!num(f.valor_seller))return toast("Informe o cachê da vaga no app",true);if(f.local_tipo==="cliente"&&!f.local_endereco)return toast("Escreva onde é a live (terceiros)",true);
+  const row={proposta_id:f.proposta_id||null,cliente_id:f.cliente_id||null,marca:f.marca||cliNome(f.cliente_id)||null,equipamento:srv?(f.equipamento||null):null,seller_clt:clt,seller_fora:fora,clt_ids:clt&&f.clt_ids?f.clt_ids.split(","):[],convidados:conv?(f.convidados||null):null,modalidade:f.modalidade,local_tipo:f.local_tipo,
     espaco:f.local_tipo==="estudio"?(f.espaco||null):null,local_endereco:f.local_tipo==="cliente"?f.local_endereco||null:null,inicio:ini.toISOString(),fim:fim.toISOString(),
-    valor_seller:fora?num(f.valor_seller):null,seller_pago_por:f.seller_pago_por||"cliente",requisitos:fora?(f.requisitos||null):null,publicado:fora&&f.publicado==="true",
-    principal_id:fora?(f.principal_id||null):null,substituto_id:fora?(f.substituto_id||null):null,obs:f.obs||null};
+    valor_seller:app?num(f.valor_seller):null,seller_pago_por:f.seller_pago_por||"cliente",requisitos:app?(f.requisitos||null):null,publicado:app,
+    principal_id:app?(f.principal_id||null):null,substituto_id:app?(f.substituto_id||null):null,obs:f.obs||null};
   if(row.principal_id&&row.principal_id===row.substituto_id)return toast("Principal e substituto precisam ser pessoas diferentes",true);
   if(id&&f.ireal_h!==undefined){const j=S.jobs.find(x=>x.id===id);const base=ymd(new Date(j.inicio));
     let ir=combine(f.data||base,f.ireal_h,f.ireal_m),fr=combine(f.data||base,f.freal_h,f.freal_m);if(fr<=ir)fr=new Date(fr.getTime()+864e5);
@@ -1380,7 +1380,7 @@ VIEWS.contratos=()=>{const f=S.f.ctr;
   <div id="lst">${f.tipo==="clientes"?tbl([["Contrato"],["Pacote"],["Valor"],["Vigência"],["Lives"],["Ação"]],cli.map(p=>{const fim=p.contrato_fim?parseYmd(p.contrato_fim):null;const js=S.jobs.filter(j=>j.proposta_id===p.id&&j.status!=="cancelado");
     return `<tr data-act="prop" data-id="${p.id}"><td class="m0"><div class="t">${esc(p.marca)}</div><div class="s">${esc(p.contrato_numero||"")} · ${esc(cliNome(p.cliente_id)||"")}${(o=>o?` · da proposta <b>${on(o.numero)}</b>`:"")(typeof orcDoContrato==="function"?orcDoContrato(p.id):null)}</div></td><td data-l="Pacote">${esc(p.pacote||"—")}</td><td data-l="Valor" class="r">${p.valor_fixo?brl(p.valor_fixo)+"/mês":"—"}${p.perc_variavel?`<div class="s">+ ${numIn(p.perc_variavel)}%</div>`:""}</td>
     <td data-l="Vigência">${dCurta(p.contrato_inicio)} → ${dCurta(p.contrato_fim)}${fim&&fim<hoje?` <span class="tag x">vencido</span>`:fim&&(fim-hoje)/864e5<=30?` <span class="tag w">renovar</span>`:""}</td><td data-l="Lives">${js.length}</td><td data-l="Ação"><button class="btn p sm" data-act="ctrCli" data-id="${p.id}">Gerar contrato</button></td></tr>`}),"Nenhum contrato ainda. Em Propostas, use “Cliente aceitou → contrato” para a proposta virar contrato.")
-   :tbl([["Seller"],["Vínculo"],["CNPJ / MEI"],["Termo no app"],["Lives"],["Ação"]],sel.map(m=>`<tr data-act="membro" data-id="${m.id}"><td class="m0"><div class="t">${esc(m.nome)}</div><div class="s">${esc(m.email)}</div></td><td data-l="Vínculo">${VINC[m.vinculo]||m.vinculo}</td><td data-l="CNPJ">${esc(m.cnpj||"—")}</td><td data-l="Termo">${m.termo_aceito_em?`<span class="tag o">aceito ${dCurta(m.termo_aceito_em)}</span>`:`<span class="tag x">pendente</span>`}</td><td data-l="Lives">${S.jobs.filter(j=>j.principal_id===m.id).length}</td><td data-l="Ação"><button class="btn p sm" data-act="ctrSel" data-id="${m.id}">Gerar contrato</button></td></tr>`),"Nenhum seller cadastrado.")}</div>`};
+   :tbl([["Seller"],["Vínculo"],["CNPJ / MEI"],["Termo no app"],["Lives"],["Ação"]],sel.map(m=>`<tr data-act="membro" data-id="${m.id}"><td class="m0"><div class="t">${esc(m.nome)}</div><div class="s">${esc(m.email)}</div></td><td data-l="Vínculo">${VINC[m.vinculo]||m.vinculo}</td><td data-l="CNPJ">${esc(m.cnpj||"—")}</td><td data-l="Termo">${m.termo_aceito_em&&m.termo_versao==="v2-2026-10"?`<span class="tag o">assinado ${dCurta(m.termo_aceito_em)}</span>`:m.termo_aceito_em?`<span class="tag w">versão antiga</span>`:`<span class="tag x">pendente</span>`}</td><td data-l="Lives">${S.jobs.filter(j=>j.principal_id===m.id).length}</td><td data-l="Ação"><button class="btn p sm" data-act="ctrSel" data-id="${m.id}">Gerar contrato</button></td></tr>`),"Nenhum seller cadastrado.")}</div>`};
 LISTS.ctr=()=>{const h=VIEWS.contratos();const i=h.indexOf('<div id="lst">');return h.slice(i+14,h.lastIndexOf("</div>"))};
 function _(x,ph){return x?esc(x):`<span class="ph">${esc(ph)}</span>`}
 function docShell(title,body){return `<div class="ctr"><div class="chead"><img class="clogo" src="${LOGO_CARVAO}" alt="IMPlay"><span>${EMPRESA.razao} · CNPJ ${EMPRESA.cnpj}</span></div><div class="minuta">MINUTA · revisar com o jurídico antes de assinar</div><h1>${title}</h1>${body}</div>`}
