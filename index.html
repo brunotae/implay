@@ -523,6 +523,9 @@ h1,h2,.pagehead h1{font-family:var(--fb);letter-spacing:-.01em}
 .seg.hgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}.seg.hgrid button{padding:7px 0;font-size:12px;min-height:0}
 .pch.tgl{padding:10px 16px;font-size:13px}.sbox{background:var(--bg2);border:1px solid var(--linha);border-radius:14px;padding:12px;margin-top:10px}.sbox .lb{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cinza);margin-bottom:8px}
 @media(max-width:760px){.dthr{grid-template-columns:1fr}}
+textarea.ta{width:100%;box-sizing:border-box;background:var(--card);border:1px solid var(--linha2);border-radius:12px;color:var(--chalk);font:inherit;padding:10px 12px;margin-top:10px}
+.eqprev{max-height:220px;overflow:auto;margin-top:8px;font-size:12.5px;display:flex;flex-direction:column;gap:4px}
+.side>*{flex-shrink:0}.sitem{flex-shrink:0}
 </style>
 </head>
 <body>
@@ -1086,7 +1089,7 @@ function render(){
   const b=badges();const pend=pendencias();const rail=S.tab==="painel";
   $("#app").innerHTML=`<div class="shell">
    <aside class="side">
-    <div class="sbrand"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay"><div class="live" style="margin-top:12px">gestão · live commerce</div><div class="tagline">A marca que fala de volta.</div></div>
+    <div class="sbrand"><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay" data-act="tab" data-v="painel" title="Ir para o Painel" style="cursor:pointer"><div class="live" style="margin-top:12px">gestão · live commerce</div><div class="tagline">A marca que fala de volta.</div></div>
     ${MENU.map(([g,items])=>`<div class="sgrp">${g}</div>${items.map(([k,l,sub,i])=>`<button class="sitem ${S.tab===k?"on":""}" data-act="tab" data-v="${k}">${ic(i)}<span class="sl"><b>${l}</b><small>${sub}</small></span>${b[k]?`<span class="sbad">${b[k]}</span>`:""}</button>`).join("")}`).join("")}
     <div class="sfoot">${esc(S.email)}<br><a href="#" data-act="backup" style="color:var(--volt)">Copiar backup</a> · <a href="#" data-act="sair">Sair</a></div>
    </aside><div class="scrim" data-act="sideClose"></div>
@@ -1968,6 +1971,99 @@ document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]
  }}catch(err){console.warn(err)}},true);
 /* ---------- demonstração ---------- */
 const _toggle5=toggleDemo;toggleDemo=async function(){await _toggle5();if(S.demo&&!S.socios.length){S.socios=[["Tae","Bruno Tae Wook Koo","Estratégica e institucional","São Paulo/SP",false],["Dani","Danielle Laure Formiga","Estratégica e institucional","São Paulo/SP",true],["Caio","Caio Cesar Cunha Moreira","Técnica e operacional","Niterói/RJ",true],["Larissa","Larissa Amarante Raposo Moreira","Técnica e operacional","Niterói/RJ",false],["Pedro","Pedro Henrique Sinatora Sallun","Executiva · dedicação integral","São Paulo/SP",true],["Thiago","Thiago Maghamez Gonçalves","Executiva · dedicação integral","Petrópolis/RJ",true]].map((x,i)=>({id:"s"+i,apelido:x[0],nome_completo:x[1],funcao:x[2],cidade:x[3],administrador:x[4],ordem:i}));render()}};
+
+/* ================= v6: inventário de equipamentos ================= */
+S.equip=[];S.f.eqp={q:"",st:"todos",cat:"",loc:""};
+const EQ_CATS=["Celular","Fone de ouvido","Microfone","Câmera","Iluminação","Tripé / suporte","Computador / tablet","Cabo / carregador","Cenário","Outro"];
+const EQ_ESTADOS=["Novo","Bom","Precisa de reparo","Quebrado"];
+const EQ_STATUS=[["Disponível","o"],["Em uso","c"],["Emprestado","w"],["Manutenção","w"],["Baixado","x"]];
+const EQ_LOCAIS=["Estúdio Paulista","Estúdio Charitas","Depósito","Com a equipe"];
+IC.box2='<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 12h18"/>';
+MENU[0][1].push(["equip","Equipamentos","Celulares, fones, câmeras","box2"]);
+Object.assign(TAB_NOME,{equip:"Equipamentos"});Object.assign(TAB_SUB,{equip:"Tudo o que a IMPlay tem: onde está, com quem e em que estado"});
+HEADACT.equip=()=>`<button class="btn sm" data-act="eqColar">Colar lista</button><button class="btn sm" data-act="csvEq">${ic("dl")} CSV</button><button class="btn p sm" data-act="eqNovo">+ Equipamento</button>`;
+const _loadAll6=loadAll;loadAll=async function(){await _loadAll6();if(S.demo)return;const r=await db.from("imp_equip").select("id,numero,nome,categoria,marca,modelo,serie,quantidade,local,estado,status,responsavel_id,com_quem,valor,compra_em,nota_fiscal,obs,created_at,updated_at").order("categoria",{ascending:true});S.eqSemSQL=!!r.error;S.equip=r.data||[]};
+function eqn(n){return "EQ-"+String(n||0).padStart(3,"0")}
+function eqTag(st){const x=EQ_STATUS.find(s=>s[0]===st)||["?",""];return `<span class="tag ${x[1]}">${esc(st||"—")}</span>`}
+function eqCatAuto(t){t=(t||"").toLowerCase();
+  if(/iphone|celular|smartphone|galaxy|xiaomi|motorola|redmi|pixel/.test(t))return "Celular";
+  if(/microfone|mic\b|lapela|rode|shure|boya|hollyland|dji mic/.test(t))return "Microfone";
+  if(/fone|airpods|headset|earbud|in-?ear|retorno/.test(t))return "Fone de ouvido";
+  if(/c[âa]mera|sony|canon|nikon|gopro|webcam|lumix|fujifilm|osmo/.test(t))return "Câmera";
+  if(/luz|ring|led|softbox|ilumina|painel|refletor|bast[ãa]o/.test(t))return "Iluminação";
+  if(/trip[ée]|suporte|gimbal|bra[çc]o|pedestal|estabilizador/.test(t))return "Tripé / suporte";
+  if(/notebook|macbook|ipad|tablet|computador|monitor|pc\b|mac mini|imac/.test(t))return "Computador / tablet";
+  if(/cabo|carregador|fonte|hub|adaptador|bateria|power ?bank|extens/.test(t))return "Cabo / carregador";
+  if(/cen[áa]rio|fundo|backdrop|m[óo]vel|mesa|cadeira|tapete|prateleira/.test(t))return "Cenário";
+  return "Outro"}
+function eqLista(){const f=S.f.eqp;let l=S.equip.filter(e=>has(f.q,e.nome,e.marca,e.modelo,e.serie,e.local,e.com_quem,eqn(e.numero),nome(e.responsavel_id)));
+  if(f.cat)l=l.filter(e=>e.categoria===f.cat);if(f.loc)l=l.filter(e=>e.local===f.loc);
+  if(f.st==="problema")l=l.filter(e=>["Precisa de reparo","Quebrado"].includes(e.estado)||e.status==="Manutenção");
+  else if(f.st!=="todos")l=l.filter(e=>e.status===f.st);else l=l.filter(e=>e.status!=="Baixado");return l}
+LISTS.eqp=()=>{const l=eqLista();
+  return tbl([["Item"],["Categoria"],["Qtd.","r"],["Onde está"],["Estado"],["Situação"]],l.map(e=>`<tr data-act="eqAbrir" data-id="${e.id}"><td class="m0"><div class="t">${esc(e.nome)}</div><div class="s">${eqn(e.numero)}${e.marca||e.modelo?" · "+esc([e.marca,e.modelo].filter(Boolean).join(" ")):""}${e.serie?" · "+esc(e.serie):""}</div></td>
+   <td data-l="Categoria">${esc(e.categoria)}</td><td data-l="Qtd." class="r"><b>${e.quantidade||1}</b></td><td data-l="Onde está">${esc(e.local||"—")}${e.com_quem||e.responsavel_id?`<div class="s">com ${esc(e.com_quem||nome(e.responsavel_id))}</div>`:""}</td>
+   <td data-l="Estado">${["Precisa de reparo","Quebrado"].includes(e.estado)?`<span class="tag w">${esc(e.estado)}</span>`:esc(e.estado||"—")}</td><td data-l="Situação">${eqTag(e.status)}</td></tr>`),"Nada aqui ainda. Use + Equipamento ou Colar lista para cadastrar tudo de uma vez.")
+   +(l.length?`<div class="hint" style="margin-top:8px">${l.reduce((s,e)=>s+(e.quantidade||1),0)} unidades · ${l.length} itens${l.some(e=>e.valor)?" · valor "+brl(l.reduce((s,e)=>s+(Number(e.valor)||0)*(e.quantidade||1),0)):""}</div>`:"")};
+VIEWS.equip=()=>{if(S.eqSemSQL&&!S.demo)return `<div class="warnbox">Falta rodar o SQL <b>implay_equipamentos.sql</b> no Supabase (SQL Editor → New query → Run). Depois recarregue.</div>`;
+  const f=S.f.eqp,A=S.equip.filter(e=>e.status!=="Baixado");const un=l=>l.reduce((s,e)=>s+(e.quantidade||1),0);
+  const cats=EQ_CATS.filter(c=>A.some(e=>e.categoria===c));const locs=[...new Set(S.equip.map(e=>e.local).filter(Boolean))].sort();
+  const prob=A.filter(e=>["Precisa de reparo","Quebrado"].includes(e.estado)||e.status==="Manutenção");
+  return `<div class="mks">${mini("Unidades",un(A))}${mini("Celulares",un(A.filter(e=>e.categoria==="Celular")),"","v")}${mini("Fones",un(A.filter(e=>e.categoria==="Fone de ouvido")))}${mini("Fora do estúdio",un(A.filter(e=>["Emprestado","Em uso"].includes(e.status))))}${mini("Com problema",un(prob),"reparo, quebrado ou manutenção",prob.length?"f":"")}</div>`
+   +chips("eqp",[["todos","Ativos",A.length],...EQ_STATUS.map(([s])=>[s,s,S.equip.filter(e=>e.status===s).length]),["problema","Com problema",prob.length]],f.st)
+   +`<div class="tool">${qbox("eqp","Buscar nome, marca, série, com quem…")}${fsel("eqp","cat","Todas as categorias",cats.map(c=>[c,c]))}${locs.length?fsel("eqp","loc","Qualquer lugar",locs.map(c=>[c,c])):""}</div><div id="lst">${LISTS.eqp()}</div>`};
+function openEq(id){const e=id?S.equip.find(x=>x.id===id):{categoria:"Celular",quantidade:1,estado:"Bom",status:"Disponível",local:"Estúdio Paulista"};
+  const membros=S.membros.filter(m=>m.status==="ativo"&&m.papel!=="seller");
+  openSheet(`<form onsubmit="return false"><h3>${id?esc(e.nome)+" · "+eqn(e.numero):"Novo equipamento"}</h3>
+   ${fld("nome","O que é",e.nome,"text",'placeholder="Ex.: iPhone 15 Pro, AirPods Pro, Ring light 18”" required')}
+   ${pick("categoria","Categoria",e.categoria,EQ_CATS,{ph:"Outra categoria"})}
+   <div class="cols2">${fld("marca","Marca",e.marca)}${fld("modelo","Modelo",e.modelo)}</div>
+   <div class="cols2">${fld("serie","Nº de série / IMEI / patrimônio",e.serie)}${pick("quantidade","Quantidade",String(e.quantidade||1),["1","2","3","4","5","10"],{num:1,ph:"Outro número"})}</div>
+   <div class="sec"><h2>Onde e com quem</h2></div>
+   ${pick("local","Onde está",e.local||"",EQ_LOCAIS,{ph:"Outro lugar: sala E1, loja do cliente…"})}
+   <div class="cols2"><div class="fld"><label>Responsável</label><select name="responsavel_id"><option value="">— ninguém —</option>${membros.map(m=>`<option value="${m.id}" ${m.id===e.responsavel_id?"selected":""}>${esc(m.nome)}</option>`).join("")}</select></div>${fld("com_quem","Emprestado para / está com",e.com_quem,"text",'placeholder="Ex.: Mari Menezes, cliente Haoma"')}</div>
+   <div class="fld"><label>Situação</label>${seg("status",EQ_STATUS.map(x=>[x[0],x[0]]),e.status)}</div>
+   <div class="fld"><label>Estado</label>${seg("estado",EQ_ESTADOS.map(x=>[x,x]),e.estado)}</div>
+   <div class="sec"><h2>Compra</h2></div>
+   <div class="cols2">${moneyFld("valor","Valor unitário (R$)",e.valor)}${fld("compra_em","Data da compra",e.compra_em||"","date")}</div>
+   ${fld("nota_fiscal","Nota fiscal / loja",e.nota_fiscal)}
+   <div class="fld"><label>Foto</label><input type="file" accept="image/*" capture="environment" id="eqFoto"><div id="eqFotoPrev">${id?`<button type="button" class="btn sm" data-act="eqVerFoto" data-id="${id}">Ver foto</button>`:""}</div></div>
+   ${area("obs","Observações",e.obs)}
+   <div class="acts"><button type="button" class="btn p" data-act="eqSalvar" data-id="${id||""}">Salvar</button>${!id?`<button type="button" class="btn" data-act="eqSalvar" data-mais="1">Salvar e cadastrar outro</button>`:""}<button type="button" class="btn" data-act="fechar">Fechar</button>
+   ${id?`<button type="button" class="btn" data-act="eqDup" data-id="${id}">Duplicar</button>${isSocio()?`<button type="button" class="btn d" data-act="eqApagar" data-id="${id}">Excluir</button>`:""}`:""}</div></form>`)}
+function eqColar(){openSheet(`<form onsubmit="return false"><h3>Colar lista de equipamentos</h3>
+  <div class="hint">Cole da planilha ou escreva um por linha. Formato livre: <b>nome</b>; quantidade; marca; nº de série; onde está. Só o nome é obrigatório. A categoria é descoberta pelo nome (iPhone → Celular, AirPods → Fone…).</div>
+  <textarea id="eqTxt" class="ta" rows="9" placeholder="iPhone 15 Pro; 3; Apple; ; Estúdio Paulista&#10;AirPods Pro; 4&#10;Ring light 18 polegadas; 2&#10;Microfone lapela Boya; 6"></textarea>
+  <div id="eqPrev"></div><div class="acts"><button type="button" class="btn p" data-act="eqColarSalvar">Cadastrar tudo</button><button type="button" class="btn" data-act="fechar">Fechar</button></div></form>`)}
+function eqParse(t){return t.split(/\r?\n/).map(l=>l.trim()).filter(Boolean).map(l=>{const c=l.split(/\t|;/).map(x=>x.trim());const q=parseInt(c[1]);
+  return {nome:c[0],quantidade:q>0?q:1,marca:c[2]||null,serie:c[3]||null,local:c[4]||"Estúdio Paulista",categoria:eqCatAuto(c[0]+" "+(c[2]||"")),estado:"Bom",status:"Disponível"}}).filter(x=>x.nome)}
+document.addEventListener("input",e=>{if(e.target.id==="eqTxt"){const l=eqParse(e.target.value);const g={};l.forEach(x=>g[x.categoria]=(g[x.categoria]||0)+x.quantidade);
+  $("#eqPrev").innerHTML=l.length?`<div class="okbox" style="margin-top:10px"><b>${l.length} itens</b> · ${Object.entries(g).map(([k,v])=>`${v} ${k.toLowerCase()}`).join(" · ")}</div><div class="eqprev">${l.slice(0,30).map(x=>`<div><b>${esc(x.nome)}</b> <span class="muted small">${x.categoria} · ${x.quantidade} un.${x.marca?" · "+esc(x.marca):""}</span></div>`).join("")}${l.length>30?`<div class="muted small">+ ${l.length-30}…</div>`:""}</div>`:""}
+  if(e.target.dataset.q==="eqp"){S.f.eqp.q=e.target.value;$("#lst").innerHTML=LISTS.eqp()}},true);
+document.addEventListener("input",e=>{if(e.target.name==="nome"&&e.target.closest("#sheetIn")&&$("#sheetIn [data-act=eqSalvar]")){const c=eqCatAuto(e.target.value);const box=$("#sheetIn [data-pick=categoria]");if(box&&c!=="Outro"&&!S._eqCatManual){box.querySelector("input").value=c;pickSync(box)}}});
+document.addEventListener("click",e=>{if(e.target.closest("#sheetIn [data-pick=categoria] .pch"))S._eqCatManual=true},true);
+document.addEventListener("change",async e=>{if(e.target.id==="eqFoto"&&e.target.files[0]){S._eqFoto=await compress(e.target.files[0]);$("#eqFotoPrev").innerHTML=`<img class="thumb" src="${S._eqFoto}">`}});
+document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]");if(!a)return;const act=a.dataset.act,id=a.dataset.id;const H=()=>e.stopImmediatePropagation();
+ try{switch(act){
+  case"eqNovo":H();S._eqFoto=null;S._eqCatManual=false;closeSheet();openEq(null);break;
+  case"eqAbrir":H();S._eqFoto=null;S._eqCatManual=true;openEq(id);break;
+  case"eqColar":H();eqColar();break;
+  case"eqSalvar":H();{const f=formData();if(!f.nome)return toast("Escreva o que é o equipamento",true);
+    const row={nome:f.nome,categoria:f.categoria||eqCatAuto(f.nome),marca:f.marca||null,modelo:f.modelo||null,serie:f.serie||null,quantidade:Math.max(1,parseInt(f.quantidade)||1),local:f.local||null,responsavel_id:f.responsavel_id||null,com_quem:f.com_quem||null,status:f.status||"Disponível",estado:f.estado||"Bom",valor:num(f.valor),compra_em:f.compra_em||null,nota_fiscal:f.nota_fiscal||null,obs:f.obs||null,updated_at:new Date().toISOString()};
+    if(S._eqFoto)row.foto=S._eqFoto;
+    const cols="id,numero,nome,categoria,marca,modelo,serie,quantidade,local,estado,status,responsavel_id,com_quem,valor,compra_em,nota_fiscal,obs,created_at,updated_at";
+    if(id){const r=await run(db.from("imp_equip").update(row).eq("id",id).select(cols).single(),"Salvo");S.equip[S.equip.findIndex(x=>x.id===id)]=r}
+    else{const r=await run(db.from("imp_equip").insert(row).select(cols).single(),"Cadastrado "+row.nome);S.equip.push(r)}
+    S._eqFoto=null;closeSheet();render();if(a.dataset.mais){S._eqCatManual=false;openEq(null)}}break;
+  case"eqDup":H();{const o=S.equip.find(x=>x.id===id);closeSheet();S._eqCatManual=true;openEq(null);setTimeout(()=>{["nome","marca","modelo","nota_fiscal","obs"].forEach(k=>{const i=$(`#sheetIn [name=${k}]`);if(i&&o[k])i.value=o[k]});[["categoria",o.categoria],["local",o.local]].forEach(([k,v])=>{const b=$(`#sheetIn [data-pick=${k}]`);if(b&&v){b.querySelector("input").value=v;pickSync(b)}})},0)}break;
+  case"eqApagar":H();{if(!armed(a))return;await run(db.from("imp_equip").delete().eq("id",id),"Excluído");S.equip=S.equip.filter(x=>x.id!==id);closeSheet();render()}break;
+  case"eqVerFoto":H();{const r=await run(db.from("imp_equip").select("foto").eq("id",id).single());$("#eqFotoPrev").innerHTML=r.foto?`<img class="thumb" src="${r.foto}">`:`<span class="muted small">Sem foto.</span>`}break;
+  case"eqColarSalvar":H();{const l=eqParse($("#eqTxt").value);if(!l.length)return toast("Cole pelo menos um item",true);a.disabled=true;a.textContent="Cadastrando…";
+    const r=await run(db.from("imp_equip").insert(l).select("id,numero,nome,categoria,marca,modelo,serie,quantidade,local,estado,status,responsavel_id,com_quem,valor,compra_em,nota_fiscal,obs,created_at,updated_at"),`${l.length} itens cadastrados`);S.equip.push(...(r||[]));closeSheet();render()}break;
+  case"csvEq":H();{const l=eqLista();const rows=[["Código","Item","Categoria","Marca","Modelo","Série","Qtd","Onde","Com quem","Estado","Situação","Valor unit.","Compra"],...l.map(e=>[eqn(e.numero),e.nome,e.categoria,e.marca,e.modelo,e.serie,e.quantidade,e.local,e.com_quem||nome(e.responsavel_id)||"",e.estado,e.status,e.valor,e.compra_em])];
+    const csv=rows.map(r=>r.map(x=>`"${String(x??"").replace(/"/g,'""')}"`).join(";")).join("\n");const u=URL.createObjectURL(new Blob(["﻿"+csv],{type:"text/csv"}));const l2=document.createElement("a");l2.href=u;l2.download="equipamentos_implay.csv";l2.click()}break;
+ }}catch(err){console.warn(err)}},true);
+const _toggle6=toggleDemo;toggleDemo=async function(){await _toggle6();if(S.demo&&!S.equip.length){S.equip=[["iPhone 15 Pro","Celular",3,"Estúdio Paulista","Bom","Disponível"],["iPhone 13","Celular",2,"Estúdio Charitas","Bom","Em uso"],["AirPods Pro","Fone de ouvido",4,"Estúdio Paulista","Bom","Disponível"],["Ring light 18”","Iluminação",3,"Estúdio Paulista","Precisa de reparo","Disponível"],["Microfone lapela Boya","Microfone",6,"Com a equipe","Bom","Emprestado"],["Sony ZV-E10","Câmera",2,"Estúdio Paulista","Novo","Disponível"]].map((x,i)=>({id:"eq"+i,numero:i+1,nome:x[0],categoria:x[1],quantidade:x[2],local:x[3],estado:x[4],status:x[5]}));render()}};
 
 /* ================= interações ================= */
 function syncShow(){const fm=$("#sheetIn form");if(!fm)return;fm.querySelectorAll("[data-show]").forEach(el=>{const[k,val]=el.dataset.show.split("=");const inp=fm.querySelector(`[name="${k}"]`);el.hidden=!inp||inp.value!==val})}
