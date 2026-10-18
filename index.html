@@ -220,6 +220,11 @@ table.tb .r{text-align:right;white-space:nowrap;font-weight:700}
 .time{display:flex;gap:6px}.time select{flex:1;min-width:0}
 .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px;position:sticky;bottom:-20px;background:var(--noite);padding:10px 0}
 .warnbox{background:#33260b;border:1px solid #4f3a0f;color:var(--warn);border-radius:12px;padding:10px 12px;font-size:12.5px;margin-top:10px}
+.kyc{border:1px solid var(--linha);border-radius:14px;padding:12px;margin:10px 0;background:rgba(255,255,255,.02)}.kyc h4{margin:0 0 8px;font-size:14px}
+.kycf{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.kycf a{display:block;border:1px solid var(--linha);border-radius:10px;overflow:hidden;background:#000;text-decoration:none;color:inherit}.kycf img{width:100%;height:170px;object-fit:contain;display:block;background:#000}.kycf span{display:block;font-size:11px;text-align:center;padding:4px;color:var(--cinza)}
+.kyckv{display:grid;grid-template-columns:130px 1fr;gap:5px 10px;font-size:12.5px;margin-top:10px}.kyckv span{color:var(--cinza)}.kyckv .x{color:var(--bad)}
+#kycOkBtn:disabled{opacity:.45;cursor:not-allowed}.kychk{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;margin-top:6px;cursor:pointer}.kychk input{width:18px;height:18px;flex:none;accent-color:var(--volt)}
+@media(max-width:640px){.kycf img{height:120px}.kyckv{grid-template-columns:100px 1fr}}
 .okbox{background:#10301a;border:1px solid #1b4a27;color:var(--ok);border-radius:12px;padding:10px 12px;font-size:12.5px}
 .ev{border-left:2px solid var(--linha);padding:4px 0 10px 12px;font-size:12.5px}.ev b{font-weight:600}
 /* agenda */
@@ -637,7 +642,8 @@ function traduz(m){m=m||"";if(/row-level security/i.test(m)){const t=(m.match(/t
 /* ---------- dados ---------- */
 async function loadAll(){
   const q=(t,o="created_at",asc=false)=>db.from(t).select("*").order(o,{ascending:asc});
-  const [m,c,p,j,f,a]=await Promise.all([q("imp_membros","nome",true),q("imp_clientes","marca",true),q("imp_propostas","numero"),q("imp_jobs","inicio",true),q("imp_fin"),q("imp_amostras","data")]);
+  const [m,c,p,j,f,a,k]=await Promise.all([q("imp_membros","nome",true),q("imp_clientes","marca",true),q("imp_propostas","numero"),q("imp_jobs","inicio",true),q("imp_fin"),q("imp_amostras","data"),db.from("imp_kyc").select("*")]);
+  S.kyc=(k&&!k.error&&k.data)||[];
   for(const r of [m,c,p,j,f,a]) if(r.error){console.warn(r.error)}
   S.membros=m.data||[];S.clientes=c.data||[];S.propostas=p.data||[];S.jobs=j.data||[];S.fin=f.data||[];S.amostras=a.data||[];
 }
@@ -1023,10 +1029,42 @@ function openAm(id,mov){const a=id?S.amostras.find(x=>x.id===id):{movimento:mov|
 
 /* ================= EQUIPE ================= */
 const VINC={socio:"sócio",clt:"CLT",freelancer:"freelancer",pj:"PJ",mei:"MEI"};
+/* ---------- identidade do seller ---------- */
+const kycDe=id=>(S.kyc||[]).find(k=>k.membro_id===id);
+const cpfFmt=s=>{s=String(s||"").replace(/\D/g,"");return s.length===11?s.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,"$1.$2.$3-$4"):s};
+const cepFmt=s=>{s=String(s||"").replace(/\D/g,"");return s.length===8?s.slice(0,5)+"-"+s.slice(5):s};
+function kycIdade(d){if(!d)return null;const n=new Date(d+"T12:00"),h=new Date();let a=h.getFullYear()-n.getFullYear();if(h.getMonth()<n.getMonth()||(h.getMonth()===n.getMonth()&&h.getDate()<n.getDate()))a--;return a}
+function kycTag(m){if(m.papel!=="seller")return "";const k=kycDe(m.id);const st=k&&k.status;
+  return st==="aprovado"?`<span class="tag o">✓ identidade</span>`:st==="enviado"?`<span class="tag f">conferir identidade</span>`:st==="recusado"?`<span class="tag x">aguardando correção</span>`:`<span class="tag">sem documento</span>`}
+const KYC_CHECK=[["rosto","O rosto da selfie é a mesma pessoa da foto do documento"],["nome","Nome e CPF digitados batem com o documento"],["nasc","Data de nascimento bate e a pessoa tem 18 anos ou mais"],["doc","Documento legível, sem rasura, não parece montagem nem foto de tela"],["end","Endereço completo"]];
+const KYC_MOTIVOS=["A selfie não está nítida, tire de novo com mais luz","O rosto da selfie não confere com o documento","A foto do documento está ilegível ou cortada","Falta o verso do documento","Os dados digitados não batem com o documento","Documento vencido ou não aceito"];
+function kycPainel(m){setTimeout(kycImgs,0);if(!isSocio())return `<div class="kyc"><h4>Identidade</h4>${kycTag(m)} <span class="small muted">Só sócios veem os dados e as fotos.</span></div>`;
+  const k=kycDe(m.id);
+  if(!k||k.status==="rascunho")return `<div class="kyc"><h4>Identidade</h4><div class="warnbox" style="margin-top:0">${k?"O seller começou a preencher documento e selfie, mas ainda não enviou.":"O seller ainda não enviou documento e selfie pelo app."} Só depois disso dá para aprovar.</div></div>`;
+  const id=k.membro_id,ida=kycIdade(k.nascimento);
+  const foto=(c,t)=>k[c]?`<a href="#" data-act="kycFoto" data-v="${esc(k[c])}"><img data-kycimg="${esc(k[c])}" alt=""><span>${t}</span></a>`:`<a><div style="height:120px;display:grid;place-items:center" class="muted small">sem ${t.toLowerCase()}</div><span>${t}</span></a>`;
+  const dados=`<div class="kycf">${foto("doc_frente","Documento · frente")}${foto("doc_verso","Documento · verso")}${foto("selfie","Selfie")}</div>
+   <div class="kyckv"><span>Nome no documento</span><b>${esc(k.nome_doc)}${normN(k.nome_doc)!==normN(m.nome)?` <span class="small muted">(no cadastro: ${esc(m.nome)})</span>`:""}</b>
+   <span>CPF</span><b>${cpfFmt(k.cpf)}</b><span>Nascimento</span><b class="${ida!==null&&ida<18?"x":""}">${k.nascimento?new Date(k.nascimento+"T12:00").toLocaleDateString("pt-BR"):"—"}${ida!==null?` · ${ida} anos`:""}</b>
+   <span>Documento</span><b>${esc(k.doc_tipo||"")} ${esc(k.doc_numero||"")}</b>
+   <span>Endereço</span><b>${esc([k.logradouro&&(k.logradouro+(k.numero?", "+k.numero:"")),k.complemento,k.bairro,k.cidade&&(k.cidade+"/"+(k.uf||"")),k.cep&&("CEP "+cepFmt(k.cep))].filter(Boolean).join(", "))}</b>
+   <span>Enviado em</span><b>${k.enviado_em?new Date(k.enviado_em).toLocaleString("pt-BR"):"—"}</b><span>LGPD</span><b>${k.lgpd_em?"autorizou em "+new Date(k.lgpd_em).toLocaleDateString("pt-BR"):"—"}</b></div>`;
+  if(k.status==="aprovado")return `<div class="kyc"><div class="okbox">✓ Identidade conferida por ${esc(k.verif_nome||"sócio")} em ${new Date(k.verif_em).toLocaleString("pt-BR")}</div><details style="margin-top:8px"><summary class="small" style="cursor:pointer">Ver dados e fotos</summary>${dados}
+   <div class="fld" style="margin-top:10px"><label>Reabrir para o seller corrigir (ele volta a ficar sem acesso até nova aprovação)</label><input id="kycReab" placeholder="O que ele precisa corrigir?"></div><button type="button" class="btn sm" data-act="kycReabrir" data-id="${id}">Reabrir cadastro</button></details></div>`;
+  if(k.status==="recusado")return `<div class="kyc"><h4>Identidade</h4><div class="warnbox" style="margin-top:0">Recusado por ${esc(k.verif_nome||"sócio")}: <b>${esc(k.verif_motivo||"")}</b>. Aguardando o seller corrigir e reenviar.</div><details style="margin-top:8px"><summary class="small" style="cursor:pointer">Ver o que ele tinha enviado</summary>${dados}</details></div>`;
+  return `<div class="kyc"><h4>📋 Conferir identidade antes de aprovar</h4><p class="small muted" style="margin:0 0 8px">Compare a selfie com a foto do documento e os dados digitados. Toque numa foto para ampliar.</p>${dados}
+   <div style="margin-top:12px">${KYC_CHECK.map(([c,t])=>`<label class="kychk"><input type="checkbox" class="kycc" data-c="${c}"> <span>${t}</span></label>`).join("")}</div>
+   <div class="row" style="margin-top:12px"><button type="button" class="btn p" data-act="kycOk" data-id="${id}" id="kycOkBtn" disabled>Marque os ${KYC_CHECK.length} itens para aprovar</button></div>
+   <details style="margin-top:12px"><summary class="small" style="cursor:pointer;color:var(--bad)">Recusar / pedir correção</summary>
+   <div class="chips" style="margin-top:8px;flex-wrap:wrap">${KYC_MOTIVOS.map(t=>`<button type="button" class="chip" data-act="kycMot" data-v="${esc(t)}">${esc(t)}</button>`).join("")}</div>
+   <div class="fld"><label>Motivo (o seller vê esta mensagem)</label><textarea id="kycMotivo" rows="2"></textarea></div><button type="button" class="btn d sm" data-act="kycNo" data-id="${id}">Recusar e pedir correção</button></details></div>`}
+const normN=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/\s+/g," ").trim();
+async function kycImgs(){for(const im of document.querySelectorAll("img[data-kycimg]:not([src])")){const {data}=await db.storage.from("implay-kyc").createSignedUrl(im.dataset.kycimg,900);if(data&&data.signedUrl)im.src=data.signedUrl}}
+document.addEventListener("change",e=>{if(e.target.classList&&e.target.classList.contains("kycc")){const all=[...document.querySelectorAll(".kycc")];const n=all.filter(x=>x.checked).length;const b=$("#kycOkBtn");if(b){b.disabled=n<all.length;b.textContent=n<all.length?`Marque os ${all.length-n} itens que faltam`:"✓ Aprovar identidade e liberar seller"}}});
 function openMembro(id){const m=id?S.membros.find(x=>x.id===id):{papel:"basico",vinculo:"clt",status:"ativo"};const ro=!isSocio();
   const jobsM=id?S.jobs.filter(j=>j.principal_id===id||j.substituto_id===id):[];
   openSheet(`<form onsubmit="return false"><h3>${id?esc(m.nome):"Cadastrar pessoa"}</h3>
-   ${m.status==="pendente"&&isSocio()?`<div class="warnbox">Cadastro feito pelo app, aguardando aprovação.<div class="row" style="margin-top:8px"><button type="button" class="btn p sm" data-act="aprovar" data-id="${id}">Aprovar seller</button></div></div>`:""}
+   ${id&&m.papel==="seller"?kycPainel(m):""}
    <div class="cols2">${fld("nome","Nome",m.nome,"text","required")}${fld("email","E-mail (o mesmo do login)",m.email,"email",id?"readonly":"required")}</div>
    <div class="fld"><label>Acesso</label>${seg("papel",[["socio","Sócio (tudo)"],["basico","Equipe (lança, sem aprovar)"],["seller","Seller (só o app)"]],m.papel)}</div>
    <div class="fld"><label>Vínculo</label>${seg("vinculo",[["socio","Sócio"],["clt","CLT"],["freelancer","Freelancer"],["pj","PJ"],["mei","MEI"]],m.vinculo)}</div>
@@ -1092,7 +1130,7 @@ function hojeTxt(){const d=new Date();return DS[d.getDay()]+", "+d.getDate()+" d
 function pendencias(){
   const out=[];if(!isSocio())return out;
   const r=S.fin.filter(f=>f.reembolso==="solicitado"&&f.status==="ativo");if(r.length)out.push({t:`${r.length} reembolsos para aprovar`,v:brl(soma(r)),act:"goFin",a:"reemb"});
-  const p=S.membros.filter(m=>m.status==="pendente");if(p.length)out.push({t:`${p.length} sellers aguardando aprovação`,v:"",act:"goEq",a:"pendentes"});
+  const p=S.membros.filter(m=>m.status==="pendente");const pk=p.filter(m=>(kycDe(m.id)||{}).status==="enviado");if(pk.length)out.push({t:`${pk.length} ${pk.length===1?"identidade":"identidades"} de seller para conferir`,v:"",act:"goEq",a:"pendentes"});else if(p.length)out.push({t:`${p.length} sellers ainda preenchendo o cadastro`,v:"",act:"goEq",a:"pendentes"});
   const ab=S.jobs.filter(j=>j.status==="aberto"&&!j.principal_id&&new Date(j.inicio)>new Date()&&new Date(j.inicio)<new Date(Date.now()+3*864e5));if(ab.length)out.push({t:`${ab.length} lives em 3 dias sem seller`,v:"",act:"goJobs",a:"vagas"});
   const env=S.propostas.filter(x=>x.status==="enviada");if(env.length)out.push({t:`${env.length} propostas aguardando resposta`,v:"",act:"goProp",a:"enviada"});
   const atr=S.fin.filter(f=>f.status==="ativo"&&!f.pago_em&&f.vencimento&&parseYmd(f.vencimento)<new Date(new Date().toDateString()));if(atr.length)out.push({t:`${atr.length} lançamentos atrasados`,v:brl(soma(atr)),act:"goFin",a:"lanc"});
@@ -1286,7 +1324,7 @@ LISTS.eq=()=>{const f=S.f.eq;let l=eqLista();
    return `<tr data-act="membro" data-id="${m.id}"><td class="m0"><div class="row" style="flex-wrap:nowrap;gap:10px"><div class="avatar" style="padding:0"><div class="av" style="width:32px;height:32px;font-size:11px;background:${m.papel==="socio"?"var(--volt)":m.papel==="seller"?"var(--flash)":"var(--cobalt)"};color:${m.papel==="socio"||m.papel==="seller"?"#131411":"#fff"}">${esc(iniciais(m.nome))}</div></div><div><div class="t">${esc(m.nome)}</div><div class="s">${esc(m.email)}</div></div></div></td>
    <td data-l="Acesso"><span class="tag ${m.papel==="socio"?"v":m.papel==="seller"?"f":"c"}">${m.papel==="socio"?"sócio":m.papel==="basico"?"equipe":"seller"}</span>${m.status!=="ativo"?`<span class="tag w">${m.status}</span>`:""}</td>
    <td data-l="Vínculo">${VINC[m.vinculo]||m.vinculo}</td><td data-l="Contato">${esc(m.telefone||"—")}<div class="s">${esc(m.cidade||"")}</div></td>
-   <td data-l="Termo">${m.papel!=="seller"?"—":m.termo_aceito_em?`<span class="tag o">aceito</span>`:`<span class="tag x">pendente</span>`}</td><td data-l="Lives" class="r">${js.length}</td></tr>`}),"Ninguém neste filtro.")};
+   <td data-l="Termo">${kycTag(m)}${m.papel!=="seller"?"—":m.termo_aceito_em?`<span class="tag o">aceito</span>`:`<span class="tag x">pendente</span>`}</td><td data-l="Lives" class="r">${js.length}</td></tr>`}),"Ninguém neste filtro.")};
 VIEWS.equipe=()=>{const l=eqLista(),f=S.f.eq;
   return chips("eq",[["todos","Todas",l.length],["socios","Sócios",l.filter(m=>m.papel==="socio").length],["equipe","Equipe",l.filter(m=>m.papel==="basico").length],["sellers","Sellers",l.filter(m=>m.papel==="seller"&&m.status==="ativo").length],["pendentes","Aguardando aprovação",l.filter(m=>m.status==="pendente").length],["inativos","Inativos",l.filter(m=>m.status==="inativo").length]],f.st)
   +`<div class="tool">${qbox("eq","Buscar nome, e-mail, telefone, @…")}${fsel("eq","vinc","Todos os vínculos",Object.entries(VINC))}</div><div class="hint" style="margin:-4px 0 12px">Link para sellers se cadastrarem: <b>brunotae.github.io/implay/seller/</b></div><div id="lst">${LISTS.eq()}</div>`};
@@ -1489,7 +1527,7 @@ VIEWS.equipe=()=>{const v=S.f.eq.view||"cards";const tg=`<div class="chips" styl
     const cor=m.papel==="socio"?"var(--volt)":m.papel==="seller"?"var(--flash)":"var(--cobalt)";
     return `<div class="pcard" data-act="membro" data-id="${m.id}"><div class="av" style="background:${cor};color:${m.papel==="socio"||m.papel==="seller"?"#131411":"#fff"}">${esc(iniciais(m.nome))}</div><div class="t">${esc(m.nome)}</div><div class="s">${m.papel==="socio"?"Sócio":m.papel==="basico"?"Equipe":"Seller"} · ${VINC[m.vinculo]||m.vinculo}</div>${m.obs?`<div class="s">${esc(m.obs.slice(0,60))}</div>`:""}
     ${m.papel!=="socio"?`<div class="pst"><span><b>${js.length}</b>lives</span><span><b>${brlK(gm)}</b>GMV</span><span><b>${prox}</b>próx.</span></div>`:`<div class="pst"><span><b>${S.propostas.filter(p=>m.user_id&&p.created_by===m.user_id).length}</b>propostas</span><span><b>${S.fin.filter(f=>f.reembolso_para===m.id&&["solicitado","aprovado"].includes(f.reembolso)).length}</b>reemb.</span></div>`}
-    <div class="s" style="margin-top:6px">${esc(m.telefone||m.email)}</div>${m.status!=="ativo"?`<span class="tag w">${m.status}</span>`:""}</div>`};
+    <div class="s" style="margin-top:6px">${esc(m.telefone||m.email)}</div>${m.status!=="ativo"?`<span class="tag w">${m.status}</span>`:""}${m.papel==="seller"&&m.status!=="ativo"?kycTag(m):""}</div>`};
   const grp=(t,l)=>l.length?`<div class="sec"><h2>${t} <span class="muted small">${l.length}</span></h2></div><div class="pgrid">${l.map(card).join("")}</div>`:"";
   const M=S.membros.filter(m=>has(S.f.eq.q,m.nome,m.email,m.cidade,m.nicho));
   return tg+`<div class="tool">${qbox("eq","Buscar pessoa…")}</div><div class="hint" style="margin:-4px 0 4px">Link para sellers se cadastrarem: <b>brunotae.github.io/implay/seller/</b></div>`+grp("Sócios",M.filter(m=>m.papel==="socio"))+grp("Equipe (CLT)",M.filter(m=>m.papel==="basico"))+grp("Sellers",M.filter(m=>m.papel==="seller"&&m.status==="ativo"))+grp("Aguardando aprovação",M.filter(m=>m.status==="pendente"))};
@@ -2158,7 +2196,15 @@ document.addEventListener("click",async e=>{
     case"eqF":S.eqF=val;render();break;
     case"membroNovo":openMembro(null);break;
     case"membro":openMembro(id);break;
-    case"aprovar":await run(db.from("imp_membros").update({status:"ativo"}).eq("id",id),"Seller aprovado");closeSheet();await refresh();break;
+    case"aprovar":openMembro(id);break;
+    case"kycFoto":{e.preventDefault();const w=window.open("","_blank");const {data}=await db.storage.from("implay-kyc").createSignedUrl(val,900);if(data&&w)w.location=data.signedUrl;break}
+    case"kycMot":{const t=$("#kycMotivo");t.value=t.value?t.value+". "+val:val;break}
+    case"kycOk":{const chk={};document.querySelectorAll(".kycc").forEach(c=>chk[c.dataset.c]=c.checked);if(Object.values(chk).some(x=>!x))return;
+      await run(db.rpc("imp_kyc_verificar",{p_membro:id,p_ok:true,p_motivo:null,p_check:chk}),"Identidade aprovada · seller liberado para assinar o contrato");await refresh();openMembro(id);break}
+    case"kycNo":{const mt=($("#kycMotivo").value||"").trim();if(!mt)return toast("Escreva ou escolha o motivo",true);
+      await run(db.rpc("imp_kyc_verificar",{p_membro:id,p_ok:false,p_motivo:mt}),"Recusado · o seller vai ver o motivo");await refresh();openMembro(id);break}
+    case"kycReabrir":{const mt=($("#kycReab").value||"").trim();if(!mt)return toast("Diga o que ele precisa corrigir",true);if(!armed(a))return;
+      await run(db.rpc("imp_kyc_reabrir",{p_membro:id,p_motivo:mt}),"Reaberto");await run(db.from("imp_membros").update({status:"pendente"}).eq("id",id));await refresh();openMembro(id);break}
     case"membroSalvar":{const f=formData();if(!f.nome||!f.email)return toast("Nome e e-mail",true);
       const row={nome:f.nome,papel:f.papel,vinculo:f.vinculo,status:f.status,telefone:f.telefone||null,cidade:f.cidade||null,cnpj:f.cnpj||null,pix:f.pix||null,instagram:f.instagram||null,tiktok:f.tiktok||null,comissao_perc:num(f.comissao_perc),obs:f.obs||null};
       if(id)await run(db.from("imp_membros").update(row).eq("id",id),"Salvo");else{row.email=f.email.toLowerCase();await run(db.from("imp_membros").insert(row),"Cadastrado. Ela entra com este e-mail.")}
