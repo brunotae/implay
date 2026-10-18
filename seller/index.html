@@ -77,6 +77,14 @@ h1,h2,h3{font-weight:800}
 .titem .tbtn{grid-column:2;justify-self:start;margin-top:8px;border:1px solid var(--linha);background:transparent;color:var(--chalk);border-radius:99px;padding:8px 16px;font:inherit;font-weight:700;font-size:13px;cursor:pointer}
 .titem.ok{border-color:var(--volt)}.titem.ok .tn{background:var(--volt);color:#000}.titem.ok .tbtn{background:var(--volt);color:#000;border-color:var(--volt)}
 .btn:disabled{opacity:.45;cursor:not-allowed}
+.calbar{display:flex;justify-content:flex-end;margin:4px 0 10px}.seg2{display:flex;background:var(--card);border:1px solid var(--linha);border-radius:99px;padding:3px}.seg2 button{border:0;background:none;color:var(--chalk);font:inherit;font-weight:700;font-size:12.5px;padding:7px 14px;border-radius:99px;cursor:pointer}.seg2 button.on{background:var(--volt);color:#000}
+.calw{background:var(--card);border:1px solid var(--linha);border-radius:18px;padding:12px}.calh{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.calh b{font-size:16px;text-transform:capitalize}.calh button{width:36px;height:36px;border-radius:12px;border:1px solid var(--linha);background:none;color:var(--chalk);font-size:18px;cursor:pointer}
+.calg{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}.calg .wd{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--cinza);text-align:center;padding:2px 0}
+.cd{min-height:84px;border:1px solid var(--linha);background:#0b0b0b;border-radius:10px;padding:4px;display:flex;flex-direction:column;gap:3px;align-items:stretch;text-align:left;color:var(--chalk);font:inherit;cursor:default;overflow:hidden}
+.cd .n{font-size:12px;font-weight:700;color:var(--cinza)}.cd.fora{opacity:.35}.cd.hoje .n{color:var(--volt)}.cd.tem{cursor:pointer;border-color:#3a3a3a}.cd.tem:hover{border-color:var(--volt)}.cd.sel{border-color:var(--volt);box-shadow:0 0 0 1px var(--volt) inset}
+.cd .lv{display:block;background:var(--volt);color:#000;border-radius:6px;padding:3px 5px;font-size:10.5px;line-height:1.25;white-space:normal}.cd .lv.meu{background:var(--flash)}.cd .lv em{display:block;font-style:normal;font-weight:800}.cd .lv i{font-style:normal}.cd .mais{font-size:10px;color:var(--cinza)}
+.diah{font-size:16px;margin:16px 0 8px}.diah::first-letter{text-transform:uppercase}
+@media(max-width:560px){.cd{min-height:60px;padding:2px}.cd .lv{font-size:8.5px;padding:2px;letter-spacing:-.02em}.cd .lv i{display:none}.cd .lv em{font-size:9.5px}}
 </style>
 </head>
 <body>
@@ -203,23 +211,45 @@ function render(){
 }
 function vaga(j,tipo){const livre=tipo==="principal"?j.principal_livre:j.substituto_livre;const minha=j.minha_vaga===tipo;
   return `<div class="vaga"><b>${tipo==="principal"?"Principal":"Substituto"}</b>${minha?`<span class="tag v">é você</span>`:livre?(j.minha_vaga?`<span class="tag">livre</span>`:`<button class="btn ${tipo==="principal"?"p":""}" style="padding:10px" data-act="pegar" data-id="${j.id}" data-v="${tipo}">Quero</button>`):`<span class="tag">preenchida</span>`}</div>`}
-function mural(){
-  if(!S.mural.length)return `<div class="empty">Nenhuma live aberta agora. Volte mais tarde ✦</div>`;
-  return `<p class="small muted" style="margin-top:0">Escolha só o que quiser fazer. O primeiro que pegar fica com a vaga. O substituto entra se o principal não puder.</p>`+S.mural.map(j=>`<div class="card job">
-   <div class="marca">${esc(j.marca||"Live")}</div>${j.produto?`<div class="det">${esc(j.produto)}</div>`:""}
+function cardMural(j){return `<div class="card job">
+   <div class="marca">${esc(j.marca||"Live")}</div>
    <div class="quando">${dExt(j.inicio)} · ${hm(j.inicio)}–${hm(j.fim)} (${horas(j.inicio,j.fim)})</div>
    <div class="det">📍 ${esc(local(j))}</div>${j.requisitos?`<div class="det">${esc(j.requisitos)}</div>`:""}
    ${j.valor_seller?`<div class="cache">${brl(j.valor_seller)}</div>`:`<div class="det">Valor a combinar</div>`}
-   <div class="vagas">${vaga(j,"principal")}${vaga(j,"substituto")}</div></div>`).join("");
-}
-function meus(){
-  const now=new Date();const prox=S.meus.filter(j=>j.status==="aberto"&&new Date(j.fim)>now).reverse();const pass=S.meus.filter(j=>!(j.status==="aberto"&&new Date(j.fim)>now));
-  return (prox.length?prox.map(j=>`<div class="card job"><div class="marca">${esc(j.marca||"Live")}</div>
-   <div class="quando">${dExt(j.inicio)} · ${hm(j.inicio)}–${hm(j.fim)}</div><div class="det">📍 ${esc(local(j))}</div>
+   <div class="vagas">${vaga(j,"principal")}${vaga(j,"substituto")}</div></div>`}
+function cardMeu(j){return `<div class="card job"><div class="marca">${esc(j.marca||"Live")}</div>
+   <div class="quando">${dExt(j.inicio)} · ${hm(j.inicio)}–${hm(j.fim)} (${horas(j.inicio,j.fim)})</div><div class="det">📍 ${esc(local(j))}</div>
    <span class="tag ${j.minha_vaga==="principal"?"v":"f"}">${j.minha_vaga}</span>${j.valor_seller?`<span class="tag">${brl(j.valor_seller)}</span>`:""}
-   <button class="btn d" style="margin-top:12px" data-act="cancelar" data-id="${j.id}">Cancelar minha participação</button></div>`).join(""):`<div class="empty">Você ainda não escolheu nenhum job. Veja o Mural.</div>`)
-   +(pass.length?`<h3 style="font-size:15px;margin:20px 0 10px">Anteriores</h3>`+pass.map(j=>`<div class="card job" style="opacity:.8"><b>${esc(j.marca||"")}</b> · ${dExt(j.inicio)}<br><span class="tag ${j.status==="realizado"?"o":""}">${j.status==="aberto"?"passou":j.status}</span><span class="tag">${j.minha_vaga}</span></div>`).join(""):"");
-}
+   <button class="btn d" style="margin-top:12px" data-act="cancelar" data-id="${j.id}">Cancelar minha participação</button></div>`}
+/* ---------- calendário ---------- */
+S.cal=S.cal||{view:"cal",mes:null,dia:null};
+const MESES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
+function ymdL(d){d=new Date(d);return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function locCurto(j){return j.local_tipo==="estudio"?(j.espaco?"Sala "+j.espaco:"Estúdio"):"Fora"}
+function durH(j){const h=(new Date(j.fim)-new Date(j.inicio))/36e5;return (Math.round(h*10)/10).toString().replace(".",",")+"h"}
+function calView(list,card,vazio){
+  const v=S.cal.view;const tg=`<div class="calbar"><div class="seg2"><button data-act="calView" data-v="cal" class="${v==="cal"?"on":""}">📅 Calendário</button><button data-act="calView" data-v="lista" class="${v==="lista"?"on":""}">☰ Lista</button></div></div>`;
+  if(!list.length)return tg+`<div class="empty">${vazio}</div>`;
+  if(v==="lista")return tg+list.map(card).join("");
+  let m=S.cal.mes?new Date(S.cal.mes):new Date(list[0].inicio);m=new Date(m.getFullYear(),m.getMonth(),1);S.cal.mes=m.toISOString();
+  const por={};list.forEach(j=>{const k=ymdL(j.inicio);(por[k]=por[k]||[]).push(j)});
+  const doMes=list.filter(j=>{const d=new Date(j.inicio);return d.getMonth()===m.getMonth()&&d.getFullYear()===m.getFullYear()});
+  if(!S.cal.dia||!por[S.cal.dia]||new Date(S.cal.dia+"T12:00").getMonth()!==m.getMonth())S.cal.dia=doMes.length?ymdL(doMes[0].inicio):null;
+  const ini=new Date(m);ini.setDate(1-m.getDay());const hoje=ymdL(new Date());let cells="";
+  for(let i=0;i<42;i++){const d=new Date(ini);d.setDate(ini.getDate()+i);const k=ymdL(d);const js=por[k]||[];const fora=d.getMonth()!==m.getMonth();
+    if(i>=35&&fora&&d.getDay()===0)break;
+    cells+=`<button class="cd ${fora?"fora":""} ${k===hoje?"hoje":""} ${js.length?"tem":""} ${k===S.cal.dia?"sel":""}" ${js.length?`data-act="calDia" data-v="${k}"`:"disabled"}><span class="n">${d.getDate()}</span>${js.slice(0,3).map(j=>`<span class="lv ${j.minha_vaga?"meu":""}"><b>${hm(j.inicio).replace(":00","h")}</b> · ${durH(j)}<i> · ${esc(locCurto(j))}</i>${j.valor_seller?`<em>${brl(j.valor_seller).replace(",00","")}</em>`:""}</span>`).join("")}${js.length>3?`<span class="mais">+${js.length-3}</span>`:""}</button>`}
+  const dia=S.cal.dia?por[S.cal.dia]||[]:[];
+  return tg+`<div class="calw"><div class="calh"><button data-act="calMes" data-v="-1">‹</button><b>${MESES[m.getMonth()]} ${m.getFullYear()}</b><button data-act="calMes" data-v="1">›</button></div>
+   <div class="calg">${["dom","seg","ter","qua","qui","sex","sáb"].map(x=>`<span class="wd">${x}</span>`).join("")}${cells}</div>
+   <div class="small muted" style="margin-top:8px">${doMes.length?`${doMes.length} live${doMes.length>1?"s":""} neste mês · toque no dia para ver e escolher · <span style="color:var(--flash)">■</span> rosa = você já está`:"Nenhuma live neste mês. Use as setas para ver outros meses."}</div></div>
+   ${dia.length?`<h3 class="diah">${dExt(dia[0].inicio)}</h3>`+dia.map(card).join(""):""}`}
+function mural(){
+  return `<p class="small muted" style="margin-top:0">Escolha só o que quiser fazer. O primeiro que pegar fica com a vaga. O substituto entra se o principal não puder.</p>`+calView(S.mural,cardMural,"Nenhuma live aberta agora. Volte mais tarde ✦")}
+function meus(){
+  const now=new Date();const prox=S.meus.filter(j=>j.status==="aberto"&&new Date(j.fim)>now).sort((a,b)=>new Date(a.inicio)-new Date(b.inicio));const pass=S.meus.filter(j=>!(j.status==="aberto"&&new Date(j.fim)>now));
+  return calView(prox,cardMeu,"Você ainda não escolheu nenhuma live. Veja em Lives abertas.")
+   +(pass.length?`<h3 style="font-size:15px;margin:20px 0 10px">Anteriores</h3>`+pass.map(j=>`<div class="card job" style="opacity:.8"><b>${esc(j.marca||"")}</b> · ${dExt(j.inicio)}<br><span class="tag ${j.status==="realizado"?"o":""}">${j.status==="aberto"?"passou":j.status}</span><span class="tag">${j.minha_vaga}</span></div>`).join(""):"")}
 const EV={escolheu_principal:"Você escolheu ser principal",escolheu_substituto:"Você escolheu ser substituto",substituto_assumiu_principal:"Você assumiu como principal",cancelou:"Você cancelou",
   convite_assumir_principal:"Convite para assumir como principal",termo_aceito:"Você aceitou o termo",cadastro_seller:"Você fez seu cadastro",perfil_atualizado:"Você atualizou seu perfil",
   empresa_definiu_principal:"A empresa te colocou como principal",empresa_definiu_substituto:"A empresa te colocou como substituto",empresa_removeu_principal:"A empresa te tirou do principal",empresa_removeu_substituto:"A empresa te tirou do substituto"};
@@ -236,6 +266,9 @@ document.addEventListener("click",async e=>{
   switch(a.dataset.act){
     case"sair":await db.auth.signOut();S.me=null;renderLogin();break;
     case"tab":S.tab=v;render();break;
+    case"calView":S.cal.view=v;render();break;
+    case"calMes":{const m=new Date(S.cal.mes);m.setMonth(m.getMonth()+Number(v));S.cal.mes=m.toISOString();S.cal.dia=null;render();break}
+    case"calDia":S.cal.dia=v;render();{const h=document.querySelector(".diah");if(h)h.scrollIntoView({behavior:"smooth",block:"start"})}break;
     case"recarregar":boot();break;
     case"editar":renderCadastro();break;
     case"voltar":boot();break;
