@@ -369,6 +369,9 @@ i.lg{display:inline-block;width:9px;height:9px;border-radius:3px;margin:0 3px 0 
 .ctr .clogo{font-family:var(--fh);font-weight:800;font-size:22px;color:#16161a}
 .ctr .minuta{margin:14px 0 0;display:inline-block;background:#FFE7F3;color:#B0005E;font-weight:700;font-size:10.5px;letter-spacing:.08em;padding:4px 10px;border-radius:99px}
 .ctr h1{font-family:var(--fh);font-size:18px;line-height:1.3;margin:14px 0 4px;color:#16161a}
+.ctr .atb{width:100%;border-collapse:collapse;margin:12px 0;font-size:11.5px}.ctr .atb th,.ctr .atb td{border:1px solid #d6d6d0;padding:6px 8px;text-align:left;vertical-align:top}.ctr .atb th{background:#f1f1ea;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em}.ctr .atb .r{text-align:right;white-space:nowrap}
+.ctr .agrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 4px}.ctr .agrid div{border:1px solid #d6d6d0;border-radius:6px;padding:8px 10px}.ctr .agrid small{display:block;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:#666}.ctr .agrid b{font-size:13px}
+@media print{.ctr{margin:0 auto!important;padding:0!important;border-radius:0;max-width:none}}
 .ctr h2{font-family:Figtree,system-ui,sans-serif;font-size:12.5px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;margin:18px 0 6px;color:#16161a}
 .ctr p{margin:6px 0}.ctr ul{margin:6px 0;padding-left:20px}.ctr .num{color:#555;font-size:11.5px}
 .ctr .ph{background:#FFF3B0;padding:0 4px;border-radius:3px}
@@ -416,6 +419,8 @@ table.tb td{font-size:13.5px}table.tb .s{font-size:12px}
 .mgrid.big .md{min-height:118px;padding:6px 7px;cursor:default;display:flex;flex-direction:column;gap:3px;border:1px solid var(--linha)}
 .mgrid.big .md.today{border-color:var(--volt);box-shadow:inset 0 0 0 1px var(--volt)}
 .mgrid.big .md.past:not(.out){background:#121215}
+.m2w{display:grid;grid-template-columns:1fr 1fr;gap:18px}@media(max-width:1100px){.m2w{grid-template-columns:1fr}}
+.mgrid.big.sm2{gap:3px}.mgrid.big.sm2 .md{min-height:74px;padding:4px 5px;gap:2px}.mgrid.big.sm2 .md.out{background:transparent;border-color:transparent}.mgrid.big.sm2 .mj{font-size:10.5px;padding:2px 4px}.mgrid.big.sm2 .mdh b{font-size:12px}
 .mwd{text-align:center;font-size:11px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.08em;padding:4px 0}
 .mdh{display:flex;justify-content:space-between;align-items:center}
 .mdh b{font-size:14px;cursor:pointer;padding:2px 4px;border-radius:6px}.mdh b:hover{background:var(--card2)}
@@ -583,7 +588,7 @@ function num(v){if(v===null||v===undefined||v==="")return null;const n=Number(St
 function numIn(v){return v===null||v===undefined?"":String(v).replace(".",",")}
 const DS=["dom","seg","ter","qua","qui","sex","sáb"],DL=["domingo","segunda","terça","quarta","quinta","sexta","sábado"];
 const MS=["jan","fev","mar","abr","mai","jun","jul","ago","set","out","nov","dez"],ML=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
-function mondayOf(d){const x=new Date(d);x.setHours(0,0,0,0);const w=(x.getDay()+6)%7;x.setDate(x.getDate()-w);return x}
+function mondayOf(d){const x=new Date(d);x.setHours(0,0,0,0);x.setDate(x.getDate()-x.getDay());return x}/* semana começa no domingo */
 function monthKey(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")}
 function ymd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 function parseYmd(s){if(!s)return null;const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)}
@@ -714,14 +719,16 @@ VIEWS.agenda=()=>{
     <div class="pills" style="margin:0"><button data-act="agView" data-v="semana" class="${S.agView==="semana"?"on":""}">Semana</button><button data-act="agView" data-v="mes" class="${S.agView==="mes"?"on":""}">Mês</button></div>
     <div class="row"><button class="btn sm" data-act="agNav" data-v="-1">‹</button><button class="btn sm" data-act="agHoje">hoje</button><button class="btn sm" data-act="agNav" data-v="1">›</button><button class="btn p sm" data-act="novoJob">+ Nova live</button></div></div>`;
   if(S.agView==="mes"){
-    if(!S.agMes){const n=new Date();S.agMes=new Date(n.getFullYear(),n.getMonth(),1)}const ref=S.agMes;const first=new Date(ref.getFullYear(),ref.getMonth(),1);const start=mondayOf(first);
-    let cells="";for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);
-      const js=S.jobs.filter(j=>j.status!=="cancelado"&&sameDay(new Date(j.inicio),d));
-      js.sort((a,b)=>a.inicio<b.inicio?-1:1);
-      cells+=`<div class="md ${d.getMonth()!==ref.getMonth()?"out":""} ${sameDay(d,today)?"today":""} ${d<new Date(today.toDateString())?"past":""}"><div class="mdh"><b data-act="agDia" data-v="${ymd(d)}" title="Ver a semana">${d.getDate()}</b><button class="madd" data-act="novoJobDia" data-v="${ymd(d)}" title="Nova live neste dia">+</button></div>
-      ${js.slice(0,3).map(j=>`<div class="mj ${!j.principal_id&&j.status==="aberto"?"open":""} ${j.status==="realizado"?"done":""}" data-act="job" data-id="${j.id}"><b>${hm(j.inicio)}</b> ${esc(j.marca||cliNome(j.cliente_id)||"Live")}${j.espaco?` <span>${j.espaco}</span>`:""}</div>`).join("")}${js.length>3?`<div class="mmore" data-act="agDia" data-v="${ymd(d)}">+${js.length-3} mais</div>`:""}</div>`}
-    const mjs=S.jobs.filter(j=>j.status!=="cancelado"&&new Date(j.inicio).getMonth()===ref.getMonth()&&new Date(j.inicio).getFullYear()===ref.getFullYear());
-    return head+`<div class="row" style="justify-content:space-between;margin-bottom:10px"><h2 style="font-size:20px;text-transform:capitalize">${ML[ref.getMonth()]} ${ref.getFullYear()}</h2><span class="muted small">${mjs.length} lives no mês · ${mjs.filter(j=>!j.principal_id&&j.status==="aberto").length} vagas abertas · <i class="lg a"></i>com seller <i class="lg b"></i>vaga aberta</span></div><div class="mgrid big">${DS.slice(1).concat(DS[0]).map(d=>`<div class="mwd">${d}</div>`).join("")}${cells}</div>`;
+    if(!S.agMes){const n=new Date();S.agMes=new Date(n.getFullYear(),n.getMonth(),1)}
+    const mesHtml=ref=>{const start=mondayOf(new Date(ref.getFullYear(),ref.getMonth(),1));const last=new Date(ref.getFullYear(),ref.getMonth()+1,0);const nCel=Math.ceil((diasEntre(start,last)+1)/7)*7;let cells="";
+      for(let i=0;i<nCel;i++){const d=new Date(start);d.setDate(start.getDate()+i);const fora=d.getMonth()!==ref.getMonth();
+        const js=fora?[]:S.jobs.filter(j=>j.status!=="cancelado"&&sameDay(new Date(j.inicio),d)).sort((a,b)=>a.inicio<b.inicio?-1:1);
+        cells+=`<div class="md ${fora?"out":""} ${sameDay(d,today)?"today":""} ${d<new Date(today.toDateString())?"past":""}">${fora?"":`<div class="mdh"><b data-act="agDia" data-v="${ymd(d)}" title="Ver a semana">${d.getDate()}</b><button class="madd" data-act="novoJobDia" data-v="${ymd(d)}" title="Nova live neste dia">+</button></div>
+        ${js.slice(0,2).map(j=>`<div class="mj ${!j.principal_id&&j.status==="aberto"?"open":""} ${j.status==="realizado"?"done":""}" data-act="job" data-id="${j.id}" title="${hm(j.inicio)} ${esc(j.marca||"")}"><b>${hm(j.inicio).replace(":00","h")}</b> ${esc(j.marca||cliNome(j.cliente_id)||"Live")}</div>`).join("")}${js.length>2?`<div class="mmore" data-act="agDia" data-v="${ymd(d)}">+${js.length-2}</div>`:""}`}</div>`}
+      const mjs=S.jobs.filter(j=>j.status!=="cancelado"&&new Date(j.inicio).getMonth()===ref.getMonth()&&new Date(j.inicio).getFullYear()===ref.getFullYear());
+      return `<div class="m2"><div class="row" style="justify-content:space-between;margin-bottom:6px;align-items:baseline"><h2 style="font-size:16px;text-transform:capitalize;margin:0">${ML[ref.getMonth()]} ${ref.getFullYear()}</h2><span class="muted small">${mjs.length} lives · ${mjs.filter(j=>!j.principal_id&&j.status==="aberto").length} vagas</span></div><div class="mgrid big sm2">${DS.map(d=>`<div class="mwd">${d}</div>`).join("")}${cells}</div></div>`};
+    const r1=S.agMes,r2=new Date(r1.getFullYear(),r1.getMonth()+1,1);
+    return head+`<div class="muted small" style="margin:-4px 0 8px"><i class="lg a"></i>com seller <i class="lg b"></i>vaga aberta · toque no número do dia para ver a semana</div><div class="m2w">${mesHtml(r1)}${mesHtml(r2)}</div>`;
   }
   const days=[...Array(7)].map((_,i)=>{const d=new Date(S.week);d.setDate(d.getDate()+i);return d});
   const fimS=new Date(days[6]);fimS.setHours(23,59,59);
@@ -1710,7 +1717,7 @@ LISTS.orc=()=>{const f=S.f.orc;let l=orcLista();if(f.st==="meus")l=l.filter(o=>o
    <td data-l="Elaborado">${esc(o.elaborado_nome||"—")}<div class="s">${o.elaborado_em?dCurta(o.elaborado_em):""}</div></td>
    <td data-l="Aprovação">${o.aprovado_nome?`${esc(o.aprovado_nome)}<div class="s">${dCurta(o.aprovado_em)}</div>`:o.status==="aguardando"?`<span class="muted small">um sócio</span>`:"—"}</td>
    <td data-l="Situação"><span class="tag ${OST[o.status][1]}">${OST[o.status][0]}</span>${o.proposta_id?`<div class="s">contrato ${esc((S.propostas.find(p=>p.id===o.proposta_id)||{}).contrato_numero||"")}</div>`:""}</td>
-   <td class="r"><button class="btn sm ${["aprovado","enviado","aceito"].includes(o.status)?"p":""}" data-act="orcPdfRow" data-id="${o.id}" title="Abre em aba nova para salvar em PDF ou imprimir">${ic("dl")} ${["aprovado","enviado","aceito"].includes(o.status)?"PDF":"Prévia"}</button></td></tr>`),"Nenhuma proposta ainda. Clique em + Nova proposta.")};
+   <td class="r" style="white-space:nowrap">${["aprovado","enviado","aceito"].includes(o.status)?`<button class="btn sm" data-act="ctrMarca" data-id="${o.id}" title="Contrato com esta proposta como Anexo I">Contrato</button> `:""}<button class="btn sm ${["aprovado","enviado","aceito"].includes(o.status)?"p":""}" data-act="orcPdfRow" data-id="${o.id}" title="Abre em aba nova para salvar em PDF ou imprimir">${ic("dl")} ${["aprovado","enviado","aceito"].includes(o.status)?"PDF":"Prévia"}</button></td></tr>`),"Nenhuma proposta ainda. Clique em + Nova proposta.")};
 VIEWS.orcamentos=()=>{const f=S.f.orc;
   if(S.orcSemSQL&&!S.demo)return `<div class="warnbox">Falta rodar o SQL <b>implay_orcamentos.sql</b> no Supabase (SQL Editor → New query → Run). Depois recarregue a página.</div>`;
   const tabs=`<div class="chips" style="margin-bottom:10px"><button data-act="orcView" data-v="lista" class="${f.view!=="precos"?"on":""}">Propostas</button><button data-act="orcView" data-v="precos" class="${f.view==="precos"?"on":""}">Tabela de preços</button></div>`;
@@ -1775,6 +1782,7 @@ function oeActs(o){const id=o.id;const me=S.me;const desc=orcTemDesc(o);const me
   if(id&&o.status==="aguardando"&&isSocio()){out.push(`<button type="button" class="btn d" data-act="orcRecusar" data-id="${id}">Recusar</button>`)}
   out.push(`<button type="button" class="btn f" data-act="orcPdf">${["aprovado","enviado","aceito"].includes(o.status)?"Gerar PDF":"Prévia (rascunho)"}</button>`);
   if(id&&o.status==="aprovado")out.push(`<button type="button" class="btn" data-act="orcStatus" data-id="${id}" data-v="enviado">Marcar como enviada</button>`);
+  if(id&&["aprovado","enviado","aceito"].includes(o.status))out.push(`<button type="button" class="btn" data-act="ctrMarca" data-id="${id}">Gerar contrato</button>`);
   if(id&&["aprovado","enviado"].includes(o.status))out.push(`<button type="button" class="btn" data-act="orcAceito" data-id="${id}">Cliente aceitou → contrato</button>`);
   out.push(`<button type="button" class="btn" data-act="fechar">Fechar</button>`);
   if(id&&!["aceito","cancelado"].includes(o.status))out.push(`<button type="button" class="btn d" data-act="orcStatus" data-id="${id}" data-v="cancelado">Cancelar</button>`);
@@ -2499,6 +2507,121 @@ document.addEventListener("dragover",e=>{const d=e.target.closest&&e.target.clos
 document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.closest("#exDrop");if(!d)return;e.preventDefault();d.style.borderColor="";const f=e.dataTransfer.files[0];if(f)await exLer(await f.text(),f.name)});
 
 VIEWS.pessoa=VPessoa;
+/* ================= v8 · CONTRATO COM A MARCA (a partir da proposta) ================= */
+const EXT={1:"um",2:"dois",3:"três",4:"quatro",5:"cinco",6:"seis",7:"sete",8:"oito",9:"nove",10:"dez",12:"doze",15:"quinze",18:"dezoito",20:"vinte",24:"vinte e quatro",30:"trinta",45:"quarenta e cinco",60:"sessenta",90:"noventa"};
+const nx=n=>EXT[n]?`${n} (${EXT[n]})`:String(n);
+const CTRM_PADRAO={local:"estudio",exclusividade:"nao",aviso:30,multa:"nao",renovacao:"auto",foro:"São Paulo/SP",cidade:"São Paulo/SP",rep_nome:"",rep_cpf:"",rep_cargo:"",implay_rep:"",plataforma:"TikTok Shop"};
+function ctrmOpts(o){const c=S.clientes.find(x=>x.id===o.cliente_id)||{};const adm=(S.socios||[]).filter(s=>s.administrador);
+  return Object.assign({},CTRM_PADRAO,{inicio:ymd(new Date()),rep_nome:c.contato_nome||"",implay_rep:(adm[0]||{}).nome_completo||""},o.contrato||{})}
+function ctrmItens(o){return (o.itens||[]).filter(i=>i.on).map(i=>{const p=preco(i.k)||{};const nm={pontual:"Live Pontual",pacote:"Pacote mensal",drop:"Live Drop"}[p.grupo]||"Serviço";
+  const qtd=p.grupo==="pontual"?(i.qtd||1):1;return {p,i,nm,qtd,sub:Number(i.valor)*qtd,mensal:p.grupo==="pacote"}})}
+function ctrmFim(o,op){const it=ctrmItens(o);if(!it.some(x=>x.mensal))return null;const d=parseYmd(op.inicio);d.setMonth(d.getMonth()+(o.vigencia_meses||3));d.setDate(d.getDate()-1);return d}
+function openCtrm(oid){const o=S.orcs.find(x=>x.id===oid);if(!o)return;const op=ctrmOpts(o);const c=S.clientes.find(x=>x.id===o.cliente_id)||{};
+  const falta=[!c.empresa&&"razão social",!c.cnpj&&"CNPJ",!c.endereco&&"endereço"].filter(Boolean);const adm=(S.socios||[]).filter(s=>s.administrador).map(s=>s.nome_completo);
+  openSheet(`<form onsubmit="return false"><h3>Contrato · ${esc(o.marca)}</h3>
+   <p class="small muted" style="margin-top:0">O contrato traz as regras gerais. Valores, lives, percentual e vigência vêm da proposta <b>${on(o.numero)}</b>, que entra como <b>Anexo I</b>.</p>
+   ${falta.length?`<div class="warnbox" style="margin-top:0">Falta no cadastro do cliente: <b>${falta.join(", ")}</b>. Vai sair com espaço em branco para preencher à mão. ${c.id?`<a href="#" data-act="cli" data-id="${c.id}">Completar cadastro</a>`:""}</div>`:""}
+   ${o.status!=="aceito"?`<div class="hint">A proposta está como <b>${esc((OST[o.status]||[o.status])[0])}</b>. Quando a marca assinar, marque a proposta como aceita para virar contrato no sistema.</div>`:""}
+   ${dateFld("inicio","Início do contrato (1ª live)",op.inicio)}
+   <div class="fld"><label>Onde acontecem as lives</label>${seg("local",[["estudio","Estúdio IMPlay"],["marca","Local da marca"],["ambos","Os dois, conforme agenda"]],op.local)}</div>
+   ${pick("plataforma","Plataforma",op.plataforma,["TikTok Shop","Shopee","TikTok Shop e Shopee"],{ph:"Outra: escreva aqui"})}
+   <div class="fld"><label>Exclusividade</label>${seg("exclusividade",[["nao","Sem exclusividade"],["sim","IMPlay exclusiva nas lives do perfil"]],op.exclusividade)}</div>
+   ${pick("aviso","Aviso prévio para cancelar o contrato",op.aviso,[[15,"15 dias"],[30,"30 dias"],[60,"60 dias"]],{num:1,ph:"Outro: nº de dias"})}
+   <div class="fld"><label>Se a marca cancelar antes do fim</label>${seg("multa",[["nao","Sem multa (só o aviso)"],["1","Multa de 1 mensalidade"],["50","50% do que falta do período"]],op.multa)}</div>
+   <div class="fld"><label>Renovação</label>${seg("renovacao",[["auto","Automática por igual período"],["acordo","Só por acordo escrito"]],op.renovacao)}</div>
+   <div class="cols2">${fld("rep_nome","Representante da marca",op.rep_nome,"text",'placeholder="Nome de quem assina"')}${fld("rep_cpf","CPF do representante",op.rep_cpf,"text",'inputmode="numeric" placeholder="opcional"')}</div>
+   ${fld("rep_cargo","Cargo do representante",op.rep_cargo,"text",'placeholder="ex.: sócio-administrador (opcional)"')}
+   ${pick("implay_rep","Assina pela IMPlay",op.implay_rep,adm.length?adm:["Caio Cesar Cunha Moreira"],{ph:"Outro nome"})}
+   ${pick("foro","Foro (cidade da Justiça, se houver briga)",op.foro,["São Paulo/SP","Niterói/RJ"],{ph:"Outra cidade/UF"})}
+   <div class="acts"><button type="button" class="btn p" data-act="ctrmGerar" data-id="${o.id}">Gerar contrato</button><button type="button" class="btn" data-act="fechar">Fechar</button></div></form>`);syncShow()}
+function ctrmDoc(o,op){const c=S.clientes.find(x=>x.id===o.cliente_id)||{};const it=ctrmItens(o);const fim=ctrmFim(o,op);const ini=parseYmd(op.inicio);const dBR=d=>d?d.toLocaleDateString("pt-BR"):"____";
+  const mensal=it.filter(x=>x.mensal).reduce((t,x)=>t+x.sub,0),avulso=it.filter(x=>!x.mensal).reduce((t,x)=>t+x.sub,0);const percs=[...new Set(it.map(x=>numIn(x.i.perc)+"%"))];
+  const ctrNum=o.proposta_id?((S.propostas.find(p=>p.id===o.proposta_id)||{}).contrato_numero||""):"";const plat=esc(op.plataforma||"TikTok Shop");
+  const LOCAL={estudio:`no estúdio da IMPLAY (${EMPRESA.estudio})`,marca:"em local indicado pela CONTRATANTE, com estrutura adequada à transmissão",ambos:`no estúdio da IMPLAY (${EMPRESA.estudio}) ou em local indicado pela CONTRATANTE, conforme o calendário`}[op.local];
+  let n=0;const cl=(t,x)=>`<h2>Cláusula ${++n}ª · ${t}</h2>${x}`;const aviso=parseInt(op.aviso)||30;
+  const corpo=`<p class="num">${ctrNum?`Contrato nº ${esc(ctrNum)} · `:""}Proposta comercial ${on(o.numero)} (Anexo I)</p>
+  <p><b>CONTRATANTE:</b> ${_(c.empresa,"razão social da marca")}, inscrita no CNPJ sob o nº ${_(c.cnpj,"00.000.000/0000-00")}, com sede em ${_(c.endereco,"endereço completo com CEP")}, titular da marca <b>${esc(o.marca)}</b>, neste ato representada por ${_(op.rep_nome,"nome do representante")}${op.rep_cargo?`, ${esc(op.rep_cargo)}`:""}${op.rep_cpf?`, inscrito(a) no CPF sob o nº ${esc(op.rep_cpf)}`:""}, doravante denominada <b>CONTRATANTE</b>.</p>
+  <p><b>CONTRATADA:</b> ${EMPRESA.razao}, inscrita no CNPJ sob o nº ${EMPRESA.cnpj}, com sede na ${EMPRESA.sede}, neste ato representada por ${_(op.implay_rep,"sócio(a) administrador(a)")}, na forma do seu Contrato Social, doravante denominada <b>IMPLAY</b>.</p>
+  <p><b>CONSIDERANDO QUE</b> a CONTRATANTE comercializa produtos e deseja ampliar suas vendas por meio de transmissões ao vivo (lives) na plataforma ${plat}; que a IMPLAY é especializada em planejamento, produção e operação de lives de vendas, treinamento de apresentadores e gestão de campanhas de social commerce; e que a CONTRATANTE aprovou a proposta comercial ${on(o.numero)}, <b>resolvem as partes</b> celebrar este contrato, que se rege pelas cláusulas seguintes:</p>
+  ${cl("Do objeto",`<p>1. A IMPLAY prestará à CONTRATANTE os serviços de planejamento, produção e operação de lives de vendas no perfil da CONTRATANTE na plataforma ${plat}, incluindo apresentação por live sellers treinados, operação técnica e comercial da transmissão (produtos fixados, ofertas relâmpago e cupons), estrutura de áudio, vídeo e iluminação, e relatório de resultados.</p>
+   <p>2. A quantidade de lives, a duração, a categoria de estrutura, os valores, o percentual sobre vendas, a forma de pagamento e o prazo estão na proposta comercial ${on(o.numero)}, que integra este contrato como <b>Anexo I</b>.</p>
+   <p>3. Havendo diferença entre este contrato e o Anexo I, prevalece o Anexo I quanto a valores, quantidades e prazos, e este contrato quanto às demais condições.</p>`)}
+  ${cl("Da agenda e da operação das lives",`<p>1. As lives acontecerão ${LOCAL}, em dias e horários definidos em comum acordo, por meio de calendário mensal enviado pela IMPLAY e aprovado pela CONTRATANTE até o dia 25 do mês anterior.</p>
+   <p>2. Feriados não estão incluídos no calendário, salvo acordo entre as partes. Datas promocionais da plataforma (como 10.10, 11.11 e Black Friday) podem ser incluídas mediante acordo.</p>
+   <p>3. A IMPLAY manterá o padrão técnico de imagem, áudio, internet e fluxo comercial durante toda a live.</p>
+   <p>4. O início das atividades se dá em ${dBR(ini)}, desde que a CONTRATANTE tenha entregado os produtos, as informações e os acessos previstos na Cláusula 5ª.</p>`)}
+  ${cl("Do cenário e da estrutura",`<p>1. A IMPLAY fornece a estrutura de estúdio e equipamentos descrita no Anexo I, com ambientação compatível com a identidade da marca. Mudanças no cenário que envolvam a marca serão aprovadas pela CONTRATANTE.</p>
+   <p>2. Custos adicionais com cenografia personalizada, materiais, brindes ou adaptações estruturais pedidas pela CONTRATANTE serão orçados à parte e só executados após aprovação por escrito, podendo ser faturados no mês seguinte à sua implantação.</p>
+   <p>3. Os equipamentos e a estrutura da IMPLAY continuam de sua propriedade. Itens de cenografia pagos pela CONTRATANTE pertencem a ela e serão devolvidos ao fim do contrato.</p>`)}
+  ${cl("Dos live sellers e do conteúdo",`<p>1. A IMPLAY seleciona e treina os live sellers que atuarão nas transmissões, com base no roteiro, nas informações de produto e nas condições comerciais fornecidas ou aprovadas pela CONTRATANTE.</p>
+   <p>2. É vedado ao live seller divulgar informação não autorizada sobre produtos, preços, promoções ou condições comerciais. Em caso de declaração equivocada durante a live, a IMPLAY fará a correção imediata e comunicará a CONTRATANTE.</p>
+   <p>3. A CONTRATANTE é a única responsável pela veracidade das informações que fornece, pela qualidade, segurança, registro e regularidade dos produtos (inclusive perante ANVISA, INMETRO e demais órgãos, quando aplicável), pela entrega, trocas e atendimento ao consumidor final.</p>
+   <p>4. A CONTRATANTE pode acompanhar treinamentos e lives e pedir ajustes de roteiro e abordagem, que serão aplicados a partir da live seguinte.</p>`)}
+  ${cl("Das obrigações da CONTRATANTE",`<ul><li>Enviar produtos e amostras com antecedência mínima de 5 (cinco) dias úteis da live, junto com roteiro, informações técnicas e condições comerciais;</li><li>Manter a loja configurada na plataforma, com catálogo, preços, estoque, logística e atendimento ativos durante as lives;</li><li>Fornecer os acessos necessários à operação, nos termos da Cláusula 6ª;</li><li>Aprovar o calendário, preços, ofertas e cupons;</li><li>Pagar a remuneração da IMPLAY nos prazos do Anexo I;</li><li>Arcar com os custos listados na Cláusula 8ª.</li></ul>`)}
+  ${cl("Do acesso à conta e aos sistemas da marca",`<p>1. A CONTRATANTE concederá à IMPLAY acesso à conta da marca na plataforma e às ferramentas necessárias à transmissão e à operação de bastidores.</p>
+   <p>2. A IMPLAY usará os acessos exclusivamente para executar este contrato. Alterações no perfil, no catálogo, em preços ou condições comerciais, publicações fora das lives e demais ações de maior impacto dependem de aprovação prévia da CONTRATANTE.</p>
+   <p>3. A IMPLAY responde por danos à conta causados por uso indevido, negligência ou imperícia comprovados de sua equipe. Não responde por suspensões, bloqueios, mudanças de regras ou instabilidades da plataforma que não tenha causado.</p>
+   <p>4. A CONTRATANTE pode alterar ou revogar acessos a qualquer momento, por escrito, devendo as partes combinar outro meio que permita a continuidade da operação.</p>`)}
+  ${cl("Da remuneração e do pagamento",`<p>1. Pelos serviços, a CONTRATANTE pagará à IMPLAY os valores fixos e o percentual sobre vendas previstos no Anexo I.</p>
+   <p>2. O percentual sobre vendas incide sobre o GMV das lives, assim entendido o valor das vendas: (a) realizadas durante a transmissão; e (b) originadas no carrinho ou nos links da live e confirmadas depois do seu encerramento, desde que atribuídas à live nos relatórios da plataforma. Ficam excluídos pedidos cancelados, não pagos ou devolvidos.</p>
+   <p>3. O GMV será apurado pelos relatórios oficiais da plataforma, que são a fonte de referência. A IMPLAY enviará o relatório do mês até o 5º (quinto) dia útil do mês seguinte; a CONTRATANTE terá 5 (cinco) dias úteis para apontar divergências, sob pena de aceitação.</p>
+   <p>4. A IMPLAY emitirá nota fiscal da sua remuneração. Cada parte recolhe os tributos que lhe cabem.</p>
+   <p>5. O atraso no pagamento sujeita o valor a multa de 2% (dois por cento), juros de 1% (um por cento) ao mês e correção pelo IPCA. Atraso superior a 15 (quinze) dias permite à IMPLAY suspender as lives até a regularização, sem que isso configure descumprimento seu.</p>
+   <p>6. Em caso de renovação, os valores fixos serão reajustados anualmente pelo IPCA, salvo outro acordo escrito.</p>`)}
+  ${cl("Dos custos por conta da CONTRATANTE",`<p>Não estão incluídos na remuneração da IMPLAY e correm por conta da CONTRATANTE: verba de mídia paga (como GMV Max), comissões de afiliados e creators, cupons, descontos e brindes concedidos, fretes e envios, taxas e comissões da plataforma, produtos e amostras, e cenografia personalizada aprovada nos termos da Cláusula 3ª.</p>`)}
+  ${cl("Das alterações e cancelamentos de lives",`<p>1. Mudanças de horário ou cancelamento de uma live programada serão comunicados por escrito (aplicativo de mensagens ou e-mail) com antecedência mínima de 24 (vinte e quatro) horas.</p>
+   <p>2. Live cancelada pela IMPLAY será reposta em data combinada entre as partes, sem custo. Ficam dispensados do aviso prévio os casos de queda de energia, falha de internet, instabilidade da plataforma ou outro problema técnico ou de força maior comprovado, que serão comunicados assim que possível, também com reposição da live.</p>
+   <p>3. Live cancelada pela CONTRATANTE com menos de 24 (vinte e quatro) horas de antecedência, ou que não aconteça por falta de produto, acesso ou informação a cargo dela, será considerada realizada para fins de remuneração fixa.</p>`)}
+  ${cl("Do prazo e da renovação",`<p>1. ${fim?`Este contrato vigora de ${dBR(ini)} a ${dBR(fim)}, pelo prazo de ${nx(o.vigencia_meses||3)} meses previsto no Anexo I.`:`Este contrato vigora de ${dBR(ini)} até a realização das lives previstas no Anexo I e a quitação dos valores devidos.`}</p>
+   ${fim?`<p>2. ${op.renovacao==="auto"?`Ao fim do prazo, o contrato se renova automaticamente por igual período, salvo manifestação contrária de qualquer parte, por escrito, com antecedência mínima de ${nx(aviso)} dias do término.`:"A renovação depende de acordo escrito entre as partes, por aditivo ou nova proposta aceita."}</p>`:""}`)}
+  ${cl("Da rescisão",`<p>1. Qualquer parte pode encerrar este contrato sem justo motivo mediante aviso prévio por escrito de ${nx(aviso)} dias, durante os quais os serviços e os pagamentos seguem normalmente.</p>
+   ${op.multa==="nao"?`<p>2. A rescisão sem justo motivo, respeitado o aviso prévio, não gera multa.</p>`:op.multa==="1"?`<p>2. Se a CONTRATANTE encerrar o contrato sem justo motivo antes do fim do prazo vigente, pagará à IMPLAY, além do aviso prévio, multa equivalente a 1 (uma) remuneração fixa mensal prevista no Anexo I.</p>`:`<p>2. Se a CONTRATANTE encerrar o contrato sem justo motivo antes do fim do prazo vigente, pagará à IMPLAY, além do aviso prévio, multa equivalente a 50% (cinquenta por cento) da remuneração fixa que seria devida até o fim do prazo.</p>`}
+   <p>3. O contrato pode ser rescindido de imediato, por justo motivo, mediante comunicação escrita, nos casos de: (a) descumprimento de cláusula não corrigido em 10 (dez) dias úteis após notificação; (b) caso fortuito ou força maior que impeça a execução por mais de 30 (trinta) dias; (c) falência, recuperação judicial ou extrajudicial ou dissolução de qualquer parte; (d) ato ilícito ou antiético que prejudique a imagem da outra parte; (e) suspensão ou encerramento da loja da CONTRATANTE na plataforma.</p>
+   <p>4. Em qualquer caso, são devidos os valores dos serviços já prestados e o percentual sobre as vendas apuradas até a data do encerramento.</p>`)}
+  ${cl("Da exclusividade",op.exclusividade==="sim"?`<p>1. Durante a vigência, a IMPLAY terá exclusividade na operação de lives de vendas no perfil da CONTRATANTE na plataforma ${plat}. A CONTRATANTE não contratará outra agência ou produtora para esse fim sem concordância escrita da IMPLAY.</p><p>2. Se a CONTRATANTE precisar de mais lives do que as previstas, a IMPLAY terá preferência para atender a demanda adicional, em condições negociadas em aditivo.</p><p>3. A exclusividade não impede lives feitas pela própria equipe da CONTRATANTE nem conteúdos de creators e afiliados.</p>`:`<p>Este contrato não gera exclusividade para nenhuma das partes. A IMPLAY pode atender outras marcas, inclusive do mesmo segmento, preservado o sigilo da Cláusula 15ª.</p>`)}
+  ${cl("Da autonomia comercial da CONTRATANTE",`<p>A CONTRATANTE define livremente seus preços, descontos, brindes e condições de venda. Para adequar o catálogo e o roteiro, informará à IMPLAY as alterações relevantes com antecedência mínima de 2 (dois) dias úteis da live afetada.</p>`)}
+  ${cl("Da marca, da imagem e do conteúdo",`<p>1. A CONTRATANTE autoriza o uso da sua marca, logotipo e materiais apenas para a execução deste contrato.</p>
+   <p>2. As gravações e cortes das lives podem ser usados pela CONTRATANTE em seus canais durante a vigência e por 12 (doze) meses após o término. Usos em mídia paga ou fora desse prazo dependem de acordo com a IMPLAY e com os live sellers.</p>
+   <p>3. A IMPLAY pode citar a marca da CONTRATANTE e resultados agregados em seu portfólio e materiais comerciais, salvo oposição por escrito.</p>
+   <p>4. Métodos, roteiros-modelo, processos e know-how da IMPLAY continuam de sua propriedade.</p>`)}
+  ${cl("Do sigilo e da proteção de dados",`<p>1. As partes manterão sigilo sobre dados de acesso, senhas, estratégias, preços, resultados, informações de clientes e demais informações confidenciais a que tiverem acesso, durante a vigência e por 2 (dois) anos após o término.</p>
+   <p>2. As partes tratarão dados pessoais conforme a Lei nº 13.709/2018 (LGPD), apenas para executar este contrato.</p>`)}
+  ${cl("Da natureza dos serviços e da responsabilidade",`<p>1. A IMPLAY se obriga a empregar sua técnica e diligência na operação das lives (obrigação de meio). Metas e projeções de vendas são referências e não constituem garantia de resultado.</p>
+   <p>2. A responsabilidade total de cada parte por danos diretos decorrentes deste contrato fica limitada ao valor pago à IMPLAY nos 3 (três) meses anteriores ao fato, exceto em caso de dolo, violação de sigilo ou uso indevido de acessos.</p>`)}
+  ${cl("Da não contratação de profissionais",`<p>Durante a vigência e por 6 (seis) meses após o término, a CONTRATANTE não contratará diretamente, nem por interposta pessoa, live sellers ou operadores apresentados pela IMPLAY, sem concordância escrita desta, sob pena de multa equivalente a 3 (três) vezes a remuneração média mensal paga à IMPLAY nos 3 (três) meses anteriores.</p>`)}
+  ${cl("Da ausência de vínculo e da natureza do contrato",`<p>1. Este contrato não gera vínculo empregatício entre as partes, nem entre a CONTRATANTE e os profissionais da IMPLAY, inclusive live sellers, que atuam de forma autônoma.</p>
+   <p>2. Este é um contrato civil de prestação de serviços e não configura agência, mandato ou representação comercial (Lei nº 4.886/1965). A IMPLAY não pode assumir obrigações em nome da CONTRATANTE.</p>`)}
+  ${cl("Das disposições gerais",`<p>1. Alterações deste contrato e do Anexo I só valem por aditivo escrito ou nova proposta aceita por ambas as partes.</p>
+   <p>2. A tolerância de uma parte quanto a descumprimento da outra não significa renúncia ou novação.</p>
+   <p>3. As comunicações serão feitas por e-mail ou aplicativo de mensagens aos contatos indicados pelas partes.</p>
+   <p>4. Nenhuma parte pode ceder este contrato sem concordância escrita da outra.</p>
+   <p>5. As partes reconhecem a validade da assinatura eletrônica deste contrato, nos termos do art. 10, §2º, da MP nº 2.200-2/2001.</p>`)}
+  ${cl("Do foro",`<p>As partes buscarão primeiro resolver qualquer divergência por negociação direta e, se necessário, por mediação. Persistindo o conflito, fica eleito o foro da Comarca de ${esc(op.foro||"São Paulo/SP")}, com renúncia a qualquer outro.</p>`)}
+  <p style="margin-top:18px">E, por estarem de acordo, as partes assinam este contrato e seu Anexo I.</p>
+  <p class="local">${esc(op.cidade||op.foro||"São Paulo/SP").replace(/\/.*/,"")}, ____ de ______________ de ${new Date().getFullYear()}.</p>
+  <div class="assin"><div><div class="ln"></div><b>${esc(c.empresa||o.marca)}</b><br>CONTRATANTE<br>${esc(op.rep_nome||"")}</div><div><div class="ln"></div><b>${EMPRESA.razao}</b><br>IMPLAY<br>${esc(op.implay_rep||"")}</div></div>
+  <div class="assin"><div><div class="ln"></div>Testemunha 1<br>Nome / CPF</div><div><div class="ln"></div>Testemunha 2<br>Nome / CPF</div></div>`;
+  const anexo=`<div class="ctr" style="break-before:page;page-break-before:always"><div class="chead"><img class="clogo" src="${LOGO_CARVAO}" alt="IMPlay"><span>${EMPRESA.razao} · CNPJ ${EMPRESA.cnpj}</span></div>
+   <h1>Anexo I · Condições comerciais</h1><p class="num">Proposta comercial ${on(o.numero)} · emitida em ${new Date(o.elaborado_em||Date.now()).toLocaleDateString("pt-BR")}${o.aprovado_nome?` · aprovada por ${esc(o.aprovado_nome)}`:""} · Contratante: ${esc(c.empresa||o.marca)}</p>
+   <table class="atb"><tr><th>Serviço</th><th>Descrição</th><th class="r">Qtd.</th><th class="r">Valor</th><th class="r">% sobre vendas</th></tr>
+   ${it.map(x=>`<tr><td><b>${x.nm} · ${esc(x.p.categoria||"")}</b></td><td>${esc(x.p.descricao||"")}${x.p.grupo==="pacote"?` · ${x.p.lives||"—"} lives por mês${x.p.horas?` de ~${numIn(x.p.horas)} h`:""}`:x.p.grupo==="drop"?` · ${x.p.lives||"—"} lives`:x.p.horas?` · ${numIn(x.p.horas)} h por live`:""}</td><td class="r">${x.p.grupo==="pontual"?x.qtd+" live(s)":x.p.grupo==="pacote"?"mensal":"1"}</td><td class="r"><b>${brl(x.i.valor)}</b>${x.p.grupo==="pacote"?"/mês":x.p.grupo==="pontual"?"/live":""}</td><td class="r">${numIn(x.i.perc)}%</td></tr>`).join("")}</table>
+   <div class="agrid"><div><small>Valor fixo mensal</small><b>${mensal?brl(mensal):"—"}</b></div><div><small>Valor fixo único</small><b>${avulso?brl(avulso):"—"}</b></div><div><small>% sobre vendas (GMV)</small><b>${percs.join(" / ")||"—"}</b></div>
+    <div><small>Início</small><b>${dBR(ini)}</b></div><div><small>${fim?"Término":"Prazo"}</small><b>${fim?dBR(fim):"até a realização das lives"}</b></div><div><small>Vigência</small><b>${fim?nx(o.vigencia_meses||3)+" meses"+(op.renovacao==="auto"?", renovação automática":""):"pontual"}</b></div></div>
+   <h2>Pagamento</h2><p>${esc((o.pagamento||"A combinar entre as partes").replace(/\.?\s*$/,"."))} O percentual sobre vendas é apurado mensalmente pelo relatório oficial da plataforma e pago até o 10º (décimo) dia útil do mês seguinte, salvo outra data indicada acima.</p>
+   <h2>Está incluído</h2><ul><li>Estúdio com áudio, vídeo, iluminação e internet, conforme a categoria contratada</li><li>Live sellers treinados pela IMPLAY</li><li>Roteiro, planejamento de ofertas e operação da plataforma durante a live</li><li>Resumo de cada live e relatório mensal de resultados</li></ul>
+   <h2>Fica por conta da marca</h2><ul><li>Verba de mídia (GMV Max), comissão de afiliados, cupons e descontos</li><li>Produtos, amostras, fretes e envios</li><li>Cenografia personalizada, se pedida</li></ul>
+   ${orcObs(o)?`<h2>Observações da proposta</h2><p>${esc(orcObs(o))}</p>`:""}
+   <div class="assin" style="margin-top:36px"><div><div class="ln"></div>Rubrica CONTRATANTE</div><div><div class="ln"></div>Rubrica IMPLAY</div></div></div>`;
+  return docShell("Contrato de prestação de serviços de operação de live commerce",corpo)+anexo}
+document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]");if(!a)return;const act=a.dataset.act,id=a.dataset.id;
+ try{switch(act){
+  case"ctrMarca":e.stopImmediatePropagation();e.preventDefault();openCtrm(id);break;
+  case"ctrmGerar":{e.stopImmediatePropagation();const o=S.orcs.find(x=>x.id===id);const f=formData();const op=Object.assign(ctrmOpts(o),{inicio:f.inicio||ymd(new Date()),local:f.local,plataforma:f.plataforma||"TikTok Shop",exclusividade:f.exclusividade,aviso:parseInt(f.aviso)||30,multa:f.multa,renovacao:f.renovacao,rep_nome:f.rep_nome,rep_cpf:f.rep_cpf,rep_cargo:f.rep_cargo,implay_rep:f.implay_rep,foro:f.foro||"São Paulo/SP",cidade:f.foro||"São Paulo/SP",gerado_em:new Date().toISOString(),gerado_por:S.me.nome});
+    const r=await db.from("imp_orcamentos").update({contrato:op}).eq("id",id);if(r.error)console.warn(r.error);else o.contrato=op;
+    closeSheet();showCtr(ctrmDoc(o,op));if(r.error&&/contrato/.test(r.error.message||""))toast("Contrato gerado. Para guardar as escolhas, rode o SQL implay_contrato_marca.sql",true);break}
+  case"ctrCli":{const p=S.propostas.find(x=>x.id===id);const o=p&&orcDoContrato(p.id);if(o){e.stopImmediatePropagation();closeSheet();openCtrm(o.id)}break}
+ }}catch(err){console.warn(err)}},true);
+
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh()});
 setInterval(refresh,60000);
 if(!orcPreviewBoot())boot();
