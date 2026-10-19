@@ -688,7 +688,7 @@ async function boot(){
   const {data:me,error}=await db.rpc("imp_entrar",{p_app:"erp"});
   if(error){return renderLogin("Erro ao entrar: "+error.message+" (o SQL da Implay já foi rodado no Supabase?)")}
   if(!me||!me.id||me.papel==="seller"||me.status!=="ativo"){
-    $("#app").innerHTML=`<div class="login"><div class="card"><h3>Sem acesso ao ERP</h3><p class="muted">Seu e-mail <b>${esc(session.user.email)}</b> ${me&&me.papel==="seller"?"está cadastrado como seller. Use o app do seller.":"ainda não foi liberado. Peça a um sócio para te cadastrar em Equipe com este e-mail."}</p><button class="btn" id="sair">Sair</button></div></div>`;
+    $("#app").innerHTML=`<div class="login"><div class="card"><h3>Sem acesso ao ERP</h3><p class="muted">Seu e-mail <b>${esc(session.user.email)}</b> ${me&&me.papel==="seller"?"está cadastrado como seller. Use o app do seller.":me&&me.status==="pendente"?"já está na lista de <b>pedidos de acesso</b>. Avise um sócio: ele libera em Equipe. Depois toque em Atualizar.":me&&me.status==="inativo"?"está com o acesso desativado. Fale com um sócio.":"ainda não foi liberado. Peça a um sócio para te cadastrar em Equipe com este e-mail."}</p><div class="row"><button class="btn p" onclick="location.reload()">Atualizar</button><button class="btn" id="sair">Sair</button></div></div></div>`;
     $("#sair").onclick=async()=>{await db.auth.signOut();renderLogin()};return}
   S.me=me;S.email=session.user.email;await loadAll();render();
 }
@@ -1092,6 +1092,7 @@ function openMembro(id){const m=id?S.membros.find(x=>x.id===id):{papel:"basico",
   const jobsM=id?S.jobs.filter(j=>j.principal_id===id||j.substituto_id===id):[];
   openSheet(`<form onsubmit="return false"><h3>${id?esc(m.nome):"Cadastrar pessoa"}</h3>
    ${id&&m.papel==="seller"?kycPainel(m):""}
+   ${id&&m.status==="pendente"&&m.obs==="PEDIU ACESSO AO ERP"&&isSocio()?`<div class="warnbox" style="margin-bottom:10px"><b>${esc(m.email)}</b> criou conta e pediu acesso ao ERP${m.created_at?" em "+new Date(m.created_at).toLocaleDateString("pt-BR"):""}. Ajuste o nome abaixo e libere:<div class="row" style="margin-top:8px;flex-wrap:wrap"><button type="button" class="btn p sm" data-act="acessoLib" data-id="${id}" data-v="basico">Liberar como Equipe</button><button type="button" class="btn sm" data-act="acessoLib" data-id="${id}" data-v="socio">Liberar como Sócio</button><button type="button" class="btn d sm" data-act="acessoLib" data-id="${id}" data-v="recusar">Recusar</button></div><div class="small" style="margin-top:6px">Se a pessoa for seller (faz lives), recuse e mande o link do app do seller.</div></div>`:""}
    <div class="cols2">${fld("nome","Nome",m.nome,"text","required")}${fld("email","E-mail (o mesmo do login)",m.email,"email",id?"readonly":"required")}</div>
    <div class="fld"><label>Acesso</label>${seg("papel",[["socio","Sócio (tudo)"],["basico","Equipe (lança, sem aprovar)"],["seller","Seller (só o app)"]],m.papel)}</div>
    <div class="fld"><label>Vínculo</label>${seg("vinculo",[["socio","Sócio"],["clt","CLT"],["freelancer","Freelancer"],["pj","PJ"],["mei","MEI"]],m.vinculo)}</div>
@@ -1157,7 +1158,8 @@ function hojeTxt(){const d=new Date();return DS[d.getDay()]+", "+d.getDate()+" d
 function pendencias(){
   const out=[];if(!isSocio())return out;
   const r=S.fin.filter(f=>f.reembolso==="solicitado"&&f.status==="ativo");if(r.length)out.push({t:`${r.length} reembolsos para aprovar`,v:brl(soma(r)),act:"goFin",a:"reemb"});
-  const p=S.membros.filter(m=>m.status==="pendente");const pk=p.filter(m=>(kycDe(m.id)||{}).status==="enviado");if(pk.length)out.push({t:`${pk.length} ${pk.length===1?"identidade":"identidades"} de seller para conferir`,v:"",act:"goEq",a:"pendentes"});else if(p.length)out.push({t:`${p.length} sellers ainda preenchendo o cadastro`,v:"",act:"goEq",a:"pendentes"});
+  const pa=S.membros.filter(m=>m.status==="pendente"&&m.obs==="PEDIU ACESSO AO ERP");if(pa.length)out.push({t:pa.length===1?`${pa[0].email} pediu acesso ao ERP`:`${pa.length} pessoas pediram acesso ao ERP`,v:"",act:"goEq",a:"pendentes"});
+  const p=S.membros.filter(m=>m.status==="pendente"&&m.obs!=="PEDIU ACESSO AO ERP");const pk=p.filter(m=>(kycDe(m.id)||{}).status==="enviado");if(pk.length)out.push({t:`${pk.length} ${pk.length===1?"identidade":"identidades"} de seller para conferir`,v:"",act:"goEq",a:"pendentes"});else if(p.length)out.push({t:`${p.length} sellers ainda preenchendo o cadastro`,v:"",act:"goEq",a:"pendentes"});
   const ab=S.jobs.filter(j=>j.status==="aberto"&&!j.principal_id&&new Date(j.inicio)>new Date()&&new Date(j.inicio)<new Date(Date.now()+3*864e5));if(ab.length)out.push({t:`${ab.length} lives em 3 dias sem seller`,v:"",act:"goJobs",a:"vagas"});
   const fa=fxAlertas();fa.filter(x=>x.s.k==="atrasado").slice(0,4).forEach(x=>out.push({t:`${x.f.nome} · venceu ${ddmm(x.s.v)} · sem confirmação de pagamento`,v:brl(x.f.valor_previsto),act:"fxPagar",a:x.f.id+"|"+x.c}));
   if(fa.filter(x=>x.s.k==="atrasado").length>4)out.push({t:`+${fa.filter(x=>x.s.k==="atrasado").length-4} contas fixas sem confirmação`,v:"",act:"goFx",a:"fixas"});
@@ -1564,10 +1566,10 @@ VIEWS.equipe=()=>{const v=S.f.eq.view||"cards";const tg=`<div class="chips" styl
     const cor=m.papel==="socio"?"var(--volt)":m.papel==="seller"?"var(--flash)":"var(--cobalt)";
     return `<div class="pcard" data-act="membro" data-id="${m.id}"><div class="av" style="background:${cor};color:${m.papel==="socio"||m.papel==="seller"?"#131411":"#fff"}">${esc(iniciais(m.nome))}</div><div class="t">${esc(m.nome)}</div><div class="s">${m.papel==="socio"?"Sócio":m.papel==="basico"?"Equipe":"Seller"} · ${VINC[m.vinculo]||m.vinculo}</div>${m.obs?`<div class="s">${esc(m.obs.slice(0,60))}</div>`:""}
     ${m.papel!=="socio"?`<div class="pst"><span><b>${js.length}</b>lives</span><span><b>${brlK(gm)}</b>GMV</span><span><b>${prox}</b>próx.</span></div>`:`<div class="pst"><span><b>${S.propostas.filter(p=>m.user_id&&p.created_by===m.user_id).length}</b>propostas</span><span><b>${S.fin.filter(f=>f.reembolso_para===m.id&&["solicitado","aprovado"].includes(f.reembolso)).length}</b>reemb.</span></div>`}
-    <div class="s" style="margin-top:6px">${esc(m.telefone||m.email)}</div>${m.status!=="ativo"?`<span class="tag w">${m.status}</span>`:""}${m.papel==="seller"&&m.status!=="ativo"?kycTag(m):""}</div>`};
+    <div class="s" style="margin-top:6px">${esc(m.telefone||m.email)}</div>${m.obs==="PEDIU ACESSO AO ERP"&&m.status==="pendente"?`<span class="tag f">pediu acesso ao ERP</span>`:m.status!=="ativo"?`<span class="tag w">${m.status}</span>`:""}${m.papel==="seller"&&m.status!=="ativo"?kycTag(m):""}</div>`};
   const grp=(t,l)=>l.length?`<div class="sec"><h2>${t} <span class="muted small">${l.length}</span></h2></div><div class="pgrid">${l.map(card).join("")}</div>`:"";
   const M=S.membros.filter(m=>has(S.f.eq.q,m.nome,m.email,m.cidade,m.nicho));
-  return tg+`<div class="tool">${qbox("eq","Buscar pessoa…")}</div><div class="hint" style="margin:-4px 0 4px">Link para sellers se cadastrarem: <b>brunotae.github.io/implay/seller/</b></div>`+grp("Sócios",M.filter(m=>m.papel==="socio"))+grp("Equipe (CLT)",M.filter(m=>m.papel==="basico"))+grp("Sellers",M.filter(m=>m.papel==="seller"&&m.status==="ativo"))+grp("Aguardando aprovação",M.filter(m=>m.status==="pendente"))};
+  return tg+`<div class="tool">${qbox("eq","Buscar pessoa…")}</div><div class="hint" style="margin:-4px 0 4px">Link para sellers se cadastrarem: <b>brunotae.github.io/implay/seller/</b></div>`+grp("Sócios",M.filter(m=>m.papel==="socio"))+grp("Equipe (CLT)",M.filter(m=>m.papel==="basico"&&m.status!=="pendente"))+grp("Sellers",M.filter(m=>m.papel==="seller"&&m.status==="ativo"))+grp("Aguardando aprovação",M.filter(m=>m.status==="pendente"))};
 
 /* ---------- painel compacto ---------- */
 VIEWS.painel=()=>{const now=new Date(),mesK=monthKey(now);const R=rangeOf("mes");
@@ -2237,6 +2239,8 @@ document.addEventListener("click",async e=>{
     case"membroNovo":openMembro(null);break;
     case"membro":openMembro(id);break;
     case"aprovar":openMembro(id);break;
+    case"acessoLib":{const f=formData();const up=val==="recusar"?{status:"inativo",obs:"ACESSO RECUSADO"}:{papel:val,vinculo:val==="socio"?"socio":(f.vinculo&&f.vinculo!=="socio"?f.vinculo:"clt"),status:"ativo",obs:null,nome:f.nome||undefined};
+      await run(db.from("imp_membros").update(up).eq("id",id),val==="recusar"?"Pedido recusado":"Acesso liberado · peça para a pessoa tocar em Atualizar");closeSheet();await refresh();break}
     case"kycFoto":{e.preventDefault();const w=window.open("","_blank");const {data}=await db.storage.from("implay-kyc").createSignedUrl(val,900);if(data&&w)w.location=data.signedUrl;break}
     case"kycMot":{const t=$("#kycMotivo");t.value=t.value?t.value+". "+val:val;break}
     case"kycOk":{const chk={};document.querySelectorAll(".kycc").forEach(c=>chk[c.dataset.c]=c.checked);if(Object.values(chk).some(x=>!x))return;
