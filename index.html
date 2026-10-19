@@ -2032,7 +2032,7 @@ function openSocio(id){const s=S.socios.find(x=>x.id===id);const ed=isSocio();co
   <div class="kv" style="margin-top:14px"><div><span>Cidade</span><div><b>${esc(s.cidade||"—")}</b></div></div>${s.telefone?`<div><span>Telefone</span><div><b>${esc(s.telefone)}</b></div></div>`:""}
    <div><span>Acesso ao ERP</span><div><b>${m?`${esc(m.email)} · ${m.papel==="socio"?"sócio":m.papel}`:"ainda não entrou no ERP"}</b></div></div></div>
   ${s.atribuicoes?`<div class="sec"><h2>Responsabilidades</h2></div><ul class="ulc">${s.atribuicoes.split("\n").filter(Boolean).map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}
-  ${ed?`<div class="sec"><h2>Editar</h2></div><div class="cols2">${fld("email","E-mail de acesso ao ERP",s.email,"email")}${fld("telefone","Telefone",s.telefone,"tel")}</div><div class="cols2">${fld("cidade","Cidade",s.cidade)}${fld("funcao","Função",s.funcao)}</div>${area("atribuicoes","Responsabilidades (uma por linha)",s.atribuicoes)}
+  ${ed&&!m?`<div class="warnbox">${esc(s.apelido)} ainda não tem acesso ao ERP. Coloque abaixo o e-mail que ele(a) usa para entrar e toque em <b>Salvar</b>: o acesso de sócio é liberado na hora.</div>`:""}${ed?`<div class="sec"><h2>Editar</h2></div><div class="cols2">${fld("email","E-mail de acesso ao ERP",s.email,"email")}${fld("telefone","Telefone",s.telefone,"tel")}</div><div class="cols2">${fld("cidade","Cidade",s.cidade)}${fld("funcao","Função",s.funcao)}</div>${area("atribuicoes","Responsabilidades (uma por linha)",s.atribuicoes)}
    <div class="acts"><button type="button" class="btn p" data-act="socioSalvar" data-id="${s.id}">Salvar</button><button type="button" class="btn" data-act="fechar">Fechar</button></div>`:`<div class="acts"><button type="button" class="btn" data-act="fechar">Fechar</button></div>`}</form>`)}
 const _eq5=VIEWS.equipe;VIEWS.equipe=()=>{const h=_eq5();if((S.f.eq.view||"cards")!=="cards"||!S.socios.length)return h;
   const q=S.f.eq.q;const l=S.socios.filter(s=>has(q,s.apelido,s.nome_completo,s.funcao,s.cidade));
@@ -2050,7 +2050,9 @@ document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]
  try{switch(act){
   case"socio":H();openSocio(id);break;
   case"socioSalvar":H();{const f=formData();const row={email:f.email||null,telefone:f.telefone||null,cidade:f.cidade||null,funcao:f.funcao||null,atribuicoes:f.atribuicoes||null,updated_at:new Date().toISOString()};
-    const r=await run(db.from("imp_socios").update(row).eq("id",id).select().single(),"Perfil salvo");S.socios[S.socios.findIndex(x=>x.id===id)]=r;closeSheet();render()}break;
+    const r=await run(db.from("imp_socios").update(row).eq("id",id).select().single(),"Perfil salvo");S.socios[S.socios.findIndex(x=>x.id===id)]=r;
+    if(row.email&&!socioMembro(r)){await run(db.from("imp_membros").insert({nome:r.apelido||r.nome_completo,email:row.email.toLowerCase().trim(),papel:"socio",vinculo:"socio",status:"ativo",telefone:row.telefone,cidade:row.cidade}),"Acesso ao ERP liberado para "+row.email);await refresh()}
+    closeSheet();render()}break;
   case"docEscolher":H();{const i=$("#docFiles");if(i)i.click()}break;
   case"docAbrir":H();{const d=S.docs.find(x=>x.id===id);const w=window.open("","_blank");try{const u=await docUrl(d,false);if(w)w.location.href=u;else location.href=u}catch(err){if(w)w.close();toast(traduz(err.message||""),true)}}break;
   case"docBaixar":H();{const d=S.docs.find(x=>x.id===id);const u=await docUrl(d,true);const l=document.createElement("a");l.href=u;l.download=d.arquivo_nome||"documento";document.body.appendChild(l);l.click();l.remove()}break;
