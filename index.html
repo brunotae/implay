@@ -228,6 +228,10 @@ table.tb .r{text-align:right;white-space:nowrap;font-weight:700}
 .exr{padding:12px 14px;margin-bottom:8px}.exr.conciliado,.exr.ignorado{opacity:.75}.exh{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.exsug{margin-top:8px;border:1px solid var(--linha);border-radius:10px;padding:8px 10px;font-size:13px}.exsug.forte{border-color:#1b4a27;background:#0c2414}
 .exr select{background:var(--card);border:1px solid var(--linha);border-radius:10px;padding:7px 8px;font-size:12.5px;color:inherit}
 html[data-tema=papel] .hc.hok{background:#e3f5e6;color:#1b6b2c}html[data-tema=papel] .hc.hw{background:#fff1d6;color:#7a4f00}html[data-tema=papel] .hc.hx{background:#ffe1e4;color:#a1192b}html[data-tema=papel] .exsug.forte{background:#e3f5e6;border-color:#bfe5c6}
+.cpl{display:flex;flex-direction:column;gap:8px}.cpi{display:grid;grid-template-columns:22px 72px minmax(0,1fr);gap:10px;align-items:start;border:1px solid var(--linha);border-radius:12px;padding:8px}.cpi.off{opacity:.45}
+.cpimg img{width:72px;height:96px;object-fit:cover;border-radius:8px;display:block;background:#111}.cpchk input{width:18px;height:18px;accent-color:var(--volt);margin-top:4px}
+.cpf{display:flex;flex-direction:column;gap:6px;min-width:0}.cpf input,.cpf select{width:100%;min-width:0;background:var(--card);border:1px solid var(--linha);border-radius:9px;padding:7px 9px;font-size:12.5px;color:inherit}.cpf input.falta{border-color:var(--bad)}
+.cpr{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}.cpr.c2{grid-template-columns:2fr 1fr}@media(max-width:640px){.cpr{grid-template-columns:1fr 1fr}}
 #kycOkBtn:disabled{opacity:.45;cursor:not-allowed}.kychk{display:flex;gap:8px;align-items:flex-start;font-size:12.5px;margin-top:6px;cursor:pointer}.kychk input{width:18px;height:18px;flex:none;accent-color:var(--volt)}
 @media(max-width:640px){.kycf img{height:120px}.kyckv{grid-template-columns:100px 1fr}}
 .okbox{background:#10301a;border:1px solid #1b4a27;color:var(--ok);border-radius:12px;padding:10px 12px;font-size:12.5px}
@@ -1187,7 +1191,7 @@ const HEADACT={
  jobs:()=>`<button class="btn sm" data-act="csvList" data-v="jobs">${ic("dl")} CSV</button><button class="btn p sm" data-act="novoJob">+ Nova live</button>`,
  propostas:()=>`<button class="btn p sm" data-act="propNova">+ Nova proposta</button>`,
  clientes:()=>`<button class="btn p sm" data-act="cliNovo">+ Novo cliente</button>`,
- fin:()=>`<button class="btn sm" data-act="csvList" data-v="fin">${ic("dl")} CSV</button><button class="btn sm" data-act="finNovo" data-tipo="saida" data-proprio="1">Paguei do meu bolso</button><button class="btn p sm" data-act="finNovo">+ Lançar</button>`,
+ fin:()=>`<button class="btn sm" data-act="cpAbrir">📎 Importar comprovantes</button><button class="btn sm" data-act="csvList" data-v="fin">${ic("dl")} CSV</button><button class="btn sm" data-act="finNovo" data-tipo="saida" data-proprio="1">Paguei do meu bolso</button><button class="btn p sm" data-act="finNovo">+ Lançar</button>`,
  amostras:()=>`<button class="btn sm" data-act="amNova" data-v="saida">− Saída</button><button class="btn p sm" data-act="amNova" data-v="entrada">+ Chegou</button>`,
  equipe:()=>isSocio()?`<button class="btn p sm" data-act="membroNovo">+ Cadastrar</button>`:""};
 function railHtml(pend){
@@ -2516,6 +2520,97 @@ document.addEventListener("dragover",e=>{const d=e.target.closest&&e.target.clos
 document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.closest("#exDrop");if(!d)return;e.preventDefault();d.style.borderColor="";const f=e.dataTransfer.files[0];if(f)await exLer(await f.text(),f.name)});
 
 VIEWS.pessoa=VPessoa;
+/* ================= v10 · IMPORTAR COMPROVANTES (zip ou imagens) → reembolso ================= */
+const CP_MESES={jan:0,janeiro:0,fev:1,fevereiro:1,mar:2,"março":2,marco:2,abr:3,abril:3,mai:4,maio:4,jun:5,junho:5,jul:6,julho:6,ago:7,agosto:7,set:8,setembro:8,out:9,outubro:9,nov:10,novembro:10,dez:11,dezembro:11};
+const CP_CAT=[["equipamentos",/cadeira|mocho|mesa|celular|fone|microfone|ring ?light|lumin|l[aâ]mpada|led\b|trip[eé]|c[aâ]mera|notebook|monitor|cabo|suporte|bateria|carregador|teclado|mouse/i],["obra",/cortina|espuma|ac[uú]stic|isolamento|tinta|parafuso|piso|carpete|papel de parede|madeira|gesso|tomada|fio\b|el[eé]tric/i],["limpeza",/limpeza|detergente|vassoura|pano|desinfet|[aá]lcool/i],["marketing",/impress|banner|adesivo|panfleto|cart[aã]o de visita/i],["live_custos",/uber|99 ?pop|t[aá]xi|estacionamento|passagem|combust/i]];
+S.cp=null;
+function cpMime(n){n=n.toLowerCase();return n.endsWith(".png")?"image/png":n.endsWith(".webp")?"image/webp":n.endsWith(".heic")?"image/heic":n.endsWith(".pdf")?"application/pdf":"image/jpeg"}
+async function cpUnzip(file){const buf=new Uint8Array(await file.arrayBuffer());const dv=new DataView(buf.buffer,buf.byteOffset,buf.byteLength);let e=-1;
+  for(let i=buf.length-22;i>=Math.max(0,buf.length-65557);i--){if(dv.getUint32(i,true)===0x06054b50){e=i;break}}if(e<0)throw new Error("Arquivo .zip inválido");
+  const n=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);const out=[];
+  for(let k=0;k<n;k++){if(dv.getUint32(p,true)!==0x02014b50)break;const flag=dv.getUint16(p+8,true),meth=dv.getUint16(p+10,true),csz=dv.getUint32(p+20,true),fnl=dv.getUint16(p+28,true),exl=dv.getUint16(p+30,true),cml=dv.getUint16(p+32,true),off=dv.getUint32(p+42,true);
+    const nm=new TextDecoder(flag&0x800?"utf-8":"utf-8").decode(buf.subarray(p+46,p+46+fnl));p+=46+fnl+exl+cml;
+    if(nm.endsWith("/")||/(^|\/)__MACOSX\/|(^|\/)\._/.test(nm)||!/\.(jpe?g|png|webp|heic)$/i.test(nm))continue;
+    const lfn=dv.getUint16(off+26,true),lex=dv.getUint16(off+28,true);const data=buf.subarray(off+30+lfn+lex,off+30+lfn+lex+csz);let bytes;
+    if(meth===0)bytes=data;else if(meth===8){bytes=new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer())}else continue;
+    out.push(new File([bytes],nm.split("/").pop(),{type:cpMime(nm)}))}
+  return out}
+async function cpOcrWorker(){if(S.cpWorker)return S.cpWorker;if(!window.Tesseract){await new Promise(ok=>{const s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";s.onload=ok;s.onerror=ok;document.head.appendChild(s);setTimeout(ok,30000)})}
+  if(!window.Tesseract)return null;try{S.cpWorker=await window.Tesseract.createWorker("por");return S.cpWorker}catch(e){console.warn(e);return null}}
+function cpData(txt,nomeArq){const h=new Date();const t=txt.replace(/\s+/g," ");
+  const re=/(at[eé]\s+)?\b(\d{1,2})\s*(?:de\s+)?(janeiro|fevereiro|mar[cç]o|abril|maio|junho|julho|agosto|setembro|outubro|novembro|dezembro|jan|fev|mar|abr|mai|jun|jul|ago|set|out|nov|dez)\b\.?(?:\s+(?:de\s+)?(20\d\d))?/gi;let m;
+  while((m=re.exec(t))){if(m[1])continue;const ctx=t.slice(Math.max(0,m.index-25),m.index).toLowerCase();if(/avali|ganhar|at[eé]\s*$/.test(ctx))continue;
+    const mes=CP_MESES[m[3].toLowerCase().replace("ç","ç")];if(mes===undefined)continue;let y=m[4]?+m[4]:h.getFullYear();let d=new Date(y,mes,+m[2]);if(!m[4]&&d>h)d=new Date(y-1,mes,+m[2]);
+    return {d:ymd(d),tipo:/entreg/.test(ctx)?"entrega":"compra"}}
+  const d2=t.match(/\b(\d{2})\/(\d{2})\/(20\d\d)\b/);if(d2)return {d:`${d2[3]}-${d2[2]}-${d2[1]}`,tipo:"compra"};
+  const fn=(nomeArq||"").match(/(20\d\d)-(\d{2})-(\d{2})/);return {d:fn?`${fn[1]}-${fn[2]}-${fn[3]}`:ymd(h),tipo:"arquivo"}}
+function cpLimpa(l){const tk=l.split(/\s+/);let i=0;while(i<tk.length&&!/^[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-Za-zÀ-ÿ]{2,}/.test(tk[i]))i++;return tk.slice(i).join(" ").replace(/[.…]+$/,"").replace(/\s*[>›]\s*$/,"").trim()}
+const CP_LIXO=/(avali|comprar|entreg|pedido|ganhe|reportar|confirmar|total de|compra\s*#|nf-?e|gerada|moedas|pix\s*-|cor d|indicado|conclu|enviado|a caminho|rastre|reembolso|detalhes|ver mais|frete|cupom|desconto)/i;
+function cpBloco(b,full,nomeArq){const ls=b.split(/\n/).map(x=>x.trim()).filter(Boolean);const out={};
+  const st=ls.find(l=>/(conclu[ií]do|pedido entregue|entregue|enviado|a caminho)\s*$/i.test(l)&&!/^entregue em/i.test(l)&&!/^\d/.test(l));
+  if(st){out.loja=cpLimpa(st.replace(/(conclu[ií]do|pedido entregue|entregue|enviado|a caminho)\s*$/i,"").replace(/[>›]/g," "))}
+  const cand=ls.filter(l=>l!==st).map(l=>l.replace(/R\s?\$\s?[\d.]+,\d{2}/g,"").trim()).filter(l=>l.length>=12&&!/\d+,\d{2}/.test(l)&&!CP_LIXO.test(l)&&(l.match(/[A-Za-zÀ-ÿ]{3,}/g)||[]).length>=2);
+  if(cand.length){let d=cpLimpa(cand[0]);const nx=cand[1];if(nx&&ls.indexOf(nx)===ls.indexOf(cand[0])+1&&!/\.\.\.$|…$/.test(cand[0])&&d.length<45)d+=" "+cpLimpa(nx);out.desc=d.length>70?d.slice(0,68).replace(/\s+\S*$/,"")+"…":d}
+  const q=b.match(/\bx\s?(\d{1,3})\b/i)||b.match(/\b(\d{1,3})\s*un\./i);if(q&&+q[1]>1)out.qtd=+q[1];
+  const tot=[...b.matchAll(/total[^\n]*?R\s?\$\s?([\d.]+,\d{2})/gi)];const all=[...b.matchAll(/R\s?\$\s?([\d.]+,\d{2})/g)];
+  const v=tot.length?tot[tot.length-1][1]:all.length?all[all.length-1][1]:null;out.valor=v?Number(v.replace(/\./g,"").replace(",",".")):null;
+  return out}
+function cpParse(txt,nomeArq){const plat=/moedas|shopee/i.test(txt)?"Shopee":/compra\s*#|nf-?e da compra|mercado ?livre/i.test(txt)?"Mercado Livre":/b[oô]nus de \d+ ao escrever|tiktok/i.test(txt)?"TikTok Shop":/amazon/i.test(txt)?"Amazon":/aliexpress/i.test(txt)?"AliExpress":"";
+  const forma=/\bpix\b/i.test(txt)?"Pix":/boleto/i.test(txt)?"Boleto":/cart[aã]o|cr[eé]dito|parcel|\d+x de/i.test(txt)?"Cartão":"";
+  const dt=cpData(txt,nomeArq);const idx=[...txt.matchAll(/total de \d+ ite/gi)].map(m=>m.index);let blocos=[txt];
+  if(idx.length>1){blocos=[];let ini=0;idx.forEach((ix,k)=>{const fim=txt.indexOf("\n",ix);const end=fim<0?txt.length:fim;blocos.push(txt.slice(ini,end));ini=end})}
+  return blocos.map(b=>{const o=cpBloco(b,txt,nomeArq);const desc=(o.desc||"Compra")+(o.qtd?` (x${o.qtd})`:"");const cat=(CP_CAT.find(([c,r])=>r.test(desc+" "+(o.loja||"")))||["outra_saida"])[0];
+    return {valor:o.valor,data:dt.d,dataTipo:dt.tipo,descricao:desc,contraparte:[o.loja,plat].filter(Boolean).join(" · ")||plat||"",categoria:cat,forma,plat}})}
+function cpMarcarDup(){const it=S.cp.items;it.forEach(x=>x.flags=x.flags.filter(f=>!/igual|lançado/.test(f)));
+  it.forEach((x,i)=>{if(!x.valor)return;if(it.some((y,j)=>j<i&&y.valor===x.valor))x.flags.push("valor igual a outro item: veja se não é o mesmo pedido");
+    const ex=S.fin.find(f=>f.status==="ativo"&&Math.abs(Number(f.valor)-x.valor)<0.005&&f.tipo==="saida"&&(!f.pago_em||!x.data||Math.abs(diasEntre(parseYmd(f.pago_em),parseYmd(x.data)))<=20));if(ex){x.flags.push(`parece já lançado: ${ex.descricao||""} ${brl(ex.valor)}`);if(x.novo)x.on=false}x.novo=false})}
+function openCp(){S.cp=S.cp&&S.cp.items.length?S.cp:{items:[],pessoa:"",reemb:"sim",lendo:0,total:0};cpRender()}
+function cpPessoas(){return S.membros.filter(m=>m.status==="ativo"&&["socio","basico"].includes(m.papel)).sort((a,b)=>(a.papel==="socio"?0:1)-(b.papel==="socio"?0:1)||a.nome.localeCompare(b.nome))}
+function cpRender(){const C=S.cp;const sel=C.items.filter(x=>x.on&&x.valor);const tot=sel.reduce((t,x)=>t+x.valor,0);const pes=S.membros.find(m=>m.id===C.pessoa);
+  const html=`<form onsubmit="return false" id="cpForm"><h3>Importar comprovantes</h3>
+   <div class="fld"><label>Quem pagou do próprio bolso?</label><div class="chips" style="margin:0">${cpPessoas().map(m=>`<button type="button" data-act="cpPessoa" data-v="${m.id}" class="${C.pessoa===m.id?"on":""}">${esc(m.nome)}</button>`).join("")}</div></div>
+   <div class="fld"><label>Precisa de reembolso?</label>${seg("cp_reemb",[["sim","Sim, a empresa devolve"],["nao","Não (fica como contribuição)"]],C.reemb)}</div>
+   <label class="dropz" id="cpDrop" for="cpFiles" style="display:block;border:1.5px dashed var(--linha);border-radius:14px;padding:16px;text-align:center;cursor:pointer;margin-top:8px"><b>Arraste aqui o .zip ou as fotos dos comprovantes</b><div class="small muted">ou toque para escolher · prints de Shopee, Mercado Livre, TikTok Shop, notas, recibos</div><input type="file" id="cpFiles" accept=".zip,image/*" multiple hidden></label>
+   ${C.lendo?`<div class="okbox" style="margin-top:10px">Lendo ${C.total-C.lendo+1} de ${C.total}… <span class="small">(a primeira vez demora um pouco: o leitor de imagens é baixado)</span></div>`:""}
+   ${C.items.length?`<div class="sec" style="margin-top:12px"><h2 style="font-size:14px">${C.items.length} ${C.items.length===1?"item":"itens"} · confira antes de lançar</h2><span class="muted small">toque na foto para ampliar</span></div>
+   <div class="cpl">${C.items.map((x,i)=>`<div class="cpi ${x.on?"":"off"}"><label class="cpchk"><input type="checkbox" data-cp="${i}" data-f="on" ${x.on?"checked":""}></label>
+     <a href="${x.url}" target="_blank" rel="noopener" class="cpimg"><img src="${x.url}" alt=""></a>
+     <div class="cpf"><input data-cp="${i}" data-f="descricao" value="${esc(x.descricao)}" placeholder="Descrição">
+      <div class="cpr"><input data-cp="${i}" data-f="valor" inputmode="decimal" value="${x.valor?numIn(x.valor):""}" placeholder="Valor R$" class="${x.valor?"":"falta"}"><input type="date" data-cp="${i}" data-f="data" value="${x.data||""}">
+       <select data-cp="${i}" data-f="categoria">${CAT_SAI.map(c=>`<option value="${c[0]}" ${c[0]===x.categoria?"selected":""}>${esc(c[1])}</option>`).join("")}</select></div>
+      <div class="cpr c2"><input data-cp="${i}" data-f="contraparte" value="${esc(x.contraparte)}" placeholder="Loja / quem recebeu"><select data-cp="${i}" data-f="forma"><option value="">Forma</option>${["Pix","Cartão","Boleto","Transferência","Dinheiro"].map(f=>`<option ${f===x.forma?"selected":""}>${f}</option>`).join("")}</select></div>
+      ${!x.valor?`<div class="small neg">Não consegui ler o valor: digite.</div>`:""}${x.dataTipo==="arquivo"?`<div class="small" style="color:var(--warn)">Data da compra não aparece no print: usei a data do arquivo, confira.</div>`:x.dataTipo==="entrega"?`<div class="small muted">Data é a da entrega (o print não mostra a da compra).</div>`:""}
+      ${x.flags.map(f=>`<div class="small" style="color:var(--warn)">⚠ ${esc(f)}</div>`).join("")}</div></div>`).join("")}</div>`:""}
+   <div class="acts"><button type="button" class="btn p" data-act="cpLancar" ${sel.length&&C.pessoa&&!C.lendo?"":"disabled"}>${!C.pessoa?"Escolha quem pagou":sel.length?`Lançar ${sel.length} ${sel.length===1?"despesa":"despesas"} · ${brl(tot)}${C.reemb==="sim"&&pes?" · reembolso para "+esc(pes.nome):""}`:"Adicione os comprovantes"}</button><button type="button" class="btn" data-act="cpFechar">Fechar</button>${C.items.length?`<button type="button" class="btn d" data-act="cpLimpar">Limpar lista</button>`:""}</div></form>`;
+  if($("#sheet").hidden||!$("#cpForm"))openSheet(html);else{const sc=$("#sheetIn").scrollTop;$("#sheetIn").innerHTML=html;$("#sheetIn").scrollTop=sc}}
+async function cpAdd(files){let imgs=[];for(const f of files){if(/\.zip$/i.test(f.name)||f.type==="application/zip"||f.type==="application/x-zip-compressed"){try{imgs=imgs.concat(await cpUnzip(f))}catch(e){toast("Não consegui abrir o .zip: "+e.message,true)}}else if(/^image\//.test(f.type)||/\.(jpe?g|png|webp|heic)$/i.test(f.name))imgs.push(f)}
+  if(!imgs.length)return toast("Nenhuma imagem encontrada",true);S.cp.total=imgs.length;S.cp.lendo=imgs.length;cpRender();const w=await cpOcrWorker();if(!w)toast("Não consegui carregar o leitor de imagens. Preencha os valores à mão.",true);
+  for(const f of imgs){let txt="";if(w){try{txt=(await w.recognize(f)).data.text||""}catch(e){console.warn(e)}}
+    const url=URL.createObjectURL(f);const rs=txt?cpParse(txt,f.name):[{valor:null,data:cpData("",f.name).d,dataTipo:"arquivo",descricao:"",contraparte:"",categoria:"outra_saida",forma:""}];
+    rs.forEach(r=>S.cp.items.push(Object.assign(r,{file:f,url,on:true,novo:true,flags:[],ocr:txt})));S.cp.lendo--;cpMarcarDup();cpRender()}
+  S.cp.lendo=0;cpRender()}
+document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]");if(!a)return;const act=a.dataset.act,v=a.dataset.v;const H=()=>{e.stopImmediatePropagation();e.preventDefault()};
+ try{switch(act){
+  case"cpAbrir":H();openCp();break;
+  case"cpPessoa":H();S.cp.pessoa=v;cpRender();break;
+  case"cpFechar":H();closeSheet();break;
+  case"cpLimpar":H();if(!armed(a))return;S.cp.items.forEach(x=>URL.revokeObjectURL(x.url));S.cp.items=[];cpRender();break;
+  case"cpLancar":{H();const C=S.cp;const sel=C.items.filter(x=>x.on&&x.valor);if(!C.pessoa||!sel.length)return;a.disabled=true;let ok=0;
+    for(const x of sel){a.textContent=`Lançando ${ok+1} de ${sel.length}…`;const nat=(CAT_SAI.find(c=>c[0]===x.categoria)||[])[2]||"variavel";
+      const row={tipo:"saida",categoria:x.categoria,natureza:nat,valor:x.valor,descricao:x.descricao||null,contraparte:x.contraparte||null,pago_em:x.data||ymd(new Date()),vencimento:null,forma:x.forma||null,pago_por:"proprio",reembolso:C.reemb==="sim"?"solicitado":"nao",reembolso_para:C.pessoa,tem_comprovante:true};
+      const r=await db.from("imp_fin").insert(row).select().single();if(r.error){toast("Erro no item "+(ok+1)+": "+traduz(r.error.message),true);break}
+      try{const img=await compress(x.file);await db.from("imp_anexos").insert({fin_id:r.data.id,imagem:img})}catch(err){console.warn(err)}ok++}
+    const pes=S.membros.find(m=>m.id===C.pessoa);toast(`${ok} ${ok===1?"despesa lançada":"despesas lançadas"}${C.reemb==="sim"?" · reembolso para "+(pes?pes.nome:""):""}`);
+    if(ok===sel.length){C.items.forEach(x=>URL.revokeObjectURL(x.url));S.cp=null}else{S.cp.items=C.items.filter(x=>!x.on||sel.indexOf(x)>=ok)}
+    closeSheet();S.tab="fin";S.finSub="reemb";await refresh();render();break}
+ }}catch(err){console.warn(err)}},true);
+document.addEventListener("change",async e=>{const t=e.target;if(t.id==="cpFiles"&&t.files.length){const fs=[...t.files];t.value="";await cpAdd(fs);return}
+  if(t.dataset&&t.dataset.cp!==undefined){const x=S.cp.items[+t.dataset.cp];const f=t.dataset.f;if(f==="on")x.on=t.checked;else if(f==="valor")x.valor=num(t.value);else x[f]=t.value;if(f==="data")x.dataTipo="ok";cpMarcarDup();cpRender()}
+  if(t.name==="cp_reemb"&&S.cp){S.cp.reemb=t.value;cpRender()}});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-seg=cp_reemb] button");if(b&&S.cp){setTimeout(()=>{S.cp.reemb=b.dataset.v;cpRender()},0)}});
+document.addEventListener("dragover",e=>{const d=e.target.closest&&e.target.closest("#cpDrop");if(d){e.preventDefault();d.style.borderColor="var(--volt)"}});
+document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.closest("#cpDrop");if(!d)return;e.preventDefault();d.style.borderColor="";if(e.dataTransfer.files.length)await cpAdd([...e.dataTransfer.files])});
+
 /* ================= v9 · CONTRATOS GERADOS: versões, aprovação, envio, assinatura ================= */
 const ctn=n=>"CT-"+String(n||0).padStart(4,"0");
 const CST={aguardando:["aguardando aprovação","w"],aprovado:["aprovado · pronto para enviar","v"],enviado:["enviado · aguardando assinatura","c"],assinado:["assinado","o"],substituido:["substituído","" ],cancelado:["cancelado","x"]};
