@@ -1192,7 +1192,7 @@ const HEADACT={
  agenda:()=>`<button class="btn p sm" data-act="novoJob">+ Nova live</button>`,
  jobs:()=>`<button class="btn sm" data-act="csvList" data-v="jobs">${ic("dl")} CSV</button><button class="btn p sm" data-act="novoJob">+ Nova live</button>`,
  propostas:()=>`<button class="btn p sm" data-act="propNova">+ Nova proposta</button>`,
- clientes:()=>`<button class="btn p sm" data-act="cliNovo">+ Novo cliente</button>`,
+ clientes:()=>`<button class="btn sm" data-act="ciAbrir">📋 Cadastrar com print / PDF</button><button class="btn p sm" data-act="cliNovo">+ Novo cliente</button>`,
  fin:()=>`<button class="btn sm" data-act="cpAbrir">📎 Importar comprovantes</button><button class="btn sm" data-act="csvList" data-v="fin">${ic("dl")} CSV</button><button class="btn sm" data-act="finNovo" data-tipo="saida" data-proprio="1">Paguei do meu bolso</button><button class="btn p sm" data-act="finNovo">+ Lançar</button>`,
  amostras:()=>`<button class="btn sm" data-act="amNova" data-v="saida">− Saída</button><button class="btn p sm" data-act="amNova" data-v="entrada">+ Chegou</button>`,
  equipe:()=>isSocio()?`<button class="btn p sm" data-act="membroNovo">+ Cadastrar</button>`:""};
@@ -2478,6 +2478,8 @@ function VPessoa(){const m=S.membros.find(x=>x.id===S.pessoa);if(!m)return `<div
    <div style="min-width:0;flex:1"><h2 style="margin:0;font-size:22px">${esc(m.nome)}</h2><div class="row" style="gap:6px;margin-top:4px"><span class="tag ${m.papel==="socio"?"v":m.papel==="seller"?"f":"c"}">${m.papel==="socio"?"sócio":m.papel==="basico"?"equipe CLT":"seller"}</span>${m.status!=="ativo"?`<span class="tag w">${m.status}</span>`:`<span class="tag o">ativo</span>`}${pos>=0&&rk.length>1?`<span class="tag">#${pos+1} de ${rk.length} em GMV/hora</span>`:""}</div></div>
    </div>
    <div class="row" style="margin-top:12px;flex-wrap:wrap;gap:6px">${wa?`<a class="btn sm" href="https://wa.me/${wa.length<=11?"55":""}${wa}" target="_blank" rel="noopener">WhatsApp</a>`:""}${m.papel==="seller"?`<button class="btn sm" data-act="relatorio" data-id="${m.id}">Relatório de autonomia</button>`:""}${isSocio()||m.id===S.me.id?`<button class="btn p sm" data-act="pesEditar" data-id="${m.id}">Editar dados</button>`:""}</div></div>
+  ${m.status==="pendente"&&isSocio()?(m.obs==="PEDIU ACESSO AO ERP"?`<div class="warnbox" style="margin-top:12px"><b>${esc(m.email)}</b> pediu acesso ao ERP. Libere aqui:<div class="row" style="margin-top:8px;flex-wrap:wrap;gap:6px"><button class="btn p sm" data-act="pesLib" data-id="${m.id}" data-v="basico">Liberar como Equipe</button><button class="btn sm" data-act="pesLib" data-id="${m.id}" data-v="socio">Liberar como Sócio</button><button class="btn d sm" data-act="pesLib" data-id="${m.id}" data-v="recusar">Recusar</button></div></div>`
+    :m.papel==="seller"?`<div class="warnbox" style="margin-top:12px">Seller aguardando aprovação. <button class="btn p sm" data-act="pesEditar" data-id="${m.id}" style="margin-left:6px">Conferir identidade e aprovar</button></div>`:""):""}
   <div class="row" style="margin:14px 0 6px;align-items:center"><h2 style="font-size:16px;margin:0 10px 0 0">Performance</h2>${chips("pesPer",PES_PER,per)}</div>
   <div class="mks six">${mini("Lives realizadas",st.js.length,subst?subst+" como substituto":"")}${mini("Horas no ar",nf(st.h,1)+" h")}${mini("GMV",brlK(st.g),"","v")}${mini("GMV por hora",brlK(st.gh))}${mini("Pedidos",nf(st.p),st.p?"ticket "+brl(st.tk):"")}${mini(m.papel==="seller"?"Cachês":"Próximas",m.papel==="seller"?brlK(st.cache):prox.length,m.papel==="seller"?prox.length+" lives agendadas":"")}</div>
   ${m.papel==="seller"?`<div class="mks" style="margin-top:8px;grid-template-columns:repeat(3,minmax(0,1fr))">${mini("Escolheu no app",escolheu,"lives que pegou")}${mini("Cancelou",canc.length,cancTarde?cancTarde+" em cima da hora":"todas no prazo",cancTarde?"f":"")}${mini("Comparecimento",st.js.length+cancTarde?Math.round(st.js.length/(st.js.length+cancTarde)*100)+"%":"—","realizadas ÷ (realizadas + cancel. em cima)")}</div>`:""}
@@ -2518,12 +2520,87 @@ document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]
   case"membro":{if(a.closest("#sheetIn"))return;H();closeSheet();S.pessoa=id;S.tab="pessoa";if(!S.ev&&!S.demo)loadEv().then(()=>{if(S.tab==="pessoa")render()});render();scrollTo(0,0);break}
   case"pesVoltar":H();S.tab="equipe";render();break;
   case"pesEditar":H();openMembro(id);break;
+  case"pesLib":{H();const up=v==="recusar"?{status:"inativo",obs:"ACESSO RECUSADO"}:{papel:v,vinculo:v==="socio"?"socio":"clt",status:"ativo",obs:null};
+    await run(db.from("imp_membros").update(up).eq("id",id),v==="recusar"?"Pedido recusado":"Acesso liberado · peça para a pessoa tocar em Atualizar");await refresh();render();break}
  }}catch(err){console.warn(err)}},true);
 document.addEventListener("change",async e=>{if(e.target.id==="exFile"&&e.target.files[0]){const f=e.target.files[0];const t=await f.text();e.target.value="";await exLer(t,f.name)}});
 document.addEventListener("dragover",e=>{const d=e.target.closest&&e.target.closest("#exDrop");if(d){e.preventDefault();d.style.borderColor="var(--volt)"}});
 document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.closest("#exDrop");if(!d)return;e.preventDefault();d.style.borderColor="";const f=e.dataTransfer.files[0];if(f)await exLer(await f.text(),f.name)});
 
 VIEWS.pessoa=VPessoa;
+/* ================= v11 · CADASTRO DE CLIENTE POR PRINT / PDF / TEXTO ================= */
+const soD=s=>String(s||"").replace(/\D/g,"");
+const cnpjFmt=s=>{s=soD(s);return s.length===14?s.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,"$1.$2.$3/$4-$5"):s};
+const telFmt=s=>{s=soD(s);if(s.startsWith("55")&&s.length>11)s=s.slice(2);return s.length===11?`(${s.slice(0,2)}) ${s.slice(2,7)}-${s.slice(7)}`:s.length===10?`(${s.slice(0,2)}) ${s.slice(2,6)}-${s.slice(6)}`:s};
+const titulo=s=>String(s||"").toLowerCase().replace(/(^|[\s\-\/(])([a-zà-ü])/g,(m,a,b)=>a+b.toUpperCase()).replace(/\b(De|Da|Do|Dos|Das|E)\b/g,w=>w.toLowerCase());
+async function pdfLinhas(file){try{const lib=await loadPdfJs();const pdf=await lib.getDocument({data:await file.arrayBuffer()}).promise;let t="";for(let p=1;p<=Math.min(3,pdf.numPages);p++){const pg=await pdf.getPage(p);const c=await pg.getTextContent();t+=c.items.map(i=>i.str+(i.hasEOL?"\n":" ")).join("")+"\n"}return t}catch(e){console.warn("pdf",e);return ""}}
+function cliParse(txt){const t=String(txt||"").replace(/\r/g,"");const ls=t.split("\n").map(x=>x.replace(/^[\s*•\-–]+|[\s*]+$/g,"").trim()).filter(Boolean);const flat=ls.join("\n");const o={};
+  const lab=(re)=>{for(let i=0;i<ls.length;i++){const m=ls[i].match(re);if(m){const v=(m[1]||"").trim();if(v)return v;const nx=ls[i+1];if(nx&&!/:$/.test(nx))return nx.trim()}}return ""};
+  const cj=flat.match(/\b\d{2}\.?\d{3}\.?\d{3}\s*\/?\s*\d{4}\s*-?\s*\d{2}\b/);if(cj)o.cnpj=cnpjFmt(cj[0]);
+  let raz=lab(/^(?:raz[ãa]o social|nome empresarial|empresa)\s*:?\s*(.*)$/i);if(!raz)raz=(ls.find(l=>/\b(LTDA|S\.?\/?A\.?|EIRELI|EPP|LIMITADA|MEI)\b|\bME$/i.test(l)&&!/cnpj|inscri|cadastr/i.test(l))||"");o.empresa=raz.replace(/^(raz[ãa]o social|nome empresarial)\s*:?\s*/i,"").trim();
+  let fan=lab(/^(?:nome (?:de )?fantasia|t[íi]tulo do estabelecimento.*|marca)\s*:?\s*(.*)$/i);if(!fan){const d=flat.match(/dados\s+(?:cadastrais|da empresa|para (?:o )?contrato)\s*(?:da|de|do)?\s*[:\-]?\s*([^\n]{2,40})/i);if(d)fan=d[1].trim()}
+  if(!fan&&o.empresa)fan=o.empresa.split(/\s+/)[0];o.marca=fan&&fan!=="********"?fan.replace(/[:\-]+$/,"").trim():"";
+  const ie=flat.match(/(?:inscri[çc][ãa]o estadual|\bI\.?E\.?)\s*[:\-]?\s*([\d.\-\/]{5,}|isento)/i),im=flat.match(/(?:inscri[çc][ãa]o municipal|\bI\.?M\.?)\s*[:\-]?\s*([\d.\-\/]{3,})/i);
+  const cep=flat.match(/\b\d{2}\.?\d{3}-?\d{3}\b/g);const cepV=(flat.match(/CEP\s*[:\-]?\s*(\d{2}\.?\d{3}-?\d{3})/i)||[])[1]||(cep&&cep.find(x=>soD(x).length===8&&soD(x)!==soD(o.cnpj).slice(0,8)));
+  let end="";const logr=lab(/^logradouro\s*:?\s*(.*)$/i);
+  if(logr){const num=lab(/^n[úu]mero(?!\s+de\b)\s*:?\s*(.*)$/i),comp=lab(/^complemento\s*:?\s*(.*)$/i),bai=lab(/^bairro(?:\/distrito)?\s*:?\s*(.*)$/i),mun=lab(/^munic[íi]pio\s*:?\s*(.*)$/i),uf=lab(/^UF\s*:?\s*(.*)$/i);
+    end=[titulo(logr)+(num?", "+num:""),comp&&!/^\*+$/.test(comp)?titulo(comp):"",bai?titulo(bai):"",mun?titulo(mun)+(uf?"/"+uf.slice(0,2).toUpperCase():""):""].filter(Boolean).join(", ")}
+  else{const rua=ls.find(l=>/^(rua|r\.|av\.?|avenida|rodovia|rod\.|alameda|al\.|travessa|estrada|pra[çc]a|largo|via)\b/i.test(l))||(flat.match(/(?:endere[çc]o|sede)\s*:?\s*([^\n]+)/i)||[])[1]||"";
+    const cid=ls.find(l=>/^[A-ZÀ-Üa-zà-ü][A-Za-zÀ-ü' ]{2,40}\s*[-\/–]\s*[A-Z]{2}\b\.?$/.test(l)&&!/cep|cnpj/i.test(l));
+    end=[rua?rua.replace(/^(endere[çc]o|sede)\s*:?\s*/i,"").replace(/\s*-\s*CEP.*$/i,""):"",cid?titulo(cid.replace(/\s*[-\/–]\s*([A-Z]{2})\.?$/,""))+"/"+cid.match(/([A-Z]{2})\.?$/)[1]:""].filter(Boolean).join(", ")}
+  if(cepV)end+=(end?", ":"")+"CEP "+soD(cepV).replace(/(\d{5})(\d{3})/,"$1-$2");o.endereco=end;
+  const tel=flat.match(/(?:telefone|tel\.?|fone|celular|whats(?:app)?)\s*[:\-]?\s*(\+?55\s*)?\(?(\d{2})\)?\s*(9?\d{4})[\s.\-]?(\d{4})/i)||flat.match(/\(?\b(\d{2})\)?\s*(9\d{4}|\d{4})[\s.\-](\d{4})\b/);
+  if(tel)o.contato_tel=telFmt(tel.slice(1).filter(Boolean).join(""));
+  const em=flat.match(/[\w.+\-]+@[\w\-]+\.[\w.\-]+/);if(em)o.contato_email=em[0].toLowerCase();
+  const ct=lab(/^(?:contato|respons[áa]vel|representante(?: legal)?|aos cuidados de|a\/c)\s*:?\s*(.*)$/i);if(ct)o.contato_nome=ct;
+  o.obs=[ie?"Inscrição estadual: "+ie[1]:"",im?"Inscrição municipal: "+im[1]:""].filter(Boolean).join(" · ");
+  return o}
+async function cliReceita(cnpj){const d=soD(cnpj);if(d.length!==14)return null;try{const r=await fetch(`https://brasilapi.com.br/api/cnpj/v1/${d}`);if(!r.ok)return {erro:r.status===404?"CNPJ não encontrado na Receita":"Não consegui consultar a Receita agora"};const j=await r.json();
+  const end=[[titulo(j.descricao_tipo_de_logradouro?j.descricao_tipo_de_logradouro+" "+j.logradouro:j.logradouro),j.numero].filter(Boolean).join(", "),j.complemento?titulo(j.complemento):"",titulo(j.bairro),j.municipio?titulo(j.municipio)+"/"+j.uf:"",j.cep?"CEP "+String(j.cep).replace(/(\d{5})(\d{3})/,"$1-$2"):""].filter(Boolean).join(", ");
+  return {empresa:j.razao_social,marca:j.nome_fantasia?titulo(j.nome_fantasia):"",endereco:end,contato_tel:j.ddd_telefone_1?telFmt(j.ddd_telefone_1):"",contato_email:(j.email||"").toLowerCase(),situacao:j.descricao_situacao_cadastral,abertura:j.data_inicio_atividade,atividade:j.cnae_fiscal_descricao}}catch(e){return {erro:"Não consegui consultar a Receita agora"}}}
+S.ci=null;
+function openCliImport(){S.ci={sug:null,fonte:"",lendo:false,receita:null};ciRender()}
+function ciRender(){const C=S.ci,s=C.sug;const dup=s&&s.cnpj?S.clientes.find(c=>soD(c.cnpj)===soD(s.cnpj)):null;const F=(k,l,ph)=>`<div class="fld"><label>${l}</label><input data-ci="${k}" value="${esc((s&&s[k])||"")}" placeholder="${ph||""}"></div>`;
+  const html=`<form onsubmit="return false" id="ciForm"><h3>Cadastrar cliente com print, PDF ou texto</h3>
+   <label class="dropz" id="ciDrop" for="ciFile" style="display:block;border:1.5px dashed var(--linha);border-radius:14px;padding:16px;text-align:center;cursor:pointer"><b>Arraste aqui o print ou o PDF com os dados da empresa</b><div class="small muted">cartão CNPJ, mensagem de WhatsApp, e-mail, assinatura… · ou toque para escolher</div><input type="file" id="ciFile" accept="image/*,application/pdf" hidden></label>
+   <div class="fld"><label>Ou cole o texto aqui</label><textarea id="ciTxt" rows="4" placeholder="DADOS CADASTRAIS…&#10;CNPJ: …"></textarea></div>
+   <div class="row" style="gap:6px"><button type="button" class="btn sm" data-act="ciLer">Ler texto colado</button><span class="small muted">Só tem o CNPJ? Cole só ele: o resto vem da Receita.</span></div>
+   ${C.lendo?`<div class="okbox" style="margin-top:10px">Lendo… ${C.lendo===true?"":esc(C.lendo)}</div>`:""}
+   ${s?`<div class="sec" style="margin-top:14px"><h2 style="font-size:15px">Sugestão de cadastro</h2><span class="muted small">${esc(C.fonte)}</span></div>
+    ${C.receita&&!C.receita.erro?`<div class="okbox" style="margin-bottom:8px">✓ Conferido na Receita Federal: <b>${esc(C.receita.situacao||"")}</b>${C.receita.abertura?` · aberta em ${new Date(C.receita.abertura+"T12:00").toLocaleDateString("pt-BR")}`:""}${C.receita.atividade?` · ${esc(C.receita.atividade)}`:""}</div>`:C.receita&&C.receita.erro?`<div class="warnbox" style="margin:0 0 8px">${esc(C.receita.erro)}. Confira os dados abaixo.</div>`:""}
+    ${dup?`<div class="warnbox" style="margin:0 0 8px">Já existe um cliente com este CNPJ: <b>${esc(dup.marca)}</b>. Aceitar vai <b>atualizar</b> esse cadastro, só preenchendo o que estiver vazio nele.</div>`:""}
+    <div class="cols2">${F("marca","Marca (como vocês chamam)","ex.: LIVE!")}${F("empresa","Razão social")}</div>
+    <div class="cols2">${F("cnpj","CNPJ")}${F("contato_tel","Telefone")}</div>
+    <div class="cols2">${F("contato_nome","Contato (quem assina / responde)","nome da pessoa")}${F("contato_email","E-mail","")}</div>
+    ${F("endereco","Endereço completo")}${F("obs","Observações (inscrições etc.)")}
+    ${!s.contato_nome?`<div class="hint">Falta o <b>nome do contato</b>: ele entra no contrato como quem assina pela marca.</div>`:""}
+    <div class="acts"><button type="button" class="btn p" data-act="ciAceitar">${dup?"✓ Aceitar e atualizar "+esc(dup.marca):"✓ Aceitar e cadastrar"}</button><button type="button" class="btn" data-act="fechar">Fechar</button></div>`:`<div class="acts"><button type="button" class="btn" data-act="fechar">Fechar</button></div>`}</form>`;
+  if($("#sheet").hidden||!$("#ciForm"))openSheet(html);else{const sc=$("#sheetIn").scrollTop;const tx=($("#ciTxt")||{}).value||"";$("#sheetIn").innerHTML=html;$("#ciTxt").value=tx;$("#sheetIn").scrollTop=sc}}
+async function ciProcessa(txt,fonte){const C=S.ci;let s=cliParse(txt);C.fonte=fonte;C.receita=null;
+  if(soD(s.cnpj).length===14){C.lendo="conferindo o CNPJ na Receita";ciRender();const r=await cliReceita(s.cnpj);C.receita=r;if(r&&!r.erro){["empresa","endereco","contato_tel"].forEach(k=>{if(!s[k])s[k]=r[k]});if(r.contato_email&&r.contato_email!==s.contato_email)s.obs=[s.obs,"E-mail na Receita (pode ser do contador): "+r.contato_email].filter(Boolean).join(" · ");if(!s.marca||s.marca===String(s.empresa||"").split(/\s+/)[0])s.marca=s.marca||r.marca;if(!s.empresa)s.empresa=r.empresa}}
+  else if(!s.empresa&&!s.cnpj){C.lendo=false;ciRender();return toast("Não achei dados de empresa nesse conteúdo",true)}
+  C.sug=s;C.lendo=false;ciRender()}
+async function ciArquivo(f){const C=S.ci;C.lendo=f.type==="application/pdf"?"lendo o PDF":"lendo a imagem (a primeira vez demora um pouco)";ciRender();let txt="";
+  if(f.type==="application/pdf"||/\.pdf$/i.test(f.name))txt=await pdfLinhas(f);
+  else{const w=await cpOcrWorker();if(w){try{txt=(await w.recognize(f)).data.text||""}catch(e){console.warn(e)}}else{C.lendo=false;ciRender();return toast("Não consegui carregar o leitor de imagens. Cole o texto.",true)}}
+  if(!txt.trim()){C.lendo=false;ciRender();return toast("Não consegui ler esse arquivo. Tente colar o texto.",true)}
+  await ciProcessa(txt,"lido de "+f.name)}
+document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]");if(!a)return;const act=a.dataset.act;const H=()=>{e.stopImmediatePropagation();e.preventDefault()};
+ try{switch(act){
+  case"ciAbrir":H();openCliImport();break;
+  case"ciLer":{H();const t=($("#ciTxt")||{}).value||"";if(!t.trim())return toast("Cole o texto primeiro",true);await ciProcessa(t,"lido do texto colado");break}
+  case"ciAceitar":{H();const s=S.ci.sug;if(!s.marca&&!s.empresa)return toast("Preencha a marca",true);const row={marca:s.marca||s.empresa,empresa:s.empresa||null,cnpj:s.cnpj?cnpjFmt(s.cnpj):null,contato_nome:s.contato_nome||null,contato_tel:s.contato_tel||null,contato_email:s.contato_email||null,endereco:s.endereco||null,obs:s.obs||null};
+    const dup=row.cnpj?S.clientes.find(c=>soD(c.cnpj)===soD(row.cnpj)):null;let id;
+    if(dup){const up={};Object.keys(row).forEach(k=>{if(row[k]&&!dup[k])up[k]=row[k]});if(row.obs&&dup.obs&&!dup.obs.includes(row.obs))up.obs=dup.obs+" · "+row.obs;if(Object.keys(up).length)await run(db.from("imp_clientes").update(up).eq("id",dup.id),"Cadastro de "+dup.marca+" atualizado");else toast("Nada novo para atualizar");id=dup.id}
+    else{const r=await run(db.from("imp_clientes").insert(row).select().single(),row.marca+" cadastrado ✓");id=r&&r.id}
+    S.ci=null;closeSheet();await refresh();if(id)openCli(id);break}
+ }}catch(err){console.warn(err)}},true);
+document.addEventListener("input",e=>{const k=e.target.dataset&&e.target.dataset.ci;if(k&&S.ci&&S.ci.sug)S.ci.sug[k]=e.target.value});
+document.addEventListener("paste",e=>{if(e.target.id==="ciTxt")setTimeout(()=>{const t=$("#ciTxt").value;if(t.trim())ciProcessa(t,"lido do texto colado")},50);else if(S.ci&&!$("#sheet").hidden&&$("#ciForm")&&e.clipboardData&&e.clipboardData.files.length){e.preventDefault();ciArquivo(e.clipboardData.files[0])}});
+document.addEventListener("change",e=>{if(e.target.id==="ciFile"&&e.target.files[0]){const f=e.target.files[0];e.target.value="";ciArquivo(f)}});
+document.addEventListener("dragover",e=>{const d=e.target.closest&&e.target.closest("#ciDrop");if(d){e.preventDefault();d.style.borderColor="var(--volt)"}});
+document.addEventListener("drop",e=>{const d=e.target.closest&&e.target.closest("#ciDrop");if(!d)return;e.preventDefault();d.style.borderColor="";if(e.dataTransfer.files[0])ciArquivo(e.dataTransfer.files[0])});
+
 /* ================= v10 · IMPORTAR COMPROVANTES (zip ou imagens) → reembolso ================= */
 const CP_MESES={jan:0,janeiro:0,fev:1,fevereiro:1,mar:2,"março":2,marco:2,abr:3,abril:3,mai:4,maio:4,jun:5,junho:5,jul:6,julho:6,ago:7,agosto:7,set:8,setembro:8,out:9,outubro:9,nov:10,novembro:10,dez:11,dezembro:11};
 const CP_CAT=[["equipamentos",/cadeira|mocho|mesa|celular|fone|microfone|ring ?light|lumin|l[aâ]mpada|led\b|trip[eé]|c[aâ]mera|notebook|monitor|cabo|suporte|bateria|carregador|teclado|mouse/i],["obra",/cortina|espuma|ac[uú]stic|isolamento|tinta|parafuso|piso|carpete|papel de parede|madeira|gesso|tomada|fio\b|el[eé]tric/i],["limpeza",/limpeza|detergente|vassoura|pano|desinfet|[aá]lcool/i],["marketing",/impress|banner|adesivo|panfleto|cart[aã]o de visita/i],["live_custos",/uber|99 ?pop|t[aá]xi|estacionamento|passagem|combust/i]];
