@@ -1177,7 +1177,7 @@ function render(){
    <aside class="side">
     <div class="sbrand"><img class="logoimg" src="${S.tema==="papel"?LOGO_CARVAO:LOGO_LIMA}" alt="IMPlay" data-act="tab" data-v="painel" title="Ir para o Painel" style="cursor:pointer"><div class="live" style="margin-top:12px">gestão · live commerce</div><div class="tagline">A marca que fala de volta.</div></div>
     ${MENU.map(([g,items])=>`<div class="sgrp">${g}</div>${items.map(([k,l,sub,i])=>`<button class="sitem ${S.tab===k?"on":""}" data-act="tab" data-v="${k}">${ic(i)}<span class="sl"><b>${l}</b><small>${sub}</small></span>${b[k]?`<span class="sbad">${b[k]}</span>`:""}</button>`).join("")}`).join("")}
-    <div class="sfoot">${esc(S.email)}<br><a href="#" data-act="backup" style="color:var(--voltx)">Copiar backup</a> · <a href="#" data-act="sair">Sair</a></div>
+    <div class="sfoot">${esc(S.email)}<br><a href="#" data-act="novidades" style="color:var(--voltx)">Versão ${APP_VERSAO}</a> · <a href="#" data-act="backup" style="color:var(--voltx)">Copiar backup</a> · <a href="#" data-act="sair">Sair</a></div>
    </aside><div class="scrim" data-act="sideClose"></div>
    <div class="main">
     <div class="topbar"><button class="burger" data-act="sideOpen" aria-label="Menu">${ic("menu")}</button>
@@ -2530,6 +2530,50 @@ document.addEventListener("dragover",e=>{const d=e.target.closest&&e.target.clos
 document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.closest("#exDrop");if(!d)return;e.preventDefault();d.style.borderColor="";const f=e.dataTransfer.files[0];if(f)await exLer(await f.text(),f.name)});
 
 VIEWS.pessoa=VPessoa;
+/* ================= v13 · VERSÃO DO SISTEMA + LER CONDIÇÕES DE ARQUIVOS ================= */
+const APP_VERSAO="13";const APP_DATA="26/10/2026";
+const NOVIDADES=[
+ ["13","26/10","Contrato: arraste ou cole arquivos (PDF, print, Word, texto do WhatsApp) e o sistema lê as condições. Número de versão do sistema e aviso de versão nova."],
+ ["12","26/10","Contratos → + Novo contrato: condições preenchidas ou coladas, sem precisar de proposta."],
+ ["11","26/10","Clientes → Cadastrar com print / PDF / texto, conferindo o CNPJ na Receita."],
+ ["10","26/10","Liberar acesso direto no perfil da pessoa (funciona no celular)."],
+ ["9","21/10","Proposta: slide da Haoma com foto."],
+ ["8","19/10","Pedidos de acesso ao ERP aparecem em Equipe."],
+ ["7","19/10","Financeiro → Importar comprovantes (zip ou fotos) como reembolso."],
+ ["6","18/10","Contratos gerados: versões, aprovação, envio (e-mail, DocuSign, WhatsApp), assinatura e histórico."],
+ ["5","18/10","Contrato com a marca a partir da proposta · Agenda com 2 meses e semana começando no domingo."],
+ ["4","18/10","Despesas fixas, fluxo de caixa, extrato do banco e perfil completo da pessoa."],
+ ["3","18/10","Identidade do seller (documento + selfie) conferida pelos sócios."]];
+function openNovidades(){openSheet(`<form onsubmit="return false"><h3>Versão ${APP_VERSAO} · ${APP_DATA}</h3><p class="small muted" style="margin-top:0">O número aparece no menu lateral. Se ele não mudou depois de subir um index.html novo, a página ainda está com a versão antiga: recarregue.</p>
+  ${NOVIDADES.map(([v,d,t])=>`<div class="pend" style="cursor:default;align-items:flex-start"><span><b>Versão ${v}</b> · <span class="muted">${d}</span><br>${esc(t)}</span>${v===APP_VERSAO?`<b><span class="tag o">atual</span></b>`:""}</div>`).join("")}
+  <div class="acts"><button type="button" class="btn" data-act="fechar">Fechar</button></div></form>`)}
+async function checaVersao(){try{const r=await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"});if(!r.ok)return;const t=await r.text();const m=t.match(/APP_VERSAO="([^"]+)"/);
+  if(m&&m[1]!==APP_VERSAO&&!document.getElementById("novaVer")){const d=document.createElement("div");d.id="novaVer";d.innerHTML=`<b>Versão ${esc(m[1])} disponível</b> · você está na ${APP_VERSAO} <button class="btn p sm" onclick="location.reload()">Atualizar</button>`;d.style.cssText="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:90;background:var(--card);border:1px solid var(--volt);border-radius:99px;padding:8px 10px 8px 16px;display:flex;gap:10px;align-items:center;font-size:13px;box-shadow:0 8px 30px rgba(0,0,0,.5)";document.body.appendChild(d)}}catch(e){}}
+setInterval(checaVersao,5*60000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checaVersao()});setTimeout(checaVersao,8000);
+/* ---------- ler arquivos com condições ---------- */
+async function zipEntrada(file,nome){const buf=new Uint8Array(await file.arrayBuffer());const dv=new DataView(buf.buffer,buf.byteOffset,buf.byteLength);let e=-1;for(let i=buf.length-22;i>=Math.max(0,buf.length-65557);i--){if(dv.getUint32(i,true)===0x06054b50){e=i;break}}if(e<0)return null;
+  const n=dv.getUint16(e+10,true);let p=dv.getUint32(e+16,true);for(let k=0;k<n;k++){const meth=dv.getUint16(p+10,true),csz=dv.getUint32(p+20,true),fnl=dv.getUint16(p+28,true),exl=dv.getUint16(p+30,true),cml=dv.getUint16(p+32,true),off=dv.getUint32(p+42,true);const nm=new TextDecoder().decode(buf.subarray(p+46,p+46+fnl));p+=46+fnl+exl+cml;
+   if(nm!==nome)continue;const lfn=dv.getUint16(off+26,true),lex=dv.getUint16(off+28,true);const data=buf.subarray(off+30+lfn+lex,off+30+lfn+lex+csz);
+   const bytes=meth===0?data:new Uint8Array(await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer());return new TextDecoder().decode(bytes)}return null}
+async function lerArquivoTexto(f){const n=f.name.toLowerCase();
+  if(f.type==="application/pdf"||n.endsWith(".pdf"))return await pdfLinhas(f);
+  if(n.endsWith(".docx")){const x=await zipEntrada(f,"word/document.xml");return x?x.replace(/<\/w:p>/g,"\n").replace(/<w:tab\/>/g," ").replace(/<[^>]+>/g,"").replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"'):""}
+  if(/^image\//.test(f.type)||/\.(jpe?g|png|webp|heic)$/.test(n)){const w=await cpOcrWorker();if(!w)return "";try{return (await w.recognize(f)).data.text||""}catch(e){return ""}}
+  if(/^text\//.test(f.type)||/\.(txt|csv|eml|md)$/.test(n))return await f.text();
+  return ""}
+async function cdArquivos(files){if(!S.cd)return;cdLerForm();const st=$("#cdLendo");if(st){st.hidden=false;st.textContent="Lendo "+files.length+(files.length===1?" arquivo":" arquivos")+"… (imagem demora um pouco na primeira vez)"}
+  let txt="";for(const f of files){const t=await lerArquivoTexto(f);if(t.trim())txt+=(txt?"\n\n":"")+"── "+f.name+" ──\n"+t.trim()}
+  if(st)st.hidden=true;if(!txt.trim())return toast("Não consegui ler esses arquivos. Formatos: PDF, imagem, Word (.docx) ou texto.",true);
+  const ta=$("#cdTxt");if(ta){ta.value=txt.slice(0,20000);ta.closest("details").open=true}
+  const r=cdParse(txt);if(!r.itens.length&&!r.vigencia_meses&&!r.pagamento)return toast("Li os arquivos, mas não achei valores. O texto ficou no campo: confira e preencha.",true);
+  if(r.itens.length)S.cd.itens=r.itens;if(r.vigencia_meses)S.cd.vigencia_meses=r.vigencia_meses;if(r.pagamento)S.cd.pagamento=r.pagamento;if(r.inicio)S.cd.inicio=r.inicio;if(r.plataforma)S.cd.plataforma=r.plataforma;
+  S.cd.fontes=files.map(f=>f.name);cdRender();const ta2=$("#cdTxt");if(ta2){ta2.value=txt.slice(0,20000)}toast("Li "+files.length+(files.length===1?" arquivo":" arquivos")+" · confira os campos")}
+document.addEventListener("change",e=>{if(e.target.id==="cdFile"&&e.target.files.length){const fs=[...e.target.files];e.target.value="";cdArquivos(fs)}});
+document.addEventListener("dragover",e=>{const d=e.target.closest&&e.target.closest("#cdForm");if(d&&e.dataTransfer&&[...e.dataTransfer.types].includes("Files")){e.preventDefault();const z=$("#cdDrop");if(z)z.style.borderColor="var(--volt)"}});
+document.addEventListener("drop",e=>{const d=e.target.closest&&e.target.closest("#cdForm");if(!d||!e.dataTransfer.files.length)return;e.preventDefault();const z=$("#cdDrop");if(z)z.style.borderColor="";cdArquivos([...e.dataTransfer.files])});
+document.addEventListener("paste",e=>{if(S.cd&&$("#cdForm")&&e.clipboardData&&e.clipboardData.files.length){e.preventDefault();cdArquivos([...e.clipboardData.files])}});
+document.addEventListener("click",e=>{const a=e.target.closest("[data-act=novidades]");if(a){e.preventDefault();e.stopImmediatePropagation();openNovidades()}},true);
+
 /* ================= v12 · CONTRATO DIRETO (condições preenchidas ou coladas, sem proposta) ================= */
 const CD_TIPOS=[["pacote","Pacote mensal"],["pontual","Lives avulsas"],["drop","Live de lançamento"],["outro","Outro serviço"]];
 const CD_ESTR=["GO","BOOST","ICON"];
@@ -2543,7 +2587,7 @@ function cdParse(t){const out={itens:[]};const T=String(t||"");const tx=T.replac
   if(!out.itens.length&&perc)out.itens.push({grupo:"pacote",categoria:estr?estr[1].toUpperCase():"",descricao:"Somente comissão sobre vendas",lives:lives?lives[1]:"",horas:horas?horas[1]:"",valor:0,perc:N(perc[1]),qtd:1});
   const vig=tx.match(/(\d{1,2})\s*mes(?:es)?\s*(?:de\s*)?(?:contrato|vig[eê]ncia|prazo)?/i)||tx.match(/(?:vig[eê]ncia|prazo|contrato)\D{0,15}(\d{1,2})\s*mes/i);if(vig)out.vigencia_meses=+vig[1];
   const ini=tx.match(/(?:in[ií]cio|come[çc]a|start)\D{0,20}(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/i);if(ini){let y=ini[3]?+ini[3]:new Date().getFullYear();if(y<100)y+=2000;out.inicio=`${y}-${String(ini[2]).padStart(2,"0")}-${String(ini[1]).padStart(2,"0")}`}
-  const pg=T.split(/\n/).find(l=>/pagamento|boleto|\bpix\b|dia \d{1,2}|vencimento|faturad/i.test(l));if(pg)out.pagamento=pg.replace(/^[\s\-•*]+/,"").trim();
+  const pg=T.split(/\n/).find(l=>/pagamento|boleto|\bpix\b|dia \d{1,2}|vencimento|faturad/i.test(l));if(pg)out.pagamento=pg.replace(/^\[[^\]]*\]\s*[^:]{1,40}:\s*/,"").replace(/^\d{1,2}\/\d{1,2}\/\d{2,4},?\s*\d{1,2}:\d{2}(?::\d{2})?\s*(?:[AP]M)?\s*-\s*[^:]{1,40}:\s*/i,"").replace(/^[\s\-•*]+/,"").replace(/^./,c=>c.toUpperCase()).trim();
   if(/instagram/i.test(tx)&&/tiktok/i.test(tx))out.plataforma="TikTok Shop e Instagram";else if(/instagram/i.test(tx))out.plataforma="Instagram";else if(/shopee/i.test(tx))out.plataforma="Shopee";
   return out}
 function cdItemHtml(it,i){return `<div class="cdi"><div class="row" style="justify-content:space-between;align-items:center"><b class="small">Item ${i+1}</b>${i?`<button type="button" class="btn d sm" data-act="cdDel" data-v="${i}">Remover</button>`:""}</div>
@@ -2557,9 +2601,11 @@ function cdItemHtml(it,i){return `<div class="cdi"><div class="row" style="justi
 function openCtrDir(cond,antId){S.cd=cond?JSON.parse(JSON.stringify(cond)):cdNovo();S.cd.antId=antId||null;cdRender()}
 function cdRender(){const C=S.cd;const cli=S.clientes.filter(c=>c.status!=="cancelado").sort((a,b)=>a.marca.localeCompare(b.marca));
   const html=`<form onsubmit="return false" id="cdForm"><h3>${C.antId?"Nova versão · condições":"Novo contrato · condições comerciais"}</h3>
-   <p class="small muted" style="margin-top:0">Preencha ou <b>cole as condições combinadas</b> (WhatsApp, e-mail). Elas viram o <b>Anexo I</b> do contrato. Não precisa de proposta.</p>
+   <p class="small muted" style="margin-top:0"><b>Arraste os arquivos</b>, cole o texto ou preencha as condições combinadas. Elas viram o <b>Anexo I</b> do contrato. Não precisa de proposta.</p>
    <div class="fld"><label>Cliente</label><div class="row" style="gap:6px;flex-wrap:nowrap"><select id="cdCli" style="flex:1"><option value="">Escolha…</option>${cli.map(c=>`<option value="${c.id}" ${c.id===C.cliente_id?"selected":""}>${esc(c.marca)}${c.empresa?" · "+esc(c.empresa):""}</option>`).join("")}</select><button type="button" class="btn sm" data-act="ciAbrir" title="Cadastrar cliente com print/PDF">+ Cliente</button></div></div>
-   <details ${C.itens.some(x=>x.valor!==""||x.perc!=="")?"":"open"}><summary class="small" style="cursor:pointer;font-weight:700">📋 Colar as condições combinadas</summary><textarea id="cdTxt" rows="5" style="width:100%;margin-top:6px" placeholder="ex.: Pacote BOOST, 12 lives por mês de 3h, R$ 10.000 por mês + 8% sobre vendas. Contrato de 3 meses, início 26/10. Pagamento por boleto todo dia 10."></textarea><button type="button" class="btn sm" data-act="cdLer" style="margin-top:6px">Ler e preencher</button></details>
+   <label class="dropz" id="cdDrop" for="cdFile" style="display:block;border:1.5px dashed var(--linha);border-radius:14px;padding:14px;text-align:center;cursor:pointer;margin-bottom:8px"><b>Arraste aqui os arquivos com as condições</b><div class="small muted">PDF, print, Word (.docx), conversa do WhatsApp (.txt) · pode ser mais de um · ou toque para escolher</div><input type="file" id="cdFile" multiple accept="application/pdf,image/*,.docx,.txt,.csv,.eml,text/plain" hidden></label>
+   <div class="okbox" id="cdLendo" hidden style="margin-bottom:8px"></div>${C.fontes&&C.fontes.length?`<div class="small muted" style="margin-bottom:6px">Lido de: ${C.fontes.map(esc).join(", ")}</div>`:""}
+   <details ${C.itens.some(x=>x.valor!==""||x.perc!=="")?"":"open"}><summary class="small" style="cursor:pointer;font-weight:700">📋 Ou cole o texto das condições</summary><textarea id="cdTxt" rows="5" style="width:100%;margin-top:6px" placeholder="ex.: Pacote BOOST, 12 lives por mês de 3h, R$ 10.000 por mês + 8% sobre vendas. Contrato de 3 meses, início 26/10. Pagamento por boleto todo dia 10."></textarea><button type="button" class="btn sm" data-act="cdLer" style="margin-top:6px">Ler e preencher</button></details>
    <div class="sec" style="margin-top:12px"><h2 style="font-size:14px">Serviços e valores</h2><button type="button" class="btn sm" data-act="cdAdd">+ Item</button></div>
    ${C.itens.map(cdItemHtml).join("")}
    ${pick("cd_vig","Vigência (para pacote mensal)",C.vigencia_meses,[[1,"1 mês"],[3,"3 meses"],[6,"6 meses"],[12,"12 meses"]],{num:1,ph:"Outro: nº de meses"})}
