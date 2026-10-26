@@ -2531,8 +2531,9 @@ document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.cl
 
 VIEWS.pessoa=VPessoa;
 /* ================= v13 · VERSÃO DO SISTEMA + LER CONDIÇÕES DE ARQUIVOS ================= */
-const APP_VERSAO="13";const APP_DATA="26/10/2026";
+const APP_VERSAO="14";const APP_DATA="26/10/2026";
 const NOVIDADES=[
+ ["14","26/10","Contrato: leitura das condições melhorada (\"150 reais a hora\", \"40h mensais\", \"9 porcento\", \"6 mil mês\", \"150 vezes 40\"), calcula o fixo mensal, traz o que está incluso e avisa quando os valores não batem."],
  ["13","26/10","Contrato: arraste ou cole arquivos (PDF, print, Word, texto do WhatsApp) e o sistema lê as condições. Número de versão do sistema e aviso de versão nova."],
  ["12","26/10","Contratos → + Novo contrato: condições preenchidas ou coladas, sem precisar de proposta."],
  ["11","26/10","Clientes → Cadastrar com print / PDF / texto, conferindo o CNPJ na Receita."],
@@ -2566,7 +2567,7 @@ async function cdArquivos(files){if(!S.cd)return;cdLerForm();const st=$("#cdLend
   if(st)st.hidden=true;if(!txt.trim())return toast("Não consegui ler esses arquivos. Formatos: PDF, imagem, Word (.docx) ou texto.",true);
   const ta=$("#cdTxt");if(ta){ta.value=txt.slice(0,20000);ta.closest("details").open=true}
   const r=cdParse(txt);if(!r.itens.length&&!r.vigencia_meses&&!r.pagamento)return toast("Li os arquivos, mas não achei valores. O texto ficou no campo: confira e preencha.",true);
-  if(r.itens.length)S.cd.itens=r.itens;if(r.vigencia_meses)S.cd.vigencia_meses=r.vigencia_meses;if(r.pagamento)S.cd.pagamento=r.pagamento;if(r.inicio)S.cd.inicio=r.inicio;if(r.plataforma)S.cd.plataforma=r.plataforma;
+  if(r.itens.length)S.cd.itens=r.itens;if(r.vigencia_meses)S.cd.vigencia_meses=r.vigencia_meses;if(r.pagamento)S.cd.pagamento=r.pagamento;if(r.inicio)S.cd.inicio=r.inicio;if(r.plataforma)S.cd.plataforma=r.plataforma;if(r.inclui&&r.inclui.length)S.cd.obs="Inclui: "+r.inclui.join("; ")+".";S.cd.aviso=r.aviso||"";
   S.cd.fontes=files.map(f=>f.name);cdRender();const ta2=$("#cdTxt");if(ta2){ta2.value=txt.slice(0,20000)}toast("Li "+files.length+(files.length===1?" arquivo":" arquivos")+" · confira os campos")}
 document.addEventListener("change",e=>{if(e.target.id==="cdFile"&&e.target.files.length){const fs=[...e.target.files];e.target.value="";cdArquivos(fs)}});
 document.addEventListener("dragover",e=>{const d=e.target.closest&&e.target.closest("#cdForm");if(d&&e.dataTransfer&&[...e.dataTransfer.types].includes("Files")){e.preventDefault();const z=$("#cdDrop");if(z)z.style.borderColor="var(--volt)"}});
@@ -2578,17 +2579,34 @@ document.addEventListener("click",e=>{const a=e.target.closest("[data-act=novida
 const CD_TIPOS=[["pacote","Pacote mensal"],["pontual","Lives avulsas"],["drop","Live de lançamento"],["outro","Outro serviço"]];
 const CD_ESTR=["GO","BOOST","ICON"];
 function cdNovo(){return {cliente_id:"",itens:[{grupo:"pacote",categoria:"",descricao:"",lives:"",horas:"",valor:"",perc:"",qtd:1}],vigencia_meses:3,pagamento:"",obs:""}}
-function cdParse(t){const out={itens:[]};const T=String(t||"");const tx=T.replace(/\s+/g," ");const N=v=>Number(String(v).replace(/\./g,"").replace(",","."));
-  const mens=tx.match(/R\$\s?([\d.]+(?:,\d{1,2})?)\s*(?:\/|por|ao)\s*m[eê]s|(?:mensal(?:idade)?|fixo(?: mensal)?|fee)\D{0,20}R\$\s?([\d.]+(?:,\d{1,2})?)/i);
-  const plive=tx.match(/R\$\s?([\d.]+(?:,\d{1,2})?)\s*(?:\/|por|cada)\s*live/i);const perc=tx.match(/(\d{1,2}(?:[.,]\d{1,2})?)\s*%/);
-  const lives=tx.match(/(\d{1,3})\s*lives?/i);const horas=tx.match(/(\d{1,2})\s*(?:h\b|horas?)/i);const estr=tx.match(/\b(GO|BOOST|ICON)\b/i);
-  if(mens)out.itens.push({grupo:"pacote",categoria:estr?estr[1].toUpperCase():"",descricao:"",lives:lives?lives[1]:"",horas:horas?horas[1]:"",valor:N(mens[1]||mens[2]),perc:perc?N(perc[1]):"",qtd:1});
-  if(plive)out.itens.push({grupo:"pontual",categoria:estr?estr[1].toUpperCase():"",descricao:"",lives:"",horas:horas?horas[1]:"",valor:N(plive[1]),perc:perc?N(perc[1]):"",qtd:lives&&!mens?+lives[1]:1});
-  if(!out.itens.length&&perc)out.itens.push({grupo:"pacote",categoria:estr?estr[1].toUpperCase():"",descricao:"Somente comissão sobre vendas",lives:lives?lives[1]:"",horas:horas?horas[1]:"",valor:0,perc:N(perc[1]),qtd:1});
-  const vig=tx.match(/(\d{1,2})\s*mes(?:es)?\s*(?:de\s*)?(?:contrato|vig[eê]ncia|prazo)?/i)||tx.match(/(?:vig[eê]ncia|prazo|contrato)\D{0,15}(\d{1,2})\s*mes/i);if(vig)out.vigencia_meses=+vig[1];
+function cdParse(t){const out={itens:[]};const T=String(t||"").replace(/\r/g,"");const tx=T.replace(/[•°¢·]/g," ").replace(/\s+/g," ");
+  const N=v=>{if(v===undefined||v===null)return NaN;let s=String(v).trim().toLowerCase();let m=1;if(/\s*(mil|k)$/.test(s)){m=1000;s=s.replace(/\s*(mil|k)$/,"")}
+    if(/,\d{1,2}$/.test(s))s=s.replace(/\./g,"").replace(",",".");else if(/\.\d{3}(\D|$)/.test(s))s=s.replace(/\./g,"");else s=s.replace(",",".");const n=parseFloat(s);return isNaN(n)?NaN:n*m};
+  const VAL="(\\d[\\d.,]*(?:\\s*(?:mil|k))?)";const M=(re)=>{const r=tx.match(new RegExp(re,"i"));return r?N(r[1]):NaN};
+  const perc=(tx.match(/(\d{1,2}(?:[.,]\d{1,2})?)\s*(?:%|por\s*cento|porcento)/i)||[])[1];const pc=perc?N(perc):NaN;
+  let hora=[M("R\\$\\s*"+VAL+"\\s*(?:\\/|por|a|cada)\\s*(?:hora|h)\\b"),M(VAL+"\\s*reais\\s*(?:\\/|por|a|cada)\\s*(?:hora|h)\\b"),M(VAL+"\\s*(?:\\/|por)\\s*hora\\s*de\\s*live")].find(x=>!isNaN(x));
+  const vezes=tx.match(/(\d[\d.,]*)\s*(?:vezes|x)\s*(\d{1,3})\b/i);
+  let hMes=[M("(?:m[ií]nimo\\s+de\\s+)?(\\d{1,3})\\s*h(?:oras|rs)?\\s*(?:de\\s+lives?\\s*)?(?:mensais|por\\s+m[eê]s|\\/\\s*m[eê]s|ao\\s+m[eê]s|no\\s+m[eê]s|mensalmente)")].find(x=>!isNaN(x));
+  if(isNaN(hMes)&&vezes&&!isNaN(hora)&&N(vezes[1])===hora)hMes=N(vezes[2]);let hora2=hora;
+  const mensal0=null;const mensal=[M("R\\$\\s*"+VAL+"\\s*(?:\\/|por|ao|a|no)\\s*m[eê]s"),M(VAL+"\\s*reais\\s*(?:\\/|por|ao|a|no)?\\s*m[eê]s"),M("(\\d[\\d.,]*\\s*(?:mil|k))\\s*(?:\\/|por|ao|a|no)?\\s*m[eê]s"),M("(?:mensal(?:idade)?|fixo(?:\\s+mensal)?|fee)\\D{0,20}R\\$\\s*"+VAL)].find(x=>!isNaN(x));
+  if(vezes&&isNaN(hora)&&isNaN(hMes)){const x=N(vezes[1]),y=N(vezes[2]);if(isNaN(mensal)||Math.abs(x*y-mensal)<1){hora=x;hMes=y}}
+  const plive=[M("R\\$\\s*"+VAL+"\\s*(?:\\/|por|cada|a)\\s*live\\b"),M(VAL+"\\s*reais\\s*(?:\\/|por|cada|a)\\s*live\\b")].find(x=>!isNaN(x));
+  const hLive=[M("(\\d{1,2})\\s*(?:h\\b|horas?)\\s*(?:por|\\/|a)\\s*(?:dia|live)"),M("lives?\\s*de\\s*(\\d{1,2})\\s*(?:h\\b|horas?)")].find(x=>!isNaN(x));
+  let lMes=M("(\\d{1,3})\\s*lives?\\s*(?:por|\\/|ao|no)\\s*m[eê]s");const dSem=M("(\\d)\\s*dias?\\s*(?:na|por|\\/)\\s*semana");
+  const estr=(tx.match(/\b(GO|BOOST|ICON)\b/)||[])[1]||"";const fmt=v=>brl(v).replace(",00","");
+  if(!isNaN(hora)||!isNaN(mensal)||!isNaN(hMes)){const desc=[];if(!isNaN(hMes))desc.push(`mínimo de ${hMes} h de live por mês`);if(!isNaN(hora))desc.push(`${fmt(hora)} por hora de live`);if(!isNaN(hLive)&&!isNaN(dSem))desc.push(`recomendado ${hLive} h por dia, ${dSem} dias por semana`);
+    let v=!isNaN(mensal)?mensal:(!isNaN(hora)&&!isNaN(hMes)?hora*hMes:"");out.itens.push({grupo:"pacote",categoria:estr,descricao:desc.join(" · ").replace(/^./,c=>c.toUpperCase()),lives:!isNaN(lMes)?lMes:"",horas:!isNaN(hLive)?hLive:"",valor:v,perc:isNaN(pc)?"":pc,qtd:1});
+    if(!isNaN(hora)&&!isNaN(hMes)&&!isNaN(mensal)&&Math.abs(hora*hMes-mensal)>1)out.aviso=`O texto fala em ${fmt(mensal)}/mês, mas ${fmt(hora)} × ${hMes} h dá ${fmt(hora*hMes)}. Confira o valor.`;
+    if(!isNaN(hora)&&isNaN(hMes)&&isNaN(mensal))out.aviso="Achei o valor por hora, mas não a quantidade de horas por mês: preencha o valor mensal."}
+  if(!isNaN(plive))out.itens.push({grupo:"pontual",categoria:estr,descricao:"",lives:"",horas:!isNaN(hLive)?hLive:"",valor:plive,perc:out.itens.length||isNaN(pc)?"":pc,qtd:!isNaN(lMes)&&!out.itens.length?lMes:1});
+  if(!out.itens.length&&!isNaN(pc))out.itens.push({grupo:"pacote",categoria:estr,descricao:"Somente comissão sobre vendas",lives:!isNaN(lMes)?lMes:"",horas:!isNaN(hLive)?hLive:"",valor:0,perc:pc,qtd:1});
+  const vig=tx.match(/(?:vig[eê]ncia|prazo|contrato|per[ií]odo)\D{0,15}(\d{1,2})\s*mes/i)||tx.match(/(\d{1,2})\s*mes(?:es)?\s*(?:de\s*)?(?:contrato|vig[eê]ncia|prazo)/i);if(vig)out.vigencia_meses=+vig[1];
   const ini=tx.match(/(?:in[ií]cio|come[çc]a|start)\D{0,20}(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?/i);if(ini){let y=ini[3]?+ini[3]:new Date().getFullYear();if(y<100)y+=2000;out.inicio=`${y}-${String(ini[2]).padStart(2,"0")}-${String(ini[1]).padStart(2,"0")}`}
-  const pg=T.split(/\n/).find(l=>/pagamento|boleto|\bpix\b|dia \d{1,2}|vencimento|faturad/i.test(l));if(pg)out.pagamento=pg.replace(/^\[[^\]]*\]\s*[^:]{1,40}:\s*/,"").replace(/^\d{1,2}\/\d{1,2}\/\d{2,4},?\s*\d{1,2}:\d{2}(?::\d{2})?\s*(?:[AP]M)?\s*-\s*[^:]{1,40}:\s*/i,"").replace(/^[\s\-•*]+/,"").replace(/^./,c=>c.toUpperCase()).trim();
-  if(/instagram/i.test(tx)&&/tiktok/i.test(tx))out.plataforma="TikTok Shop e Instagram";else if(/instagram/i.test(tx))out.plataforma="Instagram";else if(/shopee/i.test(tx))out.plataforma="Shopee";
+  const pg=T.split(/\n/).find(l=>/pagamento|boleto|\bpix\b|dia \d{1,2}\b|vencimento|faturad/i.test(l));if(pg)out.pagamento=pg.replace(/^\[[^\]]*\]\s*[^:]{1,40}:\s*/,"").replace(/^\d{1,2}\/\d{1,2}\/\d{2,4},?\s*\d{1,2}:\d{2}(?::\d{2})?\s*(?:[AP]M)?\s*-\s*[^:]{1,40}:\s*/i,"").replace(/^[\s\-•*°¢]+/,"").replace(/^./,c=>c.toUpperCase()).trim();
+  if(/instagram/i.test(tx)&&/tiktok/i.test(tx))out.plataforma="TikTok Shop e Instagram";else if(/instagram/i.test(tx))out.plataforma="Instagram";else if(/shopee/i.test(tx))out.plataforma="Shopee";else if(/tiktok/i.test(tx))out.plataforma="TikTok Shop";
+  const ls=T.split("\n").map(l=>l.trim());const a=ls.findIndex(l=>/^(incluso|inclui|o que (est[áa] )?inclu|est[áa] inclu)/i.test(l));
+  if(a>=0){const b=ls.findIndex((l,i)=>i>a&&/^(investimento|valores?|pre[çc]o|condi[çc][õo]es|pagamento)\b/i.test(l));const bl=[];ls.slice(a+1,b>0?b:a+20).forEach(l=>{if(!l)return;if(/^[•*°¢\-–·]/.test(l)||!bl.length)bl.push(l.replace(/^[•*°¢\-–·]\s*/,""));else bl[bl.length-1]+=" "+l});
+    out.inclui=bl.map(x=>x.replace(/\s+/g," ").replace(/\(([^)]*)$/,"($1)").trim()).filter(x=>x.length>3)}
   return out}
 function cdItemHtml(it,i){return `<div class="cdi"><div class="row" style="justify-content:space-between;align-items:center"><b class="small">Item ${i+1}</b>${i?`<button type="button" class="btn d sm" data-act="cdDel" data-v="${i}">Remover</button>`:""}</div>
   <div class="fld" style="margin-top:4px">${seg("cd_g_"+i,CD_TIPOS,it.grupo)}</div>
@@ -2606,6 +2624,7 @@ function cdRender(){const C=S.cd;const cli=S.clientes.filter(c=>c.status!=="canc
    <label class="dropz" id="cdDrop" for="cdFile" style="display:block;border:1.5px dashed var(--linha);border-radius:14px;padding:14px;text-align:center;cursor:pointer;margin-bottom:8px"><b>Arraste aqui os arquivos com as condições</b><div class="small muted">PDF, print, Word (.docx), conversa do WhatsApp (.txt) · pode ser mais de um · ou toque para escolher</div><input type="file" id="cdFile" multiple accept="application/pdf,image/*,.docx,.txt,.csv,.eml,text/plain" hidden></label>
    <div class="okbox" id="cdLendo" hidden style="margin-bottom:8px"></div>${C.fontes&&C.fontes.length?`<div class="small muted" style="margin-bottom:6px">Lido de: ${C.fontes.map(esc).join(", ")}</div>`:""}
    <details ${C.itens.some(x=>x.valor!==""||x.perc!=="")?"":"open"}><summary class="small" style="cursor:pointer;font-weight:700">📋 Ou cole o texto das condições</summary><textarea id="cdTxt" rows="5" style="width:100%;margin-top:6px" placeholder="ex.: Pacote BOOST, 12 lives por mês de 3h, R$ 10.000 por mês + 8% sobre vendas. Contrato de 3 meses, início 26/10. Pagamento por boleto todo dia 10."></textarea><button type="button" class="btn sm" data-act="cdLer" style="margin-top:6px">Ler e preencher</button></details>
+   ${C.aviso?`<div class="warnbox" style="margin:8px 0 0">${esc(C.aviso)}</div>`:""}
    <div class="sec" style="margin-top:12px"><h2 style="font-size:14px">Serviços e valores</h2><button type="button" class="btn sm" data-act="cdAdd">+ Item</button></div>
    ${C.itens.map(cdItemHtml).join("")}
    ${pick("cd_vig","Vigência (para pacote mensal)",C.vigencia_meses,[[1,"1 mês"],[3,"3 meses"],[6,"6 meses"],[12,"12 meses"]],{num:1,ph:"Outro: nº de meses"})}
@@ -2626,7 +2645,7 @@ document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]
   case"cdDel":H();cdLerForm();S.cd.itens.splice(+v,1);cdRender();break;
   case"cdLer":{H();cdLerForm();const t=($("#cdTxt")||{}).value||"";if(!t.trim())return toast("Cole as condições primeiro",true);const r=cdParse(t);
     if(!r.itens.length&&!r.vigencia_meses&&!r.pagamento)return toast("Não achei valores no texto. Preencha abaixo.",true);
-    if(r.itens.length)S.cd.itens=r.itens;if(r.vigencia_meses)S.cd.vigencia_meses=r.vigencia_meses;if(r.pagamento)S.cd.pagamento=r.pagamento;if(r.inicio)S.cd.inicio=r.inicio;if(r.plataforma)S.cd.plataforma=r.plataforma;
+    if(r.itens.length)S.cd.itens=r.itens;if(r.vigencia_meses)S.cd.vigencia_meses=r.vigencia_meses;if(r.pagamento)S.cd.pagamento=r.pagamento;if(r.inicio)S.cd.inicio=r.inicio;if(r.plataforma)S.cd.plataforma=r.plataforma;if(r.inclui&&r.inclui.length)S.cd.obs="Inclui: "+r.inclui.join("; ")+".";S.cd.aviso=r.aviso||"";
     cdRender();toast("Preenchi o que achei · confira os campos");break}
   case"cdSeguir":{H();cdLerForm();const C=S.cd;if(!C.cliente_id)return toast("Escolha o cliente (ou cadastre em + Cliente)",true);
     if(!C.itens.some(it=>Number(it.valor)>0||Number(it.perc)>0))return toast("Preencha o valor ou o % de pelo menos um item",true);
