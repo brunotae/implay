@@ -2046,8 +2046,14 @@ function openSocio(id){const s=S.socios.find(x=>x.id===id);const ed=isSocio();co
    <div class="acts"><button type="button" class="btn p" data-act="socioSalvar" data-id="${s.id}">Salvar</button><button type="button" class="btn" data-act="fechar">Fechar</button></div>`:`<div class="acts"><button type="button" class="btn" data-act="fechar">Fechar</button></div>`}</form>`)}
 const _eq5=VIEWS.equipe;VIEWS.equipe=()=>{const h=_eq5();if((S.f.eq.view||"cards")!=="cards"||!S.socios.length)return h;
   const q=S.f.eq.q;const l=S.socios.filter(s=>has(q,s.apelido,s.nome_completo,s.funcao,s.cidade));
-  const sec=`<div class="sec"><h2>Sócios <span class="muted small">${l.length}</span></h2></div><div class="pgrid">${l.map(socioCard).join("")}</div>`;
+  const semN=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+  const soltos=S.membros.filter(m=>m.papel==="socio"&&m.status==="ativo"&&!S.socios.some(x=>socioMembro(x)===m));const livres=S.socios.filter(x=>!socioMembro(x));
+  const aviso=isSocio()&&soltos.length&&livres.length?`<div class="warnbox" style="margin-bottom:10px">${soltos.map(m=>{const p1=semN(m.nome).split(/\s+/)[0];const sug=livres.filter(x=>semN(x.apelido)===p1||semN(x.nome_completo).split(/\s+/)[0]===p1||semN(m.email).includes(semN(x.apelido)));const ops=(sug.length?sug:livres);
+    return `<div style="margin:4px 0"><b>${esc(m.nome)}</b> (${esc(m.email)}) já tem acesso de sócio, mas não está ligado(a) a um cartão de sócio. ${ops.map(x=>`<button class="btn sm ${sug.includes(x)?"p":""}" data-act="socioLigar" data-s="${x.id}" data-m="${m.id}">É ${esc(x.apelido)}</button>`).join(" ")}</div>`}).join("")}</div>`:"";
+  const sec=`<div class="sec"><h2>Sócios <span class="muted small">${l.length}</span></h2></div>${aviso}<div class="pgrid">${l.map(socioCard).join("")}</div>`;
   const i=h.indexOf('<div class="sec"><h2>Sócios');if(i<0)return h+sec;const j=h.indexOf('<div class="sec">',i+10);return h.slice(0,i)+sec+(j>0?h.slice(j):"")};
+document.addEventListener("click",async e=>{const a=e.target.closest("[data-act=socioLigar]");if(!a)return;e.preventDefault();e.stopImmediatePropagation();const m=S.membros.find(x=>x.id===a.dataset.m),so=S.socios.find(x=>x.id===a.dataset.s);
+  const r=await db.from("imp_socios").update({email:m.email}).eq("id",so.id).select().single();if(r.error)return toast("Erro: "+r.error.message,true);S.socios[S.socios.findIndex(x=>x.id===so.id)]=r.data;toast(so.apelido+" ligado ao acesso "+m.email);render()},true);
 /* ---------- proposta ↔ contrato ---------- */
 function orcDoContrato(pid){return S.orcs.find(o=>o.proposta_id===pid)}
 /* ---------- eventos ---------- */
@@ -2543,8 +2549,9 @@ document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.cl
 
 VIEWS.pessoa=VPessoa;
 /* ================= v13 · VERSÃO DO SISTEMA + LER CONDIÇÕES DE ARQUIVOS ================= */
-const APP_VERSAO="23";const APP_DATA="26/10/2026";
+const APP_VERSAO="24";const APP_DATA="26/10/2026";
 const NOVIDADES=[
+ ["24","27/10","Equipe: quando alguém recebe acesso de sócio com um e-mail diferente do cartão de sócio, aparece um aviso com o botão 'É Fulano' para ligar os dois."],
  ["23","27/10","7 opções de cores bem diferentes (4 escuras, 3 claras) em Cores. Todo campo de arquivo aceita arrastar e soltar."],
  ["22","27/10","Perfil da pessoa: botões Desligar (sai do time, histórico fica) e Apagar (só quem não tem histórico). Inativos saem de 'Todas' em Equipe."],
  ["21","27/10","Agenda: visões Dia e Lista (próximas, vagas abertas, passadas). Clicar numa live abre um resumo simples, com Editar. Formulário da live mais compacto (data, hora e sala em campos curtos; salas ocupadas marcadas). Saiu o bloco 'Depois da live'."],
