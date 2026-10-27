@@ -1725,7 +1725,7 @@ const _pend4=pendencias;pendencias=function(){const p=_pend4();const o=orcPenden
 
 /* ---------- lista ---------- */
 function orcLista(){const f=S.f.orc;let l=S.orcs.filter(o=>has(f.q,o.marca,on(o.numero),o.elaborado_nome,cliNome(o.cliente_id)));return l}
-LISTS.orc=()=>{const f=S.f.orc;let l=orcLista();if(f.st==="meus")l=l.filter(o=>o.created_by===S.me.user_id);else if(f.st==="pendentes")l=orcPendentes();else if(f.st!=="todos")l=l.filter(o=>o.status===f.st);
+LISTS.orc=()=>{const f=S.f.orc;let l=orcLista();if(f.st!=="cancelado")l=l.filter(o=>o.status!=="cancelado");if(f.st==="meus")l=l.filter(o=>o.created_by===S.me.user_id);else if(f.st==="pendentes")l=orcPendentes();else if(f.st!=="todos")l=l.filter(o=>o.status===f.st);
   return tbl([["Nº"],["Cliente"],["Itens"],["Valor"],["Elaborado"],["Aprovação"],["Situação"],[""]],l.map(o=>`<tr data-act="orcAbrir" data-id="${o.id}"><td data-l="Nº"><b>${on(o.numero)}</b></td>
    <td class="m0"><div class="t">${esc(o.marca)}</div><div class="s">${esc(cliNome(o.cliente_id)||"")}</div></td>
    <td data-l="Itens">${esc(orcResumo(o))}${o.tem_desconto?` <span class="tag f">desconto</span>`:""}</td>
@@ -1738,8 +1738,8 @@ VIEWS.orcamentos=()=>{const f=S.f.orc;
   if(S.orcSemSQL&&!S.demo)return `<div class="warnbox">Falta rodar o SQL <b>implay_orcamentos.sql</b> no Supabase (SQL Editor → New query → Run). Depois recarregue a página.</div>`;
   const tabs=`<div class="chips" style="margin-bottom:10px"><button data-act="orcView" data-v="lista" class="${f.view!=="precos"?"on":""}">Propostas</button><button data-act="orcView" data-v="precos" class="${f.view==="precos"?"on":""}">Tabela de preços</button></div>`;
   if(f.view==="precos")return tabs+precosView();
-  const l=orcLista(),c=s=>l.filter(o=>o.status===s).length;
-  return tabs+chips("orc",[["todos","Todas",l.length],["pendentes","Para eu aprovar",orcPendentes().length],["meus","Feitas por mim",l.filter(o=>o.created_by===S.me.user_id).length],["rascunho","Rascunho",c("rascunho")],["aguardando","Aguardando",c("aguardando")],["aprovado","Aprovadas",c("aprovado")],["enviado","Enviadas",c("enviado")],["aceito","Aceitas",c("aceito")],["recusado","Recusadas",c("recusado")]],f.st)
+  const lt=orcLista(),l=lt.filter(o=>o.status!=="cancelado"),c=s=>lt.filter(o=>o.status===s).length;
+  return tabs+chips("orc",[["todos","Todas",l.length],["pendentes","Para eu aprovar",orcPendentes().length],["meus","Feitas por mim",l.filter(o=>o.created_by===S.me.user_id).length],["rascunho","Rascunho",c("rascunho")],["aguardando","Aguardando",c("aguardando")],["aprovado","Aprovadas",c("aprovado")],["enviado","Enviadas",c("enviado")],["aceito","Aceitas",c("aceito")],["recusado","Recusadas",c("recusado")]].concat(c("cancelado")?[["cancelado","Canceladas",c("cancelado")]]:[]),f.st)
    +`<div class="tool">${qbox("orc","Buscar marca, nº, quem elaborou…")}</div><div id="lst">${LISTS.orc()}</div>`};
 function precosView(){const ro=!isSocio();
   return `<div class="hint" style="margin-bottom:10px">Preços de tabela usados em toda proposta nova. ${ro?"Só sócios podem alterar.":"Alterar aqui não muda propostas já feitas."}</div>`+GRUPOS.map(([g,t])=>`<div class="sec"><h2>${t}</h2></div><div class="tblw"><table class="tb"><thead><tr><th>Categoria</th><th>Descrição</th><th class="r">${g==="hora"?"R$ por hora":"Valor (R$)"}</th><th class="r">%</th><th class="r">${g==="hora"?"Mín. lives/semana":"Lives"}</th><th class="r">${g==="hora"?"Mín. horas/mês":"Horas"}</th>${g==="drop"?`<th class="r">Valor cheio</th>`:""}${ro?"":"<th></th>"}</tr></thead><tbody>
@@ -2536,8 +2536,9 @@ document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.cl
 
 VIEWS.pessoa=VPessoa;
 /* ================= v13 · VERSÃO DO SISTEMA + LER CONDIÇÕES DE ARQUIVOS ================= */
-const APP_VERSAO="16";const APP_DATA="26/10/2026";
+const APP_VERSAO="17";const APP_DATA="26/10/2026";
 const NOVIDADES=[
+ ["17","26/10","Propostas canceladas saem da lista. Para vê-las, use o filtro Canceladas no fim."],
  ["16","26/10","Comprovantes: lê os prints do Mercado Livre (Detalhes da transação), inclusive valores sem centavos como R$ 1.649, junta os itens do pedido, guarda o nº do pedido e avisa se ele já foi lançado. Nova categoria: Móveis e decoração."],
  ["15","26/10","Cobrança por hora de live (valor da hora, mínimo de horas por mês, mínimo de lives por semana) no formulário do contrato, na proposta e no contrato. Formulário do contrato reorganizado por assuntos, com cálculo do fixo mensal na hora."],
  ["14","26/10","Contrato: leitura das condições melhorada (\"150 reais a hora\", \"40h mensais\", \"9 porcento\", \"6 mil mês\", \"150 vezes 40\"), calcula o fixo mensal, traz o que está incluso e avisa quando os valores não batem."],
