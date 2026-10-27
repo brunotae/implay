@@ -978,14 +978,6 @@ function fitDoc(){const w=Math.min(window.innerWidth-16,1123),k=w/1123;document.
 window.addEventListener("resize",()=>{if(!$("#doc").hidden)fitDoc()});
 
 /* ================= CLIENTES ================= */
-function openCli(id){const c=id?S.clientes.find(x=>x.id===id):{};
-  openSheet(`<form onsubmit="return false"><h3>${id?esc(c.marca):"Novo cliente"}</h3>
-  <div class="cols2">${fld("marca","Marca",c.marca,"text","required")}${fld("empresa","Empresa",c.empresa)}</div>
-  ${fld("cnpj","CNPJ",c.cnpj,"text","inputmode=numeric")}
-  <div class="cols2">${fld("contato_nome","Contato",c.contato_nome)}${fld("contato_tel","Telefone",c.contato_tel,"tel")}</div>
-  ${fld("contato_email","E-mail",c.contato_email,"email")}${fld("endereco","Endereço (usado em 'local do cliente')",c.endereco)}${area("obs","Observações",c.obs)}
-  <div class="acts"><button type="button" class="btn p" data-act="cliSalvar" data-id="${id||""}">Salvar</button><button type="button" class="btn" data-act="fechar">Fechar</button>${id?`<button type="button" class="btn" data-act="propNova" data-cli="${id}">+ Proposta</button><button type="button" class="btn d" data-act="cliCancelar" data-id="${id}">Arquivar</button>`:""}</div></form>`)}
-
 /* ================= FINANCEIRO ================= */
 function finItem(f){
   const pend=!f.pago_em,venc=f.vencimento&&parseYmd(f.vencimento)<new Date(new Date().toDateString());
@@ -1470,7 +1462,7 @@ function ctrCliente(p){const c=S.clientes.find(x=>x.id===p.cliente_id)||{};const
   return docShell(aluguel?"Contrato de locação de estúdio para transmissões ao vivo":"Contrato de prestação de serviços de live commerce",
   `<p class="num">Contrato nº ${_(p.contrato_numero,"C-0000")} · Proposta ${pn(p.numero)}</p>
   ${cl("Partes",`<p><b>CONTRATADA:</b> ${EMPRESA.razao} ("IMPLAY"), inscrita no CNPJ sob nº ${EMPRESA.cnpj}, com sede na ${EMPRESA.sede}, e estúdio na ${EMPRESA.estudio}.</p>
-   <p><b>CONTRATANTE:</b> ${_(c.empresa,"razão social da marca")}, inscrita no CNPJ sob nº ${_(c.cnpj,"00.000.000/0000-00")}, com sede na ${_(c.endereco,"endereço completo")}, titular da marca <b>${esc(p.marca)}</b>, neste ato representada por ${_(c.contato_nome,"nome do representante")}.</p>`)}
+   <p><b>CONTRATANTE:</b> ${_(c.empresa,"razão social da marca")}, inscrita no CNPJ sob nº ${_(c.cnpj,"00.000.000/0000-00")}, com sede na ${_(cliEnd(c),"endereço completo")}, titular da marca <b>${esc(p.marca)}</b>, neste ato representada por ${_(c.contato_nome,"nome do representante")}.</p>`)}
   ${cl("Objeto",aluguel?`<p>Locação de espaço no estúdio da IMPLAY, com estrutura de áudio, vídeo, iluminação e internet, para transmissões ao vivo realizadas pela CONTRATANTE.</p>`:`<p>Prestação, pela IMPLAY, de serviços de operação de vendas ao vivo (live commerce) no perfil da CONTRATANTE no TikTok Shop, compreendendo ${lives}, no estúdio da IMPLAY ou em local indicado pela CONTRATANTE, com os produtos: ${_(p.produtos,"SKUs ou categorias")}.</p>
    <p>Estão incluídos: estúdio com áudio e vídeo, apresentadores treinados, roteiro e ofertas, operação da plataforma (produtos fixados, flash sales e cupons), resumo de cada live em até 24 horas, calendário mensal com o TikTok e cadastro de SKUs novos.${p.complementos?" Complementos: "+esc(p.complementos)+".":""}</p>`)}
   ${cl("Preço",aluguel?`<p>A CONTRATANTE pagará à IMPLAY ${p.valor_fixo?brl(p.valor_fixo):"R$ ______"} pela locação, conforme a proposta aceita.</p>`:`<p>Pelos serviços, a CONTRATANTE pagará à IMPLAY: (a) remuneração fixa de <b>${p.valor_fixo?brl(p.valor_fixo):"R$ ______"} por mês</b>; e (b) remuneração variável de <b>${perc}</b> sobre o valor das vendas realizadas durante as lives (GMV), excluídos pedidos cancelados ou devolvidos, apurado mensalmente pelo relatório oficial do TikTok Shop.</p>`)}
@@ -2224,8 +2216,11 @@ document.addEventListener("click",async e=>{
       const mk=$("#sheetIn [name=marca]");if(mk&&!mk.value)mk.value=marca;break}
     case"cliNovo":openCli(null);break;
     case"cli":openCli(id);break;
-    case"cliSalvar":{const f=formData();if(!f.marca)return toast("Preencha a marca",true);const row={marca:f.marca,empresa:f.empresa||null,cnpj:f.cnpj||null,contato_nome:f.contato_nome||null,contato_tel:f.contato_tel||null,contato_email:f.contato_email||null,endereco:f.endereco||null,obs:f.obs||null};
-      await run(id?db.from("imp_clientes").update(row).eq("id",id):db.from("imp_clientes").insert(row),"Cliente salvo");closeSheet();await refresh();break}
+    case"cliSalvar":{const f=formData();if(!f.marca)return toast("Preencha a marca",true);const row={marca:f.marca,empresa:f.empresa||null,cnpj:f.cnpj?cnpjFmt(f.cnpj):null,contato_nome:f.contato_nome||null,contato_tel:f.contato_tel||null,contato_email:f.contato_email||null,endereco:f.endereco||null,obs:f.obs||null};
+      const ext={};CLI_EXTRA.forEach(k=>{if(k in f)ext[k]=f[k]||null});
+      let r=await (id?db.from("imp_clientes").update(Object.assign({},row,ext)).eq("id",id):db.from("imp_clientes").insert(Object.assign({},row,ext)));
+      if(r.error&&/column|schema/i.test(r.error.message||"")){const extra=CLI_EXTRA.filter(k=>ext[k]).map(k=>k+": "+ext[k]).join(" · ");row.obs=[row.obs,extra].filter(Boolean).join("\n");r=await (id?db.from("imp_clientes").update(row).eq("id",id):db.from("imp_clientes").insert(row));if(!r.error)toast("Salvo. Rode o SQL implay_clientes_contrato.sql para guardar os campos novos nos lugares certos",true)}
+      if(r.error){toast("Erro: "+r.error.message,true);break}if(!r.error)toast("Cliente salvo");closeSheet();await refresh();break}
     case"cliCancelar":if(!armed(a))return;await run(db.from("imp_clientes").update({status:"cancelado"}).eq("id",id),"Arquivado");closeSheet();await refresh();break;
     case"finSub":S.finSub=val;render();break;
     case"finF":S.finF=val;render();break;
@@ -2540,8 +2535,9 @@ document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.cl
 
 VIEWS.pessoa=VPessoa;
 /* ================= v13 · VERSÃO DO SISTEMA + LER CONDIÇÕES DE ARQUIVOS ================= */
-const APP_VERSAO="19";const APP_DATA="26/10/2026";
+const APP_VERSAO="20";const APP_DATA="26/10/2026";
 const NOVIDADES=[
+ ["20","27/10","Cadastro de cliente completo por blocos: razão social, CNPJ com busca na Receita (mostra os sócios), inscrição estadual, CEP com busca, quem assina o contrato (nome, CPF, cargo, e-mail), contato do dia a dia, financeiro e redes. Avisa o que falta para o contrato."],
  ["19","27/10","Novo contrato: vigência \"sem prazo definido\" (prazo indeterminado no contrato), mais de uma plataforma, pagamento \"a combinar depois\" e botões reorganizados por bloco."],
  ["18","27/10","Proposta modular: por hora de live com mínimo de horas no mês, mínimo de horas por live e frequência (ex.: a cada 3 dias), mais itens sob medida (por hora, por mês, por live ou valor único). Na proposta, preço riscado só aparece quando o valor baixou."],
  ["17","26/10","Propostas canceladas saem da lista. Para vê-las, use o filtro Canceladas no fim."],
@@ -2685,7 +2681,7 @@ function cdRender(){const C=S.cd;const cli=S.clientes.filter(c=>c.status!=="canc
       ${!C.pagamento&&!outro?`<div class="small muted" style="margin-top:6px">No contrato sai: "a definir entre as partes por escrito, antes do primeiro faturamento".</div>`:""}`)})()}
    ${cdSec(++n,"O que está incluído","Um item por linha · sai no Anexo I",`<textarea id="cdInc" rows="${Math.max(4,(C.inclui||[]).length+1)}" style="width:100%">${esc((C.inclui||[]).join("\n"))}</textarea>
      <div class="fld"><label>Fica por conta da marca (um por linha)</label><textarea id="cdMar" rows="${Math.max(3,(C.marca_lista||[]).length+1)}" style="width:100%">${esc((C.marca_lista||[]).join("\n"))}</textarea></div>
-     <button type="button" class="lnk" data-act="cdIncPadrao">Voltar às listas padrão</button>`)}
+     <button type="button" class="btn sm" style="margin-top:8px" data-act="cdIncPadrao">Voltar às listas padrão</button>`)}
    ${cdSec(++n,"Outras condições","Opcional · aparecem no Anexo I",`<textarea id="cdObs" rows="2" style="width:100%" placeholder="ex.: início a negociar conforme agenda do estúdio">${esc(C.obs||"")}</textarea>`)}
    <div class="cdfoot"><div class="small" id="cdRes">${cdResumo(C)}</div><div class="acts" style="margin-top:6px"><button type="button" class="btn p" data-act="cdSeguir">Continuar → cláusulas do contrato</button><button type="button" class="btn" data-act="fechar">Fechar</button></div></div></form>`;
   if($("#sheet").hidden||!$("#cdForm"))openSheet(html);else{const sc=$("#sheetIn").scrollTop;$("#sheetIn").innerHTML=html;$("#sheetIn").scrollTop=sc}}
@@ -2746,7 +2742,7 @@ function cliParse(txt){const t=String(txt||"").replace(/\r/g,"");const ls=t.spli
   return o}
 async function cliReceita(cnpj){const d=soD(cnpj);if(d.length!==14)return null;try{const r=await fetch(`https://brasilapi.com.br/api/cnpj/v1/${d}`);if(!r.ok)return {erro:r.status===404?"CNPJ não encontrado na Receita":"Não consegui consultar a Receita agora"};const j=await r.json();
   const end=[[titulo(j.descricao_tipo_de_logradouro?j.descricao_tipo_de_logradouro+" "+j.logradouro:j.logradouro),j.numero].filter(Boolean).join(", "),j.complemento?titulo(j.complemento):"",titulo(j.bairro),j.municipio?titulo(j.municipio)+"/"+j.uf:"",j.cep?"CEP "+String(j.cep).replace(/(\d{5})(\d{3})/,"$1-$2"):""].filter(Boolean).join(", ");
-  return {empresa:j.razao_social,marca:j.nome_fantasia?titulo(j.nome_fantasia):"",endereco:end,contato_tel:j.ddd_telefone_1?telFmt(j.ddd_telefone_1):"",contato_email:(j.email||"").toLowerCase(),situacao:j.descricao_situacao_cadastral,abertura:j.data_inicio_atividade,atividade:j.cnae_fiscal_descricao}}catch(e){return {erro:"Não consegui consultar a Receita agora"}}}
+  return {cep:j.cep?String(j.cep).replace(/\D/g,"").replace(/(\d{5})(\d{3})/,"$1-$2"):"",qsa:(j.qsa||[]).map(x=>({nome:x.nome_socio,cargo:x.qualificacao_socio})),empresa:j.razao_social,marca:j.nome_fantasia?titulo(j.nome_fantasia):"",endereco:end,contato_tel:j.ddd_telefone_1?telFmt(j.ddd_telefone_1):"",contato_email:(j.email||"").toLowerCase(),situacao:j.descricao_situacao_cadastral,abertura:j.data_inicio_atividade,atividade:j.cnae_fiscal_descricao}}catch(e){return {erro:"Não consegui consultar a Receita agora"}}}
 S.ci=null;
 function openCliImport(){S.ci={sug:null,fonte:"",lendo:false,receita:null};ciRender()}
 function ciRender(){const C=S.ci,s=C.sug;const dup=s&&s.cnpj?S.clientes.find(c=>soD(c.cnpj)===soD(s.cnpj)):null;const F=(k,l,ph)=>`<div class="fld"><label>${l}</label><input data-ci="${k}" value="${esc((s&&s[k])||"")}" placeholder="${ph||""}"></div>`;
@@ -2944,7 +2940,7 @@ function openCtrEnviar(id){const c=S.ctrs.find(x=>x.id===id);const cli=S.cliente
   const msg=`Olá${op.rep_nome?" "+op.rep_nome.split(" ")[0]:""}, tudo bem?\n\nSegue o contrato ${ctn(c.numero)} da ${c.marca} com a IMPlay, com a proposta comercial no Anexo I. Qualquer dúvida, estamos à disposição.\n\nObrigado!\n${S.me.nome} · IMPlay`;
   openSheet(`<form onsubmit="return false"><h3>Enviar ${ctn(c.numero)} · v${c.versao}</h3>
    <div class="fld"><label>Como enviar</label>${seg("via",[["email","E-mail com PDF"],["docusign","DocuSign"],["whatsapp","WhatsApp"],["outro","Já enviei por outro meio"]],"email")}</div>
-   ${fld("para","Para (e-mail ou nome)",cli.contato_email||op.rep_nome||"","text",'placeholder="email@marca.com.br"')}
+   ${fld("para","Para (e-mail ou nome)",cli.rep_email||cli.contato_email||op.rep_nome||"","text",'placeholder="email@marca.com.br"')}
    <div data-show="via=email" class="hint">No celular, o PDF vai direto como anexo no app de e-mail. No computador, o PDF é baixado e o e-mail abre pronto: é só anexar o arquivo baixado.</div>
    <div data-show="via=docusign" class="hint">O PDF é baixado e a DocuSign abre em outra aba. Lá: Iniciar → Enviar envelope → suba o PDF, coloque o e-mail de quem assina e posicione as assinaturas. Quando a marca assinar, volte aqui e marque como assinado (dá para subir o PDF assinado).</div>
    <div data-show="via=whatsapp" class="hint">No celular, o PDF vai como anexo no WhatsApp. No computador, o PDF é baixado e o WhatsApp Web abre com a mensagem.</div>
@@ -2996,7 +2992,7 @@ const EXT={1:"um",2:"dois",3:"três",4:"quatro",5:"cinco",6:"seis",7:"sete",8:"o
 const nx=n=>EXT[n]?`${n} (${EXT[n]})`:String(n);
 const CTRM_PADRAO={horas_sobra:"cobra",local:"estudio",exclusividade:"nao",aviso:30,multa:"nao",renovacao:"auto",foro:"São Paulo/SP",cidade:"São Paulo/SP",rep_nome:"",rep_cpf:"",rep_cargo:"",implay_rep:"",plataforma:"TikTok Shop"};
 function ctrmOpts(o){const c=S.clientes.find(x=>x.id===o.cliente_id)||{};const adm=(S.socios||[]).filter(s=>s.administrador);
-  return Object.assign({},CTRM_PADRAO,{inicio:ymd(new Date()),rep_nome:c.contato_nome||"",implay_rep:(adm[0]||{}).nome_completo||""},o.contrato||{})}
+  return Object.assign({},CTRM_PADRAO,{inicio:ymd(new Date()),rep_nome:c.rep_nome||c.contato_nome||"",rep_cpf:c.rep_cpf||"",rep_cargo:c.rep_cargo||"",implay_rep:(adm[0]||{}).nome_completo||""},o.contrato||{})}
 function ctrmItens(o){return (o.itens||[]).filter(i=>i.on).map(i=>{const p=i.p||preco(i.k)||{};const nm=(p.grupo==="hora"&&!(i.k&&String(i.k).startsWith("cx:"))?"Gestão de lives por hora":p.nome)||{pontual:"Live Pontual",pacote:"Pacote mensal",drop:"Live Drop"}[p.grupo]||"Serviço";
   if(p.grupo==="hora"){const h=hrDe(i,p);return {p,i,nm,qtd:1,sub:h.mensal,mensal:true,h}}
   const qtd=p.grupo==="pontual"?(i.qtd||1):1;return {p,i,nm,qtd,sub:Number(i.valor)*qtd,mensal:p.grupo==="pacote"}})}
@@ -3029,7 +3025,7 @@ function ctrmDoc(o,op,meta){meta=meta||{};const c=S.clientes.find(x=>x.id===o.cl
   const LOCAL={estudio:`no estúdio da IMPLAY (${EMPRESA.estudio})`,marca:"em local indicado pela CONTRATANTE, com estrutura adequada à transmissão",ambos:`no estúdio da IMPLAY (${EMPRESA.estudio}) ou em local indicado pela CONTRATANTE, conforme o calendário`}[op.local];
   let n=0;const cl=(t,x)=>`<h2>Cláusula ${++n}ª · ${t}</h2>${x}`;const aviso=parseInt(op.aviso)||30;
   const corpo=`<p class="num">${meta.numero?`Contrato ${ctn(meta.numero)} · versão ${meta.versao} · `:ctrNum?`Contrato nº ${esc(ctrNum)} · `:""}${o.direto?"Condições comerciais (Anexo I)":"Proposta comercial "+on(o.numero)+" (Anexo I)"}</p>
-  <p><b>CONTRATANTE:</b> ${_(c.empresa,"razão social da marca")}, inscrita no CNPJ sob o nº ${_(c.cnpj,"00.000.000/0000-00")}, com sede em ${_(c.endereco,"endereço completo com CEP")}, titular da marca <b>${esc(o.marca)}</b>, neste ato representada por ${_(op.rep_nome,"nome do representante")}${op.rep_cargo?`, ${esc(op.rep_cargo)}`:""}${op.rep_cpf?`, inscrito(a) no CPF sob o nº ${esc(op.rep_cpf)}`:""}, doravante denominada <b>CONTRATANTE</b>.</p>
+  <p><b>CONTRATANTE:</b> ${_(c.empresa,"razão social da marca")}, inscrita no CNPJ sob o nº ${_(c.cnpj,"00.000.000/0000-00")}, com sede em ${_(cliEnd(c),"endereço completo com CEP")}, titular da marca <b>${esc(o.marca)}</b>, neste ato representada por ${_(op.rep_nome,"nome do representante")}${op.rep_cargo?`, ${esc(op.rep_cargo)}`:""}${op.rep_cpf?`, inscrito(a) no CPF sob o nº ${esc(op.rep_cpf)}`:""}, doravante denominada <b>CONTRATANTE</b>.</p>
   <p><b>CONTRATADA:</b> ${EMPRESA.razao}, inscrita no CNPJ sob o nº ${EMPRESA.cnpj}, com sede na ${EMPRESA.sede}, neste ato representada por ${_(op.implay_rep,"sócio(a) administrador(a)")}, na forma do seu Contrato Social, doravante denominada <b>IMPLAY</b>.</p>
   <p><b>CONSIDERANDO QUE</b> a CONTRATANTE comercializa produtos e deseja ampliar suas vendas por meio de transmissões ao vivo (lives) na plataforma ${plat}; que a IMPLAY é especializada em planejamento, produção e operação de lives de vendas, treinamento de apresentadores e gestão de campanhas de social commerce; ${o.direto?"e que as partes ajustaram as condições comerciais descritas no Anexo I,":"e que a CONTRATANTE aprovou a proposta comercial "+on(o.numero)+","} <b>resolvem as partes</b> celebrar este contrato, que se rege pelas cláusulas seguintes:</p>
   ${cl("Do objeto",`<p>1. A IMPLAY prestará à CONTRATANTE os serviços de planejamento, produção e operação de lives de vendas no perfil da CONTRATANTE na plataforma ${plat}, incluindo apresentação por live sellers treinados, operação técnica e comercial da transmissão (produtos fixados, ofertas relâmpago e cupons), estrutura de áudio, vídeo e iluminação, e relatório de resultados.</p>
@@ -3157,6 +3153,43 @@ document.addEventListener("click",e=>{const a=e.target.closest("[data-act]");if(
   else if(act==="oeCxG"){const it=oeItem(k);it.p.grupo=v;if(v!=="hora"&&it.p.nome==="Gestão de lives por hora")it.p.nome={pacote:"Pacote mensal sob medida",pontual:"Lives avulsas",outro:"Serviço"}[v];if(v==="hora"&&!it.hmin)Object.assign(it,{hmin:40,hlive:3,freq:"a cada 3 dias"});oeRefresh(k)}
   else if(act==="oeCxNovo"){const it=cxNovo();S.oe.itens.push(it);const box=$("#oeCx");if(box)box.insertAdjacentHTML("beforeend",oeCard(it.k));oeRefresh()}
   else if(act==="oeCxDel"){S.oe.itens=S.oe.itens.filter(i=>i.k!==k);const c=$(`#sheetIn .ocard[data-k="${k}"]`);if(c)c.remove();oeRefresh()}},true);
+
+const CLI_EXTRA=["ie","cep","rep_nome","rep_cpf","rep_cargo","rep_email","fin_nome","fin_email","instagram","tiktok","site"];
+function cliEnd(c){const e=c.endereco||"";return e&&c.cep&&!/cep/i.test(e)?e+", CEP "+c.cep:e}
+function cliFalta(c){return [!c.empresa&&"razão social",!c.cnpj&&"CNPJ",!c.endereco&&"endereço",!(c.rep_nome||c.contato_nome)&&"quem assina"].filter(Boolean)}
+function openCli(id){const c=id?S.clientes.find(x=>x.id===id):{};let n=0;const F=(k,l,t,x)=>fld(k,l,c[k],t||"text",x||"");
+  openSheet(`<form onsubmit="return false" class="cdform" id="cliForm"><h3>${id?esc(c.marca):"Novo cliente"}</h3>
+  <p class="small muted" style="margin-top:0">Só a marca é obrigatória. O resto preenche o contrato sozinho. Tem print ou cartão CNPJ? <a href="#" data-act="ciAbrir">Cadastrar com print / PDF</a></p>
+  <div id="cliFalta">${cliFaltaHtml(c)}</div>
+  ${cdSec(++n,"Empresa","Dados que aparecem no contrato",`<div class="cols2">${F("marca","Marca (nome conhecido)","text","required")}${F("empresa","Razão social")}</div>
+    <div class="fld"><label>CNPJ</label><div class="row" style="gap:6px;flex-wrap:nowrap"><input name="cnpj" value="${esc(c.cnpj||"")}" inputmode="numeric" placeholder="00.000.000/0000-00" style="flex:1"><button type="button" class="btn sm" data-act="cliRec">🔎 Buscar na Receita</button></div><div class="small muted" id="cliRecMsg">Preenche razão social, endereço e mostra os sócios.</div></div>
+    ${F("ie","Inscrição estadual (opcional)")}`)}
+  ${cdSec(++n,"Endereço da sede","",`<div class="fld"><label>CEP</label><div class="row" style="gap:6px;flex-wrap:nowrap"><input name="cep" value="${esc(c.cep||"")}" inputmode="numeric" placeholder="00000-000" style="flex:1;max-width:200px"><button type="button" class="btn sm" data-act="cliCep">🔎 Buscar CEP</button></div></div>
+    ${F("endereco","Endereço completo (rua, nº, complemento, bairro, cidade/UF)")}`)}
+  ${cdSec(++n,"Quem assina o contrato","Representante legal da marca",`<div id="cliQsa"></div><div class="cols2">${F("rep_nome","Nome completo")}${F("rep_cargo","Cargo","text",'placeholder="ex.: sócio-administrador"')}</div>
+    <div class="cols2">${F("rep_cpf","CPF","text",'inputmode="numeric"')}${F("rep_email","E-mail (para enviar o contrato)","email")}</div>`)}
+  ${cdSec(++n,"Contato do dia a dia","Quem fala com a gente sobre as lives",`<div class="cols2">${F("contato_nome","Nome")}${F("contato_tel","Telefone / WhatsApp","tel")}</div>${F("contato_email","E-mail","email")}
+    <button type="button" class="btn sm" style="margin-top:8px" data-act="cliCopiaRep">Mesma pessoa que assina</button>`)}
+  ${cdSec(++n,"Financeiro","Para onde vão nota fiscal e cobrança",`<div class="cols2">${F("fin_nome","Responsável (opcional)")}${F("fin_email","E-mail do financeiro","email")}</div>`)}
+  ${cdSec(++n,"Lojas e redes","Opcional",`<div class="cols2">${F("instagram","Instagram","text",'placeholder="@marca"')}${F("tiktok","Loja no TikTok Shop","text",'placeholder="@loja ou link"')}</div>${F("site","Site","text",'placeholder="www.marca.com.br"')}`)}
+  ${cdSec(++n,"Observações","",area("obs","",c.obs))}
+  <div class="cdfoot"><div class="acts" style="margin-top:0"><button type="button" class="btn p" data-act="cliSalvar" data-id="${id||""}">Salvar</button><button type="button" class="btn" data-act="fechar">Fechar</button>${id?`<button type="button" class="btn" data-act="propNova" data-cli="${id}">+ Proposta</button><button type="button" class="btn d" data-act="cliCancelar" data-id="${id}">Arquivar</button>`:""}</div></div></form>`)}
+function cliFaltaHtml(c){const f=cliFalta(c);return f.length?`<div class="warnbox" style="margin:0">Para o contrato ainda falta: <b>${f.join(", ")}</b></div>`:`<div class="okbox" style="margin:0">✓ Pronto para contrato</div>`}
+function cliFormVal(){const o={};new FormData($("#cliForm")).forEach((v,k)=>o[k]=String(v).trim());return o}
+function cliSet(k,v,forca){const i=$(`#cliForm [name=${k}]`);if(i&&v&&(forca||!i.value.trim()))i.value=v}
+document.addEventListener("input",e=>{if(e.target.closest&&e.target.closest("#cliForm")){const b=$("#cliFalta");if(b)b.innerHTML=cliFaltaHtml(cliFormVal())}});
+document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]");if(!a||!a.closest("#cliForm"))return;const act=a.dataset.act;
+  if(!["cliRec","cliCep","cliCopiaRep","cliQsa"].includes(act))return;e.preventDefault();e.stopImmediatePropagation();const f=cliFormVal();
+  if(act==="cliRec"){const m=$("#cliRecMsg");if(soD(f.cnpj).length!==14)return toast("Digite o CNPJ com 14 números",true);m.textContent="Consultando a Receita…";const r=await cliReceita(f.cnpj);
+    if(!r||r.erro){m.textContent=(r&&r.erro)||"Não consegui consultar";return}
+    cliSet("cnpj",cnpjFmt(f.cnpj),1);cliSet("empresa",r.empresa);cliSet("marca",r.marca);cliSet("endereco",r.endereco);cliSet("cep",r.cep);cliSet("contato_tel",r.contato_tel);
+    m.innerHTML=`✓ ${esc(r.empresa||"")} · ${esc(r.situacao||"")}${r.contato_email?` · e-mail na Receita: ${esc(r.contato_email)} (pode ser do contador)`:""}`;
+    const q=(r.qsa||[]).filter(x=>x.nome);const box=$("#cliQsa");if(box)box.innerHTML=q.length?`<div class="small muted">Sócios na Receita · toque para usar:</div><div class="chrow" style="margin-bottom:6px">${q.map(x=>`<button type="button" class="pch" data-act="cliQsa" data-n="${esc(titulo(x.nome))}" data-c="${esc(x.cargo||"")}">${esc(titulo(x.nome))}${x.cargo?` · ${esc(x.cargo)}`:""}</button>`).join("")}</div>`:"";}
+  if(act==="cliQsa"){cliSet("rep_nome",a.dataset.n,1);cliSet("rep_cargo",a.dataset.c.toLowerCase(),1)}
+  if(act==="cliCep"){const d=soD(f.cep);if(d.length!==8)return toast("Digite o CEP com 8 números",true);try{const r=await (await fetch(`https://viacep.com.br/ws/${d}/json/`)).json();if(r.erro)return toast("CEP não encontrado",true);
+    cliSet("cep",d.replace(/(\d{5})(\d{3})/,"$1-$2"),1);const atual=$("#cliForm [name=endereco]").value.trim();if(!atual){cliSet("endereco",`${r.logradouro}, nº ___, ${r.bairro}, ${r.localidade}/${r.uf}`);const i=$("#cliForm [name=endereco]");i.focus();i.setSelectionRange(r.logradouro.length+5,r.logradouro.length+8)}else toast("Endereço já preenchido: confira se bate com o CEP")}catch(err){toast("Não consegui consultar o CEP agora",true)}}
+  if(act==="cliCopiaRep"){cliSet("contato_nome",f.rep_nome,1);cliSet("contato_email",f.rep_email,1)}
+  const b=$("#cliFalta");if(b)b.innerHTML=cliFaltaHtml(cliFormVal())},true);
 
 if(!orcPreviewBoot())boot();
 </script>
