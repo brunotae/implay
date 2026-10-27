@@ -581,7 +581,7 @@ const ESPACOS=[...Array.from({length:8},(_,i)=>"E"+(i+1)),...Array.from({length:
 const ESPACO_NOME={E:"Economy",P:"Premium",B:"Business",C:"Cabine"};
 const ESTUDIO="Estúdio IMPlay · Av. Paulista, 2198, salas 161/162";
 const CAT_ENT=[["aporte","Aporte Tae & Dani"],["fixo_cliente","Fixo do cliente"],["variavel_cliente","% sobre vendas"],["aluguel_espaco","Aluguel do espaço"],["rendimento","Rendimento / juros"],["outra_entrada","Outra entrada"]];
-const CAT_SAI=[["seller","Cachê de seller","variavel"],["aluguel_imovel","Aluguel do imóvel","fixa"],["condominio_iptu","Condomínio / IPTU","fixa"],["obra","Obra","variavel"],["equipamentos","Equipamentos","variavel"],["salarios","Salários CLT","fixa"],["comissao","Comissão CLT","variavel"],["impostos","Impostos","variavel"],["contador","Contador","fixa"],["marketing","Marketing","variavel"],["limpeza","Limpeza","fixa"],["contas","Energia / água / internet","fixa"],["seguro","Seguro","fixa"],["taxas","Taxas, registros e certificados","variavel"],["caucao","Caução do aluguel","variavel"],["live_custos","Custos de live (viagem, transporte)","variavel"],["caixinha","Caixinha","variavel"],["devolucao_aporte","Devolução de aporte","variavel"],["outra_saida","Outra saída","variavel"]];
+const CAT_SAI=[["seller","Cachê de seller","variavel"],["aluguel_imovel","Aluguel do imóvel","fixa"],["condominio_iptu","Condomínio / IPTU","fixa"],["obra","Obra","variavel"],["equipamentos","Equipamentos","variavel"],["salarios","Salários CLT","fixa"],["comissao","Comissão CLT","variavel"],["impostos","Impostos","variavel"],["contador","Contador","fixa"],["marketing","Marketing","variavel"],["limpeza","Limpeza","fixa"],["contas","Energia / água / internet","fixa"],["seguro","Seguro","fixa"],["taxas","Taxas, registros e certificados","variavel"],["caucao","Caução do aluguel","variavel"],["live_custos","Custos de live (viagem, transporte)","variavel"],["caixinha","Caixinha","variavel"],["devolucao_aporte","Devolução de aporte","variavel"],["moveis","Móveis e decoração","variavel"],["outra_saida","Outra saída","variavel"]];
 const CAT_NOME=Object.fromEntries([...CAT_ENT,...CAT_SAI].map(c=>[c[0],c[1]]));
 const PACOTES=["Essencial","Crescimento","Escala","Marca + afiliados","Live de lançamento","Aluguel do espaço"];
 const S={me:null,tab:"painel",membros:[],clientes:[],propostas:[],jobs:[],fin:[],amostras:[],
@@ -2536,8 +2536,9 @@ document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.cl
 
 VIEWS.pessoa=VPessoa;
 /* ================= v13 · VERSÃO DO SISTEMA + LER CONDIÇÕES DE ARQUIVOS ================= */
-const APP_VERSAO="15";const APP_DATA="26/10/2026";
+const APP_VERSAO="16";const APP_DATA="26/10/2026";
 const NOVIDADES=[
+ ["16","26/10","Comprovantes: lê os prints do Mercado Livre (Detalhes da transação), inclusive valores sem centavos como R$ 1.649, junta os itens do pedido, guarda o nº do pedido e avisa se ele já foi lançado. Nova categoria: Móveis e decoração."],
  ["15","26/10","Cobrança por hora de live (valor da hora, mínimo de horas por mês, mínimo de lives por semana) no formulário do contrato, na proposta e no contrato. Formulário do contrato reorganizado por assuntos, com cálculo do fixo mensal na hora."],
  ["14","26/10","Contrato: leitura das condições melhorada (\"150 reais a hora\", \"40h mensais\", \"9 porcento\", \"6 mil mês\", \"150 vezes 40\"), calcula o fixo mensal, traz o que está incluso e avisa quando os valores não batem."],
  ["13","26/10","Contrato: arraste ou cole arquivos (PDF, print, Word, texto do WhatsApp) e o sistema lê as condições. Número de versão do sistema e aviso de versão nova."],
@@ -2767,7 +2768,7 @@ document.addEventListener("drop",e=>{const d=e.target.closest&&e.target.closest(
 
 /* ================= v10 · IMPORTAR COMPROVANTES (zip ou imagens) → reembolso ================= */
 const CP_MESES={jan:0,janeiro:0,fev:1,fevereiro:1,mar:2,"março":2,marco:2,abr:3,abril:3,mai:4,maio:4,jun:5,junho:5,jul:6,julho:6,ago:7,agosto:7,set:8,setembro:8,out:9,outubro:9,nov:10,novembro:10,dez:11,dezembro:11};
-const CP_CAT=[["equipamentos",/cadeira|mocho|mesa|celular|fone|microfone|ring ?light|lumin|l[aâ]mpada|led\b|trip[eé]|c[aâ]mera|notebook|monitor|cabo|suporte|bateria|carregador|teclado|mouse/i],["obra",/cortina|espuma|ac[uú]stic|isolamento|tinta|parafuso|piso|carpete|papel de parede|madeira|gesso|tomada|fio\b|el[eé]tric/i],["limpeza",/limpeza|detergente|vassoura|pano|desinfet|[aá]lcool/i],["marketing",/impress|banner|adesivo|panfleto|cart[aã]o de visita/i],["live_custos",/uber|99 ?pop|t[aá]xi|estacionamento|passagem|combust/i]];
+const CP_CAT=[["moveis",/aparador|buffet|balc[aã]o|sof[aá]|poltrona|estante|nicho|expositor|\brack\b|arm[aá]rio|prateleira|cadeira|mocho|banqueta|\bmesa\b|tapete|espelho|vaso|quadro decor/i],["equipamentos",/celular|fone|microfone|ring ?light|lumin|l[aâ]mpada|led\b|trip[eé]|c[aâ]mera|notebook|monitor|cabo|suporte|bateria|carregador|teclado|mouse/i],["obra",/cortina|espuma|ac[uú]stic|isolamento|tinta|parafuso|piso|carpete|papel de parede|madeira|gesso|tomada|fio\b|el[eé]tric/i],["limpeza",/limpeza|detergente|vassoura|pano|desinfet|[aá]lcool/i],["marketing",/impress|banner|adesivo|panfleto|cart[aã]o de visita/i],["live_custos",/uber|99 ?pop|t[aá]xi|estacionamento|passagem|combust/i]];
 S.cp=null;
 function cpMime(n){n=n.toLowerCase();return n.endsWith(".png")?"image/png":n.endsWith(".webp")?"image/webp":n.endsWith(".heic")?"image/heic":n.endsWith(".pdf")?"application/pdf":"image/jpeg"}
 async function cpUnzip(file){const buf=new Uint8Array(await file.arrayBuffer());const dv=new DataView(buf.buffer,buf.byteOffset,buf.byteLength);let e=-1;
@@ -2791,23 +2792,31 @@ function cpData(txt,nomeArq){const h=new Date();const t=txt.replace(/\s+/g," ");
   const fn=(nomeArq||"").match(/(20\d\d)-(\d{2})-(\d{2})/);return {d:fn?`${fn[1]}-${fn[2]}-${fn[3]}`:ymd(h),tipo:"arquivo"}}
 function cpLimpa(l){const tk=l.split(/\s+/);let i=0;while(i<tk.length&&!/^[A-ZÁÉÍÓÚÂÊÔÃÕÇ][A-Za-zÀ-ÿ]{2,}/.test(tk[i]))i++;return tk.slice(i).join(" ").replace(/[.…]+$/,"").replace(/\s*[>›]\s*$/,"").trim()}
 const CP_LIXO=/(avali|comprar|entreg|pedido|ganhe|reportar|confirmar|total de|compra\s*#|nf-?e|gerada|moedas|pix\s*-|cor d|indicado|conclu|enviado|a caminho|rastre|reembolso|detalhes|ver mais|frete|cupom|desconto)/i;
-function cpBloco(b,full,nomeArq){const ls=b.split(/\n/).map(x=>x.trim()).filter(Boolean);const out={};
+const CP_VAL="(\\d{1,3}(?:\\.\\d{3})+(?:,\\d{2})?|\\d+(?:,\\d{2})?)";const cpNum=v=>Number(String(v).replace(/\./g,"").replace(",","."));
+function cpML(b){const ls=b.split(/\n/).map(x=>x.trim()).filter(Boolean);const out={};const ped=b.match(/#\s?(\d{10,})/);if(ped)out.pedido=ped[1];
+  const tot=b.match(new RegExp("total\\s*pago[^\\n]*?R\\s?\\$\\s?"+CP_VAL,"i"));if(tot)out.valor=cpNum(tot[1]);
+  const prods=ls.filter(l=>new RegExp("R\\s?\\$\\s?"+CP_VAL+"\\s*$").test(l)&&!/desconto|cupo|frete|total|retirada|tarifa|juros/i.test(l)).map(l=>l.replace(new RegExp("\\s*-?\\s*R\\s?\\$\\s?"+CP_VAL+"\\s*$"),"").replace(/[.…]+\s*$/,"").replace(/\s+-\s*$/,"").trim()).filter(l=>l.length>3);
+  const mais=+((b.match(/mais\s+(\d+)\s+produto/i)||[])[1]||0);const n=prods.length+mais;
+  if(prods.length){const nome=prods[0].replace(/(\d)[sS5][oO0]cm/g,"$10cm");const K=x=>x.toLowerCase().replace(/\s+/g,"");const iguais=prods.every(x=>K(x).slice(0,8)===K(prods[0]).slice(0,8)&&K(x).slice(-10)===K(prods[0]).slice(-10));
+    out.desc=iguais?nome:nome+(n>1?` + ${n-1} ${n-1===1?"item":"itens"}`:"");if(iguais&&n>1)out.qtd=n}
+  return out}
+function cpBloco(b,full,nomeArq){if(/detalhes da transa/i.test(b)&&/total\s*pago/i.test(b))return cpML(b);const ls=b.split(/\n/).map(x=>x.trim()).filter(Boolean);const out={};
   const st=ls.find(l=>/(conclu[ií]do|pedido entregue|entregue|enviado|a caminho)\s*$/i.test(l)&&!/^entregue em/i.test(l)&&!/^\d/.test(l));
   if(st){out.loja=cpLimpa(st.replace(/(conclu[ií]do|pedido entregue|entregue|enviado|a caminho)\s*$/i,"").replace(/[>›]/g," "))}
   const cand=ls.filter(l=>l!==st).map(l=>l.replace(/R\s?\$\s?[\d.]+,\d{2}/g,"").trim()).filter(l=>l.length>=12&&!/\d+,\d{2}/.test(l)&&!CP_LIXO.test(l)&&(l.match(/[A-Za-zÀ-ÿ]{3,}/g)||[]).length>=2);
   if(cand.length){let d=cpLimpa(cand[0]);const nx=cand[1];if(nx&&ls.indexOf(nx)===ls.indexOf(cand[0])+1&&!/\.\.\.$|…$/.test(cand[0])&&d.length<45)d+=" "+cpLimpa(nx);out.desc=d.length>70?d.slice(0,68).replace(/\s+\S*$/,"")+"…":d}
   const q=b.match(/\bx\s?(\d{1,3})\b/i)||b.match(/\b(\d{1,3})\s*un\./i);if(q&&+q[1]>1)out.qtd=+q[1];
-  const tot=[...b.matchAll(/total[^\n]*?R\s?\$\s?([\d.]+,\d{2})/gi)];const all=[...b.matchAll(/R\s?\$\s?([\d.]+,\d{2})/g)];
-  const v=tot.length?tot[tot.length-1][1]:all.length?all[all.length-1][1]:null;out.valor=v?Number(v.replace(/\./g,"").replace(",",".")):null;
+  const tot=[...b.matchAll(new RegExp("total[^\\n]*?R\\s?\\$\\s?"+CP_VAL,"gi"))];const all=[...b.matchAll(/R\s?\$\s?([\d.]+,\d{2})/g)];const allI=[...b.matchAll(new RegExp("R\\s?\\$\\s?"+CP_VAL,"g"))];
+  const v=tot.length?tot[tot.length-1][1]:all.length?all[all.length-1][1]:allI.length?allI[allI.length-1][1]:null;out.valor=v?cpNum(v):null;
   return out}
-function cpParse(txt,nomeArq){const plat=/moedas|shopee/i.test(txt)?"Shopee":/compra\s*#|nf-?e da compra|mercado ?livre/i.test(txt)?"Mercado Livre":/b[oô]nus de \d+ ao escrever|tiktok/i.test(txt)?"TikTok Shop":/amazon/i.test(txt)?"Amazon":/aliexpress/i.test(txt)?"AliExpress":"";
-  const forma=/\bpix\b/i.test(txt)?"Pix":/boleto/i.test(txt)?"Boleto":/cart[aã]o|cr[eé]dito|parcel|\d+x de/i.test(txt)?"Cartão":"";
+function cpParse(txt,nomeArq){const plat=/moedas|shopee/i.test(txt)?"Shopee":/compra\s*#|nf-?e da compra|mercado ?livre|meli\+|detalhes da transa[cç]/i.test(txt)?"Mercado Livre":/b[oô]nus de \d+ ao escrever|tiktok/i.test(txt)?"TikTok Shop":/amazon/i.test(txt)?"Amazon":/aliexpress/i.test(txt)?"AliExpress":"";
+  const forma=/\bpix\b/i.test(txt)?"Pix":/boleto/i.test(txt)?"Boleto":/cart[aã]o|cr[eé]dito|parcel|\d+x de|\b\d{1,2}x\s*R\s?\$/i.test(txt)?"Cartão":"";
   const dt=cpData(txt,nomeArq);const idx=[...txt.matchAll(/total de \d+ ite/gi)].map(m=>m.index);let blocos=[txt];
   if(idx.length>1){blocos=[];let ini=0;idx.forEach((ix,k)=>{const fim=txt.indexOf("\n",ix);const end=fim<0?txt.length:fim;blocos.push(txt.slice(ini,end));ini=end})}
   return blocos.map(b=>{const o=cpBloco(b,txt,nomeArq);const desc=(o.desc||"Compra")+(o.qtd?` (x${o.qtd})`:"");const cat=(CP_CAT.find(([c,r])=>r.test(desc+" "+(o.loja||"")))||["outra_saida"])[0];
-    return {valor:o.valor,data:dt.d,dataTipo:dt.tipo,descricao:desc,contraparte:[o.loja,plat].filter(Boolean).join(" · ")||plat||"",categoria:cat,forma,plat}})}
+    return {valor:o.valor,data:dt.d,dataTipo:dt.tipo,descricao:desc+(o.pedido?` · pedido #${o.pedido}`:""),pedido:o.pedido||"",contraparte:[o.loja,plat].filter(Boolean).join(" · ")||plat||"",categoria:cat,forma,plat}})}
 function cpMarcarDup(){const it=S.cp.items;it.forEach(x=>x.flags=x.flags.filter(f=>!/igual|lançado/.test(f)));
-  it.forEach((x,i)=>{if(!x.valor)return;if(it.some((y,j)=>j<i&&y.valor===x.valor))x.flags.push("valor igual a outro item: veja se não é o mesmo pedido");
+  it.forEach((x,i)=>{if(x.pedido){if(it.some((y,j)=>j<i&&y.pedido===x.pedido))x.flags.push("pedido igual a outro item: é o mesmo comprovante");const ep=S.fin.find(f=>f.status==="ativo"&&(f.descricao||"").includes(x.pedido));if(ep){x.flags.push(`pedido já lançado: ${ep.descricao||""} ${brl(ep.valor)}`);if(x.novo)x.on=false}}if(!x.valor)return;if(it.some((y,j)=>j<i&&y.valor===x.valor))x.flags.push("valor igual a outro item: veja se não é o mesmo pedido");
     const ex=S.fin.find(f=>f.status==="ativo"&&Math.abs(Number(f.valor)-x.valor)<0.005&&f.tipo==="saida"&&(!f.pago_em||!x.data||Math.abs(diasEntre(parseYmd(f.pago_em),parseYmd(x.data)))<=20));if(ex){x.flags.push(`parece já lançado: ${ex.descricao||""} ${brl(ex.valor)}`);if(x.novo)x.on=false}x.novo=false})}
 function openCp(){S.cp=S.cp&&S.cp.items.length?S.cp:{items:[],pessoa:"",reemb:"sim",lendo:0,total:0};cpRender()}
 function cpPessoas(){return S.membros.filter(m=>m.status==="ativo"&&["socio","basico"].includes(m.papel)).sort((a,b)=>(a.papel==="socio"?0:1)-(b.papel==="socio"?0:1)||a.nome.localeCompare(b.nome))}
