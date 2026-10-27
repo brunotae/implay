@@ -44,7 +44,7 @@ h1,h2,h3{font-family:var(--fh);margin:0;letter-spacing:-.01em}
 .btn.d{background:transparent;color:var(--bad);border-color:#5d1a24}
 .btn:disabled{opacity:.4}
 .tag{display:inline-block;font-size:11px;font-weight:700;border-radius:999px;padding:3px 8px;margin:4px 4px 0 0;background:var(--card2);border:1px solid var(--linha)}
-.tag.v{background:var(--volt);color:#000;border-color:var(--volt)}.tag.f{background:var(--flash);color:#131411;border-color:var(--flash)}.tag.o{background:#12301a;color:var(--ok);border-color:#1d4a29}.tag.w{background:#3a2a0b;color:var(--warn);border-color:#5a4110}
+.tag.w{background:#ffb84d;color:#131411;border-color:#ffb84d}.dzauto{display:block;border:1.5px dashed var(--linha2,#444);border-radius:14px;padding:14px;text-align:center;cursor:pointer;margin-top:4px}.dzon{border-color:var(--volt)!important}.tag.v{background:var(--volt);color:#000;border-color:var(--volt)}.tag.f{background:var(--flash);color:#131411;border-color:var(--flash)}.tag.o{background:#12301a;color:var(--ok);border-color:#1d4a29}.tag.w{background:#3a2a0b;color:var(--warn);border-color:#5a4110}
 .muted{color:var(--cinza)}.small{font-size:12px}
 .fld{margin-top:14px}
 .fld label{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--cinza);margin-bottom:6px}
@@ -104,7 +104,10 @@ const LOGO_LIMA="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWgAAACJCAYAAAABi
 const SB_URL="https://agdqlnaedojcgivwluty.supabase.co";
 const SB_KEY="sb_publishable_PKGxxrfpduzI7xY1_DWQyQ_cnJA9isP";
 const db=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,autoRefreshToken:true,storageKey:"implay-seller-auth"}});
-const TERMO_VERSAO="v4-2026-10";
+const TERMO_VERSAO="v4-2026-10";const APP_VERSAO="2";
+async function checaVersao(){try{const r=await fetch(location.pathname+"?v="+Date.now(),{cache:"no-store"});if(!r.ok)return;const t=await r.text();const m=t.match(/APP_VERSAO="([^"]+)"/);
+  if(m&&m[1]!==APP_VERSAO&&!document.getElementById("novaVer")){const d=document.createElement("div");d.id="novaVer";d.innerHTML=`<b>Versão ${m[1]} disponível</b> <button class="btn p" style="padding:6px 14px;width:auto" onclick="location.reload()">Atualizar</button>`;d.style.cssText="position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:90;background:#111;border:1px solid var(--volt);border-radius:99px;padding:8px 10px 8px 16px;display:flex;gap:10px;align-items:center;font-size:13px;color:#fff";document.body.appendChild(d)}}catch(e){}}
+setInterval(checaVersao,5*60000);document.addEventListener("visibilitychange",()=>{if(!document.hidden)checaVersao()});setTimeout(checaVersao,8000);
 const ESTUDIO="Estúdio IMPlay · Av. Paulista, 2198, salas 161/162 · São Paulo";
 const S={me:null,tab:"mural",mural:[],meus:[],hist:[]};
 function $(s){return document.querySelector(s)}
@@ -319,16 +322,16 @@ async function refresh(){if(!S.me||S.me.status!=="ativo"||!S.me.termo_aceito_em|
 
 /* ---------- telas ---------- */
 function render(){
-  const conv=S.meus.filter(j=>j.status==="aberto"&&j.minha_vaga==="substituto"&&j.principal_livre&&new Date(j.inicio)>new Date());
+  const conv=S.meus.filter(j=>j.status==="aberto"&&j.situacao!=="aguardando"&&j.minha_vaga==="substituto"&&j.principal_livre&&new Date(j.inicio)>new Date()&&!S.meus.some(x=>x.id===j.id&&x.situacao==="aguardando"));
   const prox=S.meus.filter(j=>j.status==="aberto"&&new Date(j.fim)>new Date());
-  $("#app").innerHTML=`<div class="wrap"><div class="top"><div><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay"><div class="live" style="margin-top:8px">● app do seller</div></div><div class="small muted" style="text-align:right">${esc(S.me.nome)}</div></div>
+  $("#app").innerHTML=`<div class="wrap"><div class="top"><div><img class="logoimg" src="${LOGO_LIMA}" alt="IMPlay" data-act="tab" data-v="mural" style="cursor:pointer" title="Início"><div class="live" style="margin-top:8px">● app do seller</div></div><div class="small muted" style="text-align:right">${esc(S.me.nome)}</div></div>
   <div class="tabs">${[["mural","Lives abertas"],["meus","Minha agenda"+(prox.length?" ("+prox.length+")":"")],["perfil","Perfil"]].map(([k,l])=>`<button data-act="tab" data-v="${k}" class="${S.tab===k?"on":""}">${l}</button>`).join("")}</div>
   ${conv.map(j=>`<div class="banner"><b>A vaga de principal abriu.</b><br>${esc(j.marca)} · ${dExt(j.inicio)}, ${hm(j.inicio)}. Quer assumir? (você decide)<button class="btn" style="margin-top:10px;background:#fff;color:#000" data-act="pegar" data-id="${j.id}" data-v="principal">Quero ser o principal</button></div>`).join("")}
   ${S.tab==="mural"?mural():S.tab==="meus"?meus():perfil()}
-  <div class="foot">Conectado como ${esc(S.email)} · <a href="#" data-act="sair" style="color:var(--cinza)">Sair desta conta</a></div></div>`;
+  <div class="foot">Conectado como ${esc(S.email)} · <a href="#" data-act="sair" style="color:var(--cinza)">Sair desta conta</a> · Versão ${APP_VERSAO}</div></div>`;
 }
-function vaga(j,tipo){const livre=tipo==="principal"?j.principal_livre:j.substituto_livre;const minha=j.minha_vaga===tipo;
-  return `<div class="vaga"><b>${tipo==="principal"?"Principal":"Substituto"}</b>${minha?`<span class="tag v">é você</span>`:livre?(j.minha_vaga?`<span class="tag">livre</span>`:`<button class="btn ${tipo==="principal"?"p":""}" style="padding:10px" data-act="pegar" data-id="${j.id}" data-v="${tipo}">Quero</button>`):`<span class="tag">preenchida</span>`}</div>`}
+function vaga(j,tipo){const livre=tipo==="principal"?j.principal_livre:j.substituto_livre;const minha=j.minha_vaga===tipo;const ped=j.meu_pedido===tipo;
+  return `<div class="vaga"><b>${tipo==="principal"?"Principal":"Substituto"}</b>${minha?`<span class="tag v">é você</span>`:ped?`<span class="tag w">aguardando aprovação</span>`:livre?(j.minha_vaga||j.meu_pedido?`<span class="tag">livre</span>`:`<button class="btn ${tipo==="principal"?"p":""}" style="padding:10px" data-act="pegar" data-id="${j.id}" data-v="${tipo}">Quero</button>`):`<span class="tag">preenchida</span>`}</div>`}
 function cardMural(j){return `<div class="card job">
    <div class="marca">${esc(j.marca||"Live")}</div>
    <div class="quando">${dExt(j.inicio)} · ${hm(j.inicio)}–${hm(j.fim)} (${horas(j.inicio,j.fim)})</div>
@@ -337,8 +340,8 @@ function cardMural(j){return `<div class="card job">
    <div class="vagas">${vaga(j,"principal")}${vaga(j,"substituto")}</div></div>`}
 function cardMeu(j){return `<div class="card job"><div class="marca">${esc(j.marca||"Live")}</div>
    <div class="quando">${dExt(j.inicio)} · ${hm(j.inicio)}–${hm(j.fim)} (${horas(j.inicio,j.fim)})</div><div class="det">📍 ${esc(local(j))}</div>
-   <span class="tag ${j.minha_vaga==="principal"?"v":"f"}">${j.minha_vaga}</span>${j.valor_seller?`<span class="tag">${brl(j.valor_seller)}</span>`:""}
-   <button class="btn d" style="margin-top:12px" data-act="cancelar" data-id="${j.id}">Cancelar minha participação</button></div>`}
+   ${j.situacao==="aguardando"?`<span class="tag w">aguardando aprovação · ${j.minha_vaga}</span>`:`<span class="tag ${j.minha_vaga==="principal"?"v":"f"}">${j.minha_vaga}</span>`}${j.valor_seller?`<span class="tag">${brl(j.valor_seller)}</span>`:""}
+   ${j.situacao==="aguardando"?`<div class="small muted" style="margin-top:8px">A IMPlay confirma quem faz cada live. Você recebe a resposta aqui.</div><button class="btn" style="margin-top:12px" data-act="desistir" data-id="${j.id}">Desistir do pedido</button>`:`<button class="btn d" style="margin-top:12px" data-act="cancelar" data-id="${j.id}">Cancelar minha participação</button>`}</div>`}
 /* ---------- calendário ---------- */
 S.cal=S.cal||{view:"cal",mes:null,dia:null};
 const MESES=["janeiro","fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro"];
@@ -363,12 +366,12 @@ function calView(list,card,vazio){
    <div class="small muted" style="margin-top:8px">${doMes.length?`${doMes.length} live${doMes.length>1?"s":""} neste mês · toque no dia para ver e escolher · <span style="color:var(--flash)">■</span> rosa = você já está`:"Nenhuma live neste mês. Use as setas para ver outros meses."}</div></div>
    ${dia.length?`<h3 class="diah">${dExt(dia[0].inicio)}</h3>`+dia.map(card).join(""):""}`}
 function mural(){
-  return `<p class="small muted" style="margin-top:0">Escolha só o que quiser fazer. O primeiro que pegar fica com a vaga. O substituto entra se o principal não puder.</p>`+calView(S.mural,cardMural,"Nenhuma live aberta agora. Volte mais tarde ✦")}
+  return `<p class="small muted" style="margin-top:0">Escolha só o que quiser fazer e toque em <b>Quero</b>. A IMPlay confirma quem faz cada live, e você vê a resposta em Minha agenda. O substituto entra se o principal não puder.</p>`+calView(S.mural,cardMural,"Nenhuma live aberta agora. Volte mais tarde ✦")}
 function meus(){
   const now=new Date();const prox=S.meus.filter(j=>j.status==="aberto"&&new Date(j.fim)>now).sort((a,b)=>new Date(a.inicio)-new Date(b.inicio));const pass=S.meus.filter(j=>!(j.status==="aberto"&&new Date(j.fim)>now));
   return calView(prox,cardMeu,"Você ainda não escolheu nenhuma live. Veja em Lives abertas.")
    +(pass.length?`<h3 style="font-size:15px;margin:20px 0 10px">Anteriores</h3>`+pass.map(j=>`<div class="card job" style="opacity:.8"><b>${esc(j.marca||"")}</b> · ${dExt(j.inicio)}<br><span class="tag ${j.status==="realizado"?"o":""}">${j.status==="aberto"?"passou":j.status}</span><span class="tag">${j.minha_vaga}</span></div>`).join(""):"")}
-const EV={escolheu_principal:"Você escolheu ser principal",escolheu_substituto:"Você escolheu ser substituto",substituto_assumiu_principal:"Você assumiu como principal",cancelou:"Você cancelou",
+const EV={candidatou:"Você pediu uma vaga",desistiu_candidatura:"Você desistiu de um pedido",candidatura_recusada:"Pedido não aprovado",escolheu_principal:"Você escolheu ser principal",escolheu_substituto:"Você escolheu ser substituto",substituto_assumiu_principal:"Você assumiu como principal",cancelou:"Você cancelou",
   convite_assumir_principal:"Convite para assumir como principal",termo_aceito:"Você aceitou o termo",cadastro_seller:"Você fez seu cadastro",perfil_atualizado:"Você atualizou seu perfil",
   empresa_definiu_principal:"A empresa te colocou como principal",empresa_definiu_substituto:"A empresa te colocou como substituto",empresa_removeu_principal:"A empresa te tirou do principal",empresa_removeu_substituto:"A empresa te tirou do substituto"};
 function perfil(){const m=S.me;
@@ -398,7 +401,8 @@ document.addEventListener("click",async e=>{
     case"tItem":{S.termoOk[v]=!S.termoOk[v];const it=a.closest(".titem");it.classList.toggle("ok",!!S.termoOk[v]);a.textContent=S.termoOk[v]?"✓ Entendi":"Entendi";termoProgresso();if(S.termoOk[v]){const nx=[...document.querySelectorAll(".titem:not(.ok)")][0];if(nx)nx.scrollIntoView({behavior:"smooth",block:"center"})}break}
     case"aceitar":{if(a.disabled)return;const itens=[...TERMO_ITENS.map(t=>({k:t[0],t:t[1],ok:!!S.termoOk[t[0]]})),{k:"contrato_completo",t:"Contrato de prestação de serviços (íntegra) "+TERMO_VERSAO,ok:!!$("#tChk").checked}];const {error}=await db.rpc("imp_aceitar_termo",{p_versao:TERMO_VERSAO,p_itens:itens,p_assinatura:$("#tNome").value.trim()});if(error)return toast(erro(error),true);toast("Pronto! Bem-vindo(a) ✦");boot();break}
     case"pegar":{a.disabled=true;const {error}=await db.rpc("imp_pegar",{p_job:id,p_vaga:v});if(error){toast(erro(error),true);await refresh();return}
-      toast(v==="principal"?"Vaga de principal é sua ✦":"Você é o substituto ✦");S.tab="meus";await refresh();break}
+      toast("Pedido enviado ✦ A IMPlay confirma em breve");S.tab="meus";await refresh();break}
+    case"desistir":{if(!a.dataset.armed){a.dataset.armed=1;a.textContent="Toque de novo para desistir";return}const {error}=await db.rpc("imp_desistir",{p_job:id});if(error)return toast(erro(error),true);toast("Pedido retirado");await refresh();break}
     case"cancelar":{const j=S.meus.find(x=>x.id===id);const perto=new Date(j.inicio)-new Date()<24*36e5;
       openSheet(`<h3 style="font-size:18px">Cancelar ${esc(j.marca||"")}?</h3><p class="muted">${dExt(j.inicio)} · ${hm(j.inicio)}</p>
       ${perto?`<div class="warnbox">Faltam menos de 24 horas. Você pode cancelar, mas fica registrado como cancelamento em cima da hora.</div>`:`<div class="okbox">Mais de 24 horas antes: cancelamento sem prejuízo.</div>`}
@@ -416,6 +420,19 @@ document.addEventListener("click",async e=>{
 document.addEventListener("visibilitychange",()=>{if(!document.hidden)refresh()});
 setInterval(refresh,60000);
 boot();
+/* ================= v23 · ARRASTAR E SOLTAR EM TODO CAMPO DE ARQUIVO ================= */
+function dropZona(inp){if(inp.dataset.dz)return;inp.dataset.dz=1;const z=inp.closest("label.dropz,.dropz,[data-drop],label");if(z){z.dataset.drop="1";return}
+  const lab=document.createElement("label");lab.className="dropz dzauto";const mult=inp.multiple;lab.innerHTML=`<b>Arraste ${mult?"os arquivos":"o arquivo"} e solte aqui</b><div class="small muted">ou toque para escolher</div><div class="small dzn"></div>`;
+  inp.parentNode.insertBefore(lab,inp);lab.appendChild(inp);inp.hidden=true;inp.addEventListener("change",()=>{const n=lab.querySelector(".dzn");if(n)n.textContent=inp.files.length?"✓ "+[...inp.files].map(f=>f.name).join(", "):""})}
+function dropScan(r){(r||document).querySelectorAll('input[type=file]').forEach(dropZona)}
+new MutationObserver(ms=>{for(const m of ms)for(const n of m.addedNodes)if(n.nodeType===1){if(n.matches&&n.matches("input[type=file]"))dropZona(n);else if(n.querySelector&&n.querySelector("input[type=file]"))dropScan(n)}}).observe(document.documentElement,{childList:true,subtree:true});
+function dropAlvo(e){const t=e.target.closest&&e.target.closest("label.dropz,.dropz,[data-drop]");if(!t)return null;return t.querySelector("input[type=file]")}
+document.addEventListener("dragover",e=>{if(!e.dataTransfer||![...e.dataTransfer.types].includes("Files"))return;const i=dropAlvo(e);if(!i)return;e.preventDefault();const z=i.closest("label.dropz,.dropz,[data-drop]");document.querySelectorAll(".dzon").forEach(x=>x!==z&&x.classList.remove("dzon"));z.classList.add("dzon")});
+document.addEventListener("dragleave",e=>{const z=e.target.closest&&e.target.closest(".dzon");if(z&&!z.contains(e.relatedTarget))z.classList.remove("dzon")});
+document.addEventListener("drop",e=>{document.querySelectorAll(".dzon").forEach(x=>x.classList.remove("dzon"));if(e.defaultPrevented)return;const i=dropAlvo(e);if(!i||!e.dataTransfer.files.length)return;e.preventDefault();
+  const dt=new DataTransfer();[...e.dataTransfer.files].slice(0,i.multiple?50:1).forEach(f=>dt.items.add(f));i.files=dt.files;i.dispatchEvent(new Event("change",{bubbles:true}))});
+document.addEventListener("dragover",e=>{if(e.dataTransfer&&[...e.dataTransfer.types].includes("Files"))e.preventDefault()});document.addEventListener("drop",e=>{if(!e.defaultPrevented&&!dropAlvo(e))e.preventDefault()});
+
 </script>
 </body>
 </html>
