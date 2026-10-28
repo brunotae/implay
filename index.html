@@ -2175,7 +2175,7 @@ document.addEventListener("click",async e=>{
     case"propSalvar":{const s=await saveProp(id);if(s){closeSheet();render()}break}
     case"propGerar":{const s=await saveProp(id,true);if(s){closeSheet();render();showDoc(s)}break}
     case"propCancelar":if(!armed(a))return;await run(db.from("imp_propostas").update({status:"cancelada"}).eq("id",id),"Cancelada");closeSheet();await refresh();break;
-    case"docPrint":window.print();break;
+    case"docPrint":{const t0=document.title;if(S.docNome)document.title=S.docNome;const vol=()=>{document.title=t0;removeEventListener("afterprint",vol)};addEventListener("afterprint",vol);window.print();setTimeout(vol,60000);break}
     case"docClose":$("#doc").hidden=true;$("#doc").innerHTML="";render();break;
     case"csv":{const d=$("#doc");const b=new Blob(["﻿"+d.dataset.csv],{type:"text/csv"});const u=URL.createObjectURL(b);const l=document.createElement("a");l.href=u;l.download=d.dataset.csvName;document.body.appendChild(l);l.click();l.remove();break}
     case"ncAbrir":{const b=a.closest(".fld").querySelector(".newcli");b.hidden=false;b.querySelector("#nc_marca").focus();break}
@@ -2512,8 +2512,9 @@ document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.cl
 
 VIEWS.pessoa=VPessoa;
 /* ================= v13 · VERSÃO DO SISTEMA + LER CONDIÇÕES DE ARQUIVOS ================= */
-const APP_VERSAO="26";const APP_DATA="26/10/2026";
+const APP_VERSAO="27";const APP_DATA="26/10/2026";
 const NOVIDADES=[
+ ["27","28/10","Salvar PDF já sugere o nome do arquivo com o número: Contrato_CT-0005_v2_Marca e Proposta_PROP-0012_Marca."],
  ["26","27/10","Proposta no novo modelo (Vanzak/Hidratei): páginas iguais ao Google Slides, formato 16:9; capa com o nome da marca; investimento, condições e resumo gerados pelo sistema."],
  ["25","27/10","Live recorrente (toda semana, a cada 2 semanas, dias da semana ou todo dia, até uma data). Seller que pede a vaga no app fica aguardando aprovação; a IMPlay aprova quem faz a live (aviso em Precisa de você e em Agenda › Lista › Pedidos para aprovar)."],
  ["24","27/10","Equipe: quando alguém recebe acesso de sócio com um e-mail diferente do cartão de sócio, aparece um aviso com o botão 'É Fulano' para ligar os dois."],
@@ -2914,7 +2915,7 @@ function showCtrDoc(id,editar){const c=(S.ctrs||[]).find(x=>x.id===id);if(!c)ret
    ${c.status==="aguardando"&&!editar?`<div class="warnbox" style="max-width:820px;margin:12px auto 0">Aguardando aprovação de um sócio. Ainda não pode ser enviado.</div>`:""}${editar?`<div class="okbox" style="max-width:820px;margin:12px auto 0">Modo edição: clique no texto e altere o que precisar. Ao salvar, vira a versão ${ctrVersoes(c.numero)[0].versao+1} e a atual fica guardada no histórico.</div>`:""}
    <div id="ctrBody" class="${c.status==="aguardando"?"":"aprov"}" ${editar?'contenteditable="true" spellcheck="true"':""}>${c.html||""}</div><div class="sp30" style="height:30px"></div>`;d.hidden=false;d.scrollTop=0}
 async function loadH2P(){if(window.html2pdf)return true;return new Promise(ok=>{let done=false;const fim=v=>{if(!done){done=true;ok(v)}};const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";s.onload=()=>fim(!!window.html2pdf);s.onerror=()=>fim(false);document.head.appendChild(s);setTimeout(()=>fim(!!window.html2pdf),20000)})}
-const ctrArq=c=>`Contrato_${ctn(c.numero)}_v${c.versao}_${String(c.marca||"").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/\W+/g,"_")}.pdf`;
+const ctrArq=c=>`Contrato_${ctn(c.numero)}_v${c.versao}_${String(c.marca||"").normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/\W+/g,"_").replace(/^_+|_+$/g,"")}.pdf`;
 async function ctrPdf(c){if(!await loadH2P())return null;const box=document.createElement("div");box.className="pdfbox";box.innerHTML=c.html;box.style.cssText="position:absolute;left:0;top:0;width:794px;background:#fff;z-index:-1";document.body.appendChild(box);
   try{const blob=await window.html2pdf().set({margin:[10,0,12,0],filename:ctrArq(c),image:{type:"jpeg",quality:.95},html2canvas:{scale:2,backgroundColor:"#ffffff",useCORS:true},jsPDF:{unit:"mm",format:"a4",orientation:"portrait"},pagebreak:{mode:["css","legacy"],avoid:["h2","tr","li",".assin",".agrid","p"]}}).from(box).outputPdf("blob");
     return new File([blob],ctrArq(c),{type:"application/pdf"})}catch(e){console.warn(e);return null}finally{box.remove()}}
@@ -3299,6 +3300,12 @@ document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]
   else if(act==="serieCancelar"){if(!a.dataset.armed){a.dataset.armed=1;a.textContent="Confirmar: cancelar as próximas";return}const j=S.jobs.find(x=>x.id===a.dataset.id);
     const r=await db.from("imp_jobs").update({status:"cancelado"}).eq("serie_id",j.serie_id).gte("inicio",j.inicio).eq("status","aberto");if(r.error)return toast("Erro: "+r.error.message,true);toast("Lives da série canceladas");closeSheet();await refresh()}},true);
 
+/* ================= v27 · NOME DO PDF = Nº DO CONTRATO / PROPOSTA ================= */
+const arqLimpo=x=>String(x||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^\w-]+/g,"_").replace(/^_+|_+$/g,"");
+const _showCtrDoc27=showCtrDoc;showCtrDoc=function(id,ed){const c=(S.ctrs||[]).find(x=>x.id===id);S.docNome=c?ctrArq(c).replace(/\.pdf$/,""):"";return _showCtrDoc27(id,ed)};
+const _showOrcDoc27=showOrcDoc;showOrcDoc=function(o){S.docNome=`Proposta_${o&&o.numero?on(o.numero):"Previa"}_${arqLimpo(o&&o.marca)}`;const r=_showOrcDoc27(o);if(new URLSearchParams(location.search).get("orc")==="prev")document.title=S.docNome;return r};
+const _showCtr27=showCtr;showCtr=function(h,or){if(!S.docNome)S.docNome="Contrato_IMPlay";return _showCtr27(h,or)};
+document.addEventListener("click",e=>{if(e.target.closest("[data-act=docClose],[data-act=ctrDocFechar]"))S.docNome=""},true);
 if(!orcPreviewBoot())boot();
 </script>
 </body>
