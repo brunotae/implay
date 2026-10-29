@@ -677,7 +677,7 @@ function renderLogin(msg){
   <form class="card" id="lf"><div class="fld" style="margin-top:0"><label>E-mail</label><input type="email" name="email" autocomplete="username" required></div>
   <div class="fld"><label>Senha</label><input type="password" name="senha" autocomplete="current-password" required minlength="6"></div>
   ${msg?`<div class="warnbox">${esc(msg)}</div>`:""}
-  <div class="row" style="margin-top:18px"><button class="btn p" style="flex:1">Entrar</button><button type="button" class="btn" id="criar">Criar conta</button></div>
+  <div class="row" style="margin-top:18px"><button class="btn p" style="flex:1">Entrar</button><button type="button" class="btn" id="criar">Pedir acesso</button></div><div class="small muted" style="margin-top:10px;text-align:center">Quem cria conta entra numa lista de pedidos. Só depois que um sócio libera em Equipe é que dá para ver e mexer no ERP.</div>
   <div class="hint">Use o mesmo e-mail e senha da Agenda. Sócios e equipe entram aqui. Sellers usam o app do seller.</div></form></div>`;
   $("#lf").onsubmit=async e=>{e.preventDefault();const f=new FormData(e.target);
     const {error}=await db.auth.signInWithPassword({email:f.get("email"),password:f.get("senha")});
@@ -2513,8 +2513,9 @@ document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.cl
 
 VIEWS.pessoa=VPessoa;
 /* ================= v13 · VERSÃO DO SISTEMA + LER CONDIÇÕES DE ARQUIVOS ================= */
-const APP_VERSAO="30";const APP_DATA="26/10/2026";
+const APP_VERSAO="31";const APP_DATA="26/10/2026";
 const NOVIDADES=[
+ ["31","29/10","Login: 'Criar conta' virou 'Pedir acesso', com aviso de que só entra quem um sócio liberar."],
  ["30","29/10","Proposta no modelo V3: páginas novas de Afiliados, UGC, Base de creators e Proposta de gestão; numeração de páginas corrigida e contínua."],
  ["29","29/10","Empresa: bloco 'Sócios e representantes legais' (só sócios veem) com CPF, e-mail, telefone, documento, endereço e botão Copiar tudo."],
  ["28","29/10","Financeiro › Importar comprovantes agora aceita planilha Excel/CSV: cada linha vira uma despesa para conferir, com quem pagou por linha (ex.: Cartão Tae) e opção 'Empresa pagou'."],
