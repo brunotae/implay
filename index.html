@@ -2513,8 +2513,9 @@ document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.cl
 
 VIEWS.pessoa=VPessoa;
 /* ================= v13 · VERSÃO DO SISTEMA + LER CONDIÇÕES DE ARQUIVOS ================= */
-const APP_VERSAO="32";const APP_DATA="29/10/2026";
+const APP_VERSAO="33";const APP_DATA="29/10/2026";
 const NOVIDADES=[
+ ["33","29/10","Contrato: o leitor entende conversa de WhatsApp. Reconhece a empresa pelo CNPJ (ou oferece cadastrar com razão social, endereço, quem assina e financeiro), '3 meses', '3 vezes semana', '40 horas' + '150 horas' (valor da hora), comissão 'igual à da Welz' (busca o % do contrato dela) e testemunha do nosso lado. Contrato ganhou campos de testemunhas."],
  ["32","29/10","Um clique: listas com poucas opções viraram botões (ex.: minutos da live, estrutura GO/BOOST/ICON). Campos de % sobre vendas ganharam botões favoritos: digite o valor e toque em + favorito; ✎ para tirar. Os favoritos ficam por pessoa e por aparelho."],
  ["31","29/10","Login: 'Criar conta' virou 'Pedir acesso', com aviso de que só entra quem um sócio liberar."],
  ["30","29/10","Proposta no modelo V3: páginas novas de Afiliados, UGC, Base de creators e Proposta de gestão; numeração de páginas corrigida e contínua."],
@@ -2567,7 +2568,7 @@ async function cdArquivos(files){if(!S.cd)return;cdLerForm();const st=$("#cdLend
   if(st)st.hidden=true;if(!txt.trim())return toast("Não consegui ler esses arquivos. Formatos: PDF, imagem, Word (.docx) ou texto.",true);
   const ta=$("#cdTxt");if(ta){ta.value=txt.slice(0,20000);ta.closest("details").open=true}
   const r=cdParse(txt);if(!r.itens.length&&!r.vigencia_meses&&!r.pagamento)return toast("Li os arquivos, mas não achei valores. O texto ficou no campo: confira e preencha.",true);
-  if(r.itens.length)S.cd.itens=r.itens;if(r.vigencia_meses)S.cd.vigencia_meses=r.vigencia_meses;if(r.pagamento)S.cd.pagamento=r.pagamento;if(r.inicio)S.cd.inicio=r.inicio;if(r.plataforma)S.cd.plataforma=r.plataforma;if(r.inclui&&r.inclui.length)S.cd.inclui=r.inclui;S.cd.aviso=r.aviso||"";
+  if(r.itens.length)S.cd.itens=r.itens;if(r.vigencia_meses)S.cd.vigencia_meses=r.vigencia_meses;if(r.pagamento)S.cd.pagamento=r.pagamento;if(r.inicio)S.cd.inicio=r.inicio;if(r.plataforma)S.cd.plataforma=r.plataforma;if(r.inclui&&r.inclui.length)S.cd.inclui=r.inclui;S.cd.aviso=r.aviso||"";await cdPos(r);
   S.cd.fontes=files.map(f=>f.name);cdRender();const ta2=$("#cdTxt");if(ta2){ta2.value=txt.slice(0,20000)}toast("Li "+files.length+(files.length===1?" arquivo":" arquivos")+" · confira os campos")}
 document.addEventListener("change",e=>{if(e.target.id==="cdFile"&&e.target.files.length){const fs=[...e.target.files];e.target.value="";cdArquivos(fs)}});
 document.addEventListener("dragover",e=>{const d=e.target.closest&&e.target.closest("#cdForm");if(d&&e.dataTransfer&&[...e.dataTransfer.types].includes("Files")){e.preventDefault();const z=$("#cdDrop");if(z)z.style.borderColor="var(--volt)"}});
@@ -2693,11 +2694,11 @@ document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]
   case"cdDel":H();cdLerForm();S.cd.itens.splice(+v,1);cdRender();break;
   case"cdLer":{H();cdLerForm();const t=($("#cdTxt")||{}).value||"";if(!t.trim())return toast("Cole as condições primeiro",true);const r=cdParse(t);
     if(!r.itens.length&&!r.vigencia_meses&&!r.pagamento)return toast("Não achei valores no texto. Preencha abaixo.",true);
-    if(r.itens.length)S.cd.itens=r.itens;if(r.vigencia_meses)S.cd.vigencia_meses=r.vigencia_meses;if(r.pagamento)S.cd.pagamento=r.pagamento;if(r.inicio)S.cd.inicio=r.inicio;if(r.plataforma)S.cd.plataforma=r.plataforma;if(r.inclui&&r.inclui.length)S.cd.inclui=r.inclui;S.cd.aviso=r.aviso||"";
-    cdRender();toast("Preenchi o que achei · confira os campos");break}
+    if(r.itens.length)S.cd.itens=r.itens;if(r.vigencia_meses)S.cd.vigencia_meses=r.vigencia_meses;if(r.pagamento)S.cd.pagamento=r.pagamento;if(r.inicio)S.cd.inicio=r.inicio;if(r.plataforma)S.cd.plataforma=r.plataforma;if(r.inclui&&r.inclui.length)S.cd.inclui=r.inclui;S.cd.aviso=r.aviso||"";await cdPos(r);
+    cdRender();toast("Preenchi o que achei · confira os campos e os avisos");break}
   case"cdSeguir":{H();cdLerForm();const C=S.cd;if(!C.cliente_id)return toast("Escolha o cliente (ou cadastre em + Cliente)",true);
     if(!C.itens.some(it=>Number(it.valor)>0||Number(it.perc)>0))return toast("Preencha o valor ou o % de pelo menos um item",true);
-    const o=cdPseudo(C);if(C.inicio||C.plataforma)o.contrato=Object.assign({},o.contrato||{},C.inicio?{inicio:C.inicio}:{},C.plataforma?{plataforma:C.plataforma}:{});closeSheet();openCtrm(o,C.antId);break}
+    const o=cdPseudo(C);if(C.inicio||C.plataforma)o.contrato=Object.assign({},o.contrato||{},C.inicio?{inicio:C.inicio}:{},C.plataforma?{plataforma:C.plataforma}:{},C.testemunha?{t1:C.testemunha}:{});closeSheet();openCtrm(o,C.antId);break}
  }}catch(err){console.warn(err)}},true);
 document.addEventListener("input",e=>{const t=e.target;if(t.dataset&&t.dataset.cd!==undefined&&S.cd){const ix=+t.dataset.cd;const it=S.cd.itens[ix];const f=t.dataset.f;it[f]=["descricao","categoria"].includes(f)?t.value:(t.value===""?"":(num(t.value)??""));const c=$(`#sheetIn [data-cdcalc="${ix}"]`);if(c)c.innerHTML=cdCalc(it);const r=$("#cdRes");if(r)r.innerHTML=cdResumo(S.cd)}if(t.closest&&t.closest("#cdForm")&&t.id==="cdVigN"&&S.cd){S.cd.vigencia_meses=parseInt(t.value)||0;const r=$("#cdRes");if(r)r.innerHTML=cdResumo(S.cd)}});
 document.addEventListener("change",e=>{const t=e.target;if(t.dataset&&t.dataset.cd!==undefined&&S.cd&&t.tagName==="SELECT"){S.cd.itens[+t.dataset.cd][t.dataset.f]=t.value}if(t.id==="cdCli"&&S.cd)S.cd.cliente_id=t.value});
@@ -2747,8 +2748,8 @@ function ciRender(){const C=S.ci,s=C.sug;const dup=s&&s.cnpj?S.clientes.find(c=>
     <div class="cols2">${F("marca","Marca (como vocês chamam)","ex.: LIVE!")}${F("empresa","Razão social")}</div>
     <div class="cols2">${F("cnpj","CNPJ")}${F("contato_tel","Telefone")}</div>
     <div class="cols2">${F("contato_nome","Contato (quem assina / responde)","nome da pessoa")}${F("contato_email","E-mail","")}</div>
-    ${F("endereco","Endereço completo")}${F("obs","Observações (inscrições etc.)")}
-    ${!s.contato_nome?`<div class="hint">Falta o <b>nome do contato</b>: ele entra no contrato como quem assina pela marca.</div>`:""}
+    <div class="cols2">${F("rep_nome","Quem assina pela marca","nome(s)")}${F("rep_email","E-mail de quem assina")}</div><div class="cols2">${F("fin_nome","Financeiro · nome")}${F("fin_email","Financeiro · e-mail")}</div>${F("endereco","Endereço completo")}${F("obs","Observações (inscrições etc.)")}
+    ${!s.contato_nome&&!s.rep_nome?`<div class="hint">Falta o <b>nome do contato</b>: ele entra no contrato como quem assina pela marca.</div>`:""}
     <div class="acts"><button type="button" class="btn p" data-act="ciAceitar">${dup?"✓ Aceitar e atualizar "+esc(dup.marca):"✓ Aceitar e cadastrar"}</button><button type="button" class="btn" data-act="fechar">Fechar</button></div>`:`<div class="acts"><button type="button" class="btn" data-act="fechar">Fechar</button></div>`}</form>`;
   if($("#sheet").hidden||!$("#ciForm"))openSheet(html);else{const sc=$("#sheetIn").scrollTop;const tx=($("#ciTxt")||{}).value||"";$("#sheetIn").innerHTML=html;$("#ciTxt").value=tx;$("#sheetIn").scrollTop=sc}}
 async function ciProcessa(txt,fonte){const C=S.ci;let s=cliParse(txt);C.fonte=fonte;C.receita=null;
@@ -2764,11 +2765,11 @@ document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]
  try{switch(act){
   case"ciAbrir":H();if(a.closest("#cdForm")){cdLerForm();S.cdAguarda=true}openCliImport();break;
   case"ciLer":{H();const t=($("#ciTxt")||{}).value||"";if(!t.trim())return toast("Cole o texto primeiro",true);await ciProcessa(t,"lido do texto colado");break}
-  case"ciAceitar":{H();const s=S.ci.sug;if(!s.marca&&!s.empresa)return toast("Preencha a marca",true);const row={marca:s.marca||s.empresa,empresa:s.empresa||null,cnpj:s.cnpj?cnpjFmt(s.cnpj):null,contato_nome:s.contato_nome||null,contato_tel:s.contato_tel||null,contato_email:s.contato_email||null,endereco:s.endereco||null,obs:s.obs||null};
+  case"ciAceitar":{H();const s=S.ci.sug;if(!s.marca&&!s.empresa)return toast("Preencha a marca",true);const row={marca:s.marca||s.empresa,empresa:s.empresa||null,cnpj:s.cnpj?cnpjFmt(s.cnpj):null,contato_nome:s.contato_nome||null,contato_tel:s.contato_tel||null,contato_email:s.contato_email||null,endereco:s.endereco||null,obs:s.obs||null,cep:s.cep||null,rep_nome:s.rep_nome||null,rep_email:s.rep_email||null,rep_cpf:s.rep_cpf||null,rep_cargo:s.rep_cargo||null,fin_nome:s.fin_nome||null,fin_email:s.fin_email||null};Object.keys(row).forEach(k=>{if(row[k]===null&&k!=="marca")delete row[k]});
     const dup=row.cnpj?S.clientes.find(c=>soD(c.cnpj)===soD(row.cnpj)):null;let id;
     if(dup){const up={};Object.keys(row).forEach(k=>{if(row[k]&&!dup[k])up[k]=row[k]});if(row.obs&&dup.obs&&!dup.obs.includes(row.obs))up.obs=dup.obs+" · "+row.obs;if(Object.keys(up).length)await run(db.from("imp_clientes").update(up).eq("id",dup.id),"Cadastro de "+dup.marca+" atualizado");else toast("Nada novo para atualizar");id=dup.id}
     else{const r=await run(db.from("imp_clientes").insert(row).select().single(),row.marca+" cadastrado ✓");id=r&&r.id}
-    S.ci=null;closeSheet();await refresh();if(S.cd&&S.cdAguarda){S.cdAguarda=false;S.cd.cliente_id=id;cdRender()}else if(id)openCli(id);break}
+    S.ci=null;closeSheet();await refresh();if(S.cd&&S.cdAguarda){S.cdAguarda=false;S.cd.cliente_id=id;S.cd.cliSug=null;cdRender()}else if(id)openCli(id);break}
  }}catch(err){console.warn(err)}},true);
 document.addEventListener("input",e=>{const k=e.target.dataset&&e.target.dataset.ci;if(k&&S.ci&&S.ci.sug)S.ci.sug[k]=e.target.value});
 document.addEventListener("paste",e=>{if(e.target.id==="ciTxt")setTimeout(()=>{const t=$("#ciTxt").value;if(t.trim())ciProcessa(t,"lido do texto colado")},50);else if(S.ci&&!$("#sheet").hidden&&$("#ciForm")&&e.clipboardData&&e.clipboardData.files.length){e.preventDefault();ciArquivo(e.clipboardData.files[0])}});
@@ -2980,7 +2981,7 @@ document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]
 /* ================= v8 · CONTRATO COM A MARCA (a partir da proposta) ================= */
 const EXT={1:"um",2:"dois",3:"três",4:"quatro",5:"cinco",6:"seis",7:"sete",8:"oito",9:"nove",10:"dez",12:"doze",15:"quinze",18:"dezoito",20:"vinte",24:"vinte e quatro",30:"trinta",45:"quarenta e cinco",60:"sessenta",90:"noventa"};
 const nx=n=>EXT[n]?`${n} (${EXT[n]})`:String(n);
-const CTRM_PADRAO={horas_sobra:"cobra",local:"estudio",exclusividade:"nao",aviso:30,multa:"nao",renovacao:"auto",foro:"São Paulo/SP",cidade:"São Paulo/SP",rep_nome:"",rep_cpf:"",rep_cargo:"",implay_rep:"",plataforma:"TikTok Shop"};
+const CTRM_PADRAO={horas_sobra:"cobra",local:"estudio",exclusividade:"nao",aviso:30,multa:"nao",renovacao:"auto",foro:"São Paulo/SP",cidade:"São Paulo/SP",rep_nome:"",rep_cpf:"",rep_cargo:"",implay_rep:"",t1:"",t2:"",plataforma:"TikTok Shop"};
 function ctrmOpts(o){const c=S.clientes.find(x=>x.id===o.cliente_id)||{};const adm=(S.socios||[]).filter(s=>s.administrador);
   return Object.assign({},CTRM_PADRAO,{inicio:ymd(new Date()),rep_nome:c.rep_nome||c.contato_nome||"",rep_cpf:c.rep_cpf||"",rep_cargo:c.rep_cargo||"",implay_rep:(adm[0]||{}).nome_completo||""},o.contrato||{})}
 function ctrmItens(o){return (o.itens||[]).filter(i=>i.on).map(i=>{const p=i.p||preco(i.k)||{};const nm=(p.grupo==="hora"&&!(i.k&&String(i.k).startsWith("cx:"))?"Gestão de lives por hora":p.nome)||{pontual:"Live Pontual",pacote:"Pacote mensal",drop:"Live Drop"}[p.grupo]||"Serviço";
@@ -3006,6 +3007,7 @@ function openCtrm(oid,antId){const o=typeof oid==="object"&&oid?oid:S.orcs.find(
    <div class="cols2">${fld("rep_nome","Representante da marca",op.rep_nome,"text",'placeholder="Nome de quem assina"')}${fld("rep_cpf","CPF do representante",op.rep_cpf,"text",'inputmode="numeric" placeholder="opcional"')}</div>
    ${fld("rep_cargo","Cargo do representante",op.rep_cargo,"text",'placeholder="ex.: sócio-administrador (opcional)"')}
    ${pick("implay_rep","Assina pela IMPlay",op.implay_rep,adm.length?adm:["Caio Cesar Cunha Moreira"],{ph:"Outro nome"})}
+   ${pick("t1","Testemunha 1 (do nosso lado)",op.t1||"",cdTestOp(),{ph:"Outro nome"})}${pick("t2","Testemunha 2",op.t2||"",cdTestOp(),{ph:"Outro nome"})}
    ${pick("foro","Foro (cidade da Justiça, se houver briga)",op.foro,["São Paulo/SP","Niterói/RJ"],{ph:"Outra cidade/UF"})}
    ${area("especiais","Condições especiais (opcional, entram como cláusula própria)",op.especiais||"")}
    <div class="acts"><button type="button" class="btn p" data-act="ctrmGerar" data-id="${o.id||""}" data-v="${ant?ant.id:""}">${ant?"Gerar nova versão":"Gerar contrato"}</button><button type="button" class="btn" data-act="fechar">Fechar</button></div></form>`);syncShow()}
@@ -3077,7 +3079,7 @@ function ctrmDoc(o,op,meta){meta=meta||{};const c=S.clientes.find(x=>x.id===o.cl
   <p style="margin-top:18px">E, por estarem de acordo, as partes assinam este contrato e seu Anexo I.</p>
   <p class="local">${esc(op.cidade||op.foro||"São Paulo/SP").replace(/\/.*/,"")}, ____ de ______________ de ${new Date().getFullYear()}.</p>
   <div class="assin"><div><div class="ln"></div><b>${esc(c.empresa||o.marca)}</b><br>CONTRATANTE<br>${esc(op.rep_nome||"")}</div><div><div class="ln"></div><b>${EMPRESA.razao}</b><br>IMPLAY<br>${esc(op.implay_rep||"")}</div></div>
-  <div class="assin"><div><div class="ln"></div>Testemunha 1<br>Nome / CPF</div><div><div class="ln"></div>Testemunha 2<br>Nome / CPF</div></div>`;
+  <div class="assin"><div><div class="ln"></div>Testemunha 1<br>${op.t1?esc(op.t1)+"<br>CPF:":"Nome / CPF"}</div><div><div class="ln"></div>Testemunha 2<br>${op.t2?esc(op.t2)+"<br>CPF:":"Nome / CPF"}</div></div>`;
   const anexo=`<div class="ctr" style="break-before:page;page-break-before:always"><div class="chead"><img class="clogo" src="${LOGO_CARVAO}" alt="IMPlay"><span>${EMPRESA.razao} · CNPJ ${EMPRESA.cnpj}</span></div>
    <h1>Anexo I · Condições comerciais</h1><p class="num">${meta.numero?ctn(meta.numero)+" · versão "+meta.versao+" · ":""}${o.direto?"Condições ajustadas entre as partes":"Proposta comercial "+on(o.numero)} · emitida em ${new Date(o.elaborado_em||Date.now()).toLocaleDateString("pt-BR")}${o.aprovado_nome?` · aprovada por ${esc(o.aprovado_nome)}`:""} · Contratante: ${esc(c.empresa||o.marca)}</p>
    <table class="atb"><tr><th>Serviço</th><th>Descrição</th><th class="r">Qtd.</th><th class="r">Valor</th><th class="r">% sobre vendas</th></tr>
@@ -3093,7 +3095,7 @@ function ctrmDoc(o,op,meta){meta=meta||{};const c=S.clientes.find(x=>x.id===o.cl
 document.addEventListener("click",async e=>{const a=e.target.closest("[data-act]");if(!a)return;const act=a.dataset.act,id=a.dataset.id;
  try{switch(act){
   case"ctrMarca":e.stopImmediatePropagation();e.preventDefault();openCtrm(id);break;
-  case"ctrmGerar":{e.stopImmediatePropagation();const o=S.ctrmO&&(S.ctrmO.id||"")===(id||"")?S.ctrmO:S.orcs.find(x=>x.id===id);const f=formData();const antId=a.dataset.v||null;if(antId&&!(f.motivo||"").trim())return toast("Escreva o motivo da alteração",true);const op=Object.assign(ctrmOpts(o),{inicio:f.inicio||ymd(new Date()),local:f.local,plataforma:f.plataforma||"TikTok Shop",exclusividade:f.exclusividade,aviso:parseInt(f.aviso)||30,multa:f.multa,renovacao:f.renovacao,horas_sobra:f.horas_sobra||"cobra",rep_nome:f.rep_nome,rep_cpf:f.rep_cpf,rep_cargo:f.rep_cargo,implay_rep:f.implay_rep,foro:f.foro||"São Paulo/SP",cidade:f.foro||"São Paulo/SP",especiais:f.especiais||"",gerado_em:new Date().toISOString(),gerado_por:S.me.nome});if(o.direto){op.cond=JSON.parse(JSON.stringify(o.cond));delete op.cond.antId;delete op.cond.op}
+  case"ctrmGerar":{e.stopImmediatePropagation();const o=S.ctrmO&&(S.ctrmO.id||"")===(id||"")?S.ctrmO:S.orcs.find(x=>x.id===id);const f=formData();const antId=a.dataset.v||null;if(antId&&!(f.motivo||"").trim())return toast("Escreva o motivo da alteração",true);const op=Object.assign(ctrmOpts(o),{inicio:f.inicio||ymd(new Date()),local:f.local,plataforma:f.plataforma||"TikTok Shop",exclusividade:f.exclusividade,aviso:parseInt(f.aviso)||30,multa:f.multa,renovacao:f.renovacao,horas_sobra:f.horas_sobra||"cobra",rep_nome:f.rep_nome,rep_cpf:f.rep_cpf,rep_cargo:f.rep_cargo,implay_rep:f.implay_rep,t1:f.t1||"",t2:f.t2||"",foro:f.foro||"São Paulo/SP",cidade:f.foro||"São Paulo/SP",especiais:f.especiais||"",gerado_em:new Date().toISOString(),gerado_por:S.me.nome});if(o.direto){op.cond=JSON.parse(JSON.stringify(o.cond));delete op.cond.antId;delete op.cond.op}
     if(!S.ctrSemSQL||S.demo){a.disabled=true;const row=await run(db.from("imp_ctr").insert({orcamento_id:o.id||null,cliente_id:o.cliente_id||null,marca:o.marca,opcoes:op,anterior_id:antId,motivo:antId?f.motivo:null}).select().single());
       await run(db.from("imp_ctr").update({html:ctrmDoc(o,op,row)}).eq("id",row.id));if(o.id)await db.from("imp_orcamentos").update({contrato:op}).eq("id",id);o.contrato=op;S.cd=null;
       closeSheet();await ctrLoad();toast(row.status==="aprovado"?ctn(row.numero)+" v"+row.versao+" gerado e aprovado":ctn(row.numero)+" gerado · aguardando aprovação de um sócio");showCtrDoc(row.id);break}
@@ -3375,6 +3377,87 @@ document.addEventListener("click",async e=>{const a=e.target.closest("[data-act=
   a.disabled=true;const r1=await db.from("imp_socios_priv").upsert(priv).select().single();const r2=await db.from("imp_socios").update({email:f.email||null,telefone:f.telefone||null}).eq("id",id).select().single();a.disabled=false;
   if(r1.error||r2.error)return toast("Erro: "+((r1.error||r2.error).message||""),true);
   const i=S.socPriv.findIndex(x=>x.socio_id===id);if(i>=0)S.socPriv[i]=r1.data;else S.socPriv.push(r1.data);S.socios[S.socios.findIndex(x=>x.id===id)]=r2.data;toast("Dados salvos");closeSheet();render()},true);
+
+
+/* ================= v33 · CONTRATO: LER CONVERSA DO WHATSAPP (cliente, horas, comissão "igual à de", testemunha) ================= */
+const CD_NUMW={um:1,uma:1,dois:2,duas:2,"três":3,tres:3,quatro:4,cinco:5,seis:6,sete:7,oito:8,nove:9,dez:10,onze:11,doze:12,quinze:15,dezoito:18,vinte:20,trinta:30};
+function cdNorm(s){return String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]/g,"")}
+function cdLimpa(t){return String(t||"").replace(/\r/g,"").split("\n").map(l=>l.replace(/^\[[^\]]{4,40}\]\s*[^:\n]{1,40}:\s*/,"").replace(/^\d{1,2}\/\d{1,2}\/\d{2,4},?\s*\d{1,2}:\d{2}(?::\d{2})?\s*(?:[AP]M)?\s*-\s*[^:\n]{1,40}:\s*/i,"").replace(/\s+\d{1,2}:\d{2}\s*$/,"").replace(/^[\s↪➦»>]+/,"").trimEnd())
+  .filter(l=>!/^\s*(?:forwarded|encaminhada|encaminhado|mensagem encaminhada)\s*$/i.test(l)).join("\n")
+  .replace(/\b(um|uma|dois|duas|tr[eê]s|quatro|cinco|seis|sete|oito|nove|dez|onze|doze|quinze|dezoito|vinte|trinta)\b(?=\s+(?:meses|m[eê]s|vezes|lives?|horas?|dias?|semanas?|anos?)\b)/gi,w=>CD_NUMW[w.toLowerCase()]||w)}
+function cdSocioNoTexto(raw){const so=(S.socios||[]).map(s=>s.nome_completo||s.nome).filter(Boolean);if(!so.length)return "";
+  const ls=String(raw||"").split("\n");const tl=ls.find(l=>/testemunha/i.test(l))||"";
+  const rem=(tl.match(/^\[[^\]]*\]\s*([^:]{2,40}):/)||tl.match(/^\d{1,2}\/\d{1,2}\/\d{2,4},?\s*\d{1,2}:\d{2}[^-]*-\s*([^:]{2,40}):/)||[])[1]||"";
+  const tem=(txt,n)=>new RegExp("(^|[^A-Za-zÀ-ü])"+n.split(/\s+/)[0]+"([^A-Za-zÀ-ü]|$)","i").test(txt);
+  if(rem){const a=so.filter(n=>tem(rem,n));if(a.length===1)return a[0]}
+  const b=so.filter(n=>tem(tl,n));if(b.length===1)return b[0];
+  const c=so.filter(n=>tem(raw,n));return c.length===1?c[0]:""}
+const _cdParse0=cdParse;
+cdParse=function(t){const raw=String(t||"");const L=cdLimpa(raw);const r=_cdParse0(L);const tx=L.replace(/\s+/g," ");const av=r.aviso?[r.aviso]:[];
+  if(!r.vigencia_meses){const m=tx.match(/\b(\d{1,2})\s*meses\b/i);if(m&&+m[1]<=60)r.vigencia_meses=+m[1]}
+  const lsem=(tx.match(/(\d{1,2})\s*(?:vezes|x|lives?|dias?)\s*(?:na|por|\/|a|em|cada)?\s*semana/i)||[])[1];
+  const hit=r.itens.find(i=>i.grupo==="hora");if(hit&&!hit.lsem&&lsem)hit.lsem=+lsem;
+  if(!r.itens.length){const cands=[];const re=/(\d{1,4})\s*h(?:oras?|rs)?\b([^\n]{0,40})/gi;let m;
+    while((m=re.exec(L))){const n=+m[1],dep=m[2]||"";const antes=L.slice(Math.max(0,m.index-12),m.index);if(/^\s*(?:por|\/|a|de|cada)\s*(?:dia|live|semana)/i.test(dep)||/lives?\s+de\s*$/i.test(antes)||/R\$\s*$/.test(antes))continue;cands.push({n,dep})}
+    let val=cands.find(c=>/^\s*(?:mais|\+|e)\s*(?:a\s+|o\s+)?(?:comiss|%|\d)/i.test(c.dep));let hm=cands.find(c=>c!==val&&c.n<=200);
+    if(!val&&cands.length>=2){const s=cands.slice().sort((a,b)=>b.n-a.n);if(s[0].n>=80&&s[0].n>s[1].n){val=s[0];hm=s[1]}}
+    if(val||hm){const it=cdItemNovo("hora");it.valor=val?val.n:it.valor;it.hmin=hm?hm.n:"";it.lsem=lsem?+lsem:"";it.horas="";it.perc="";r.itens.push(it);
+      if(val)av.push(`Entendi “${val.n} horas” como R$ ${val.n} por hora de live${hm?` e “${hm.n} horas” como mínimo por mês`:""}. Confira.`);else av.push("Não achei o valor da hora no texto: confira o campo.")}}
+  const ref=tx.match(/comiss[aã]o\s+(?:igual|mesma|id[eê]ntica|como)\s+(?:(?:a|o|à|ao|e)\s+)?(?:d[aoe]s?\s+)?([A-Za-zÀ-ü0-9&'!\-]+(?:\s+[A-Za-zÀ-ü0-9&'!\-]+){0,2})/i);
+  if(ref){r.percRef=ref[1].replace(/\s+(?:e|mais|com|no|na|pra|para)\b.*$/i,"").trim();r.itens.forEach(i=>{if(!/%/.test(tx))i.perc=""})}
+  if(/testemunha/i.test(tx)){r.testemunhaPedida=true;r.testemunha=cdSocioNoTexto(raw)}
+  r.cliTxt=L;r.aviso=av.join(" ");return r};
+async function cdPercDe(nome){const n=cdNorm(nome);if(!n)return null;const cs=S.clientes.filter(c=>{const a=cdNorm(c.marca),b=cdNorm(c.empresa);return a&&(a===n||a.startsWith(n)||n.startsWith(a)||(b&&b.startsWith(n)))});if(!cs.length)return null;
+  if(!S.ctrs&&typeof ctrLoad==="function"){try{await ctrLoad()}catch(e){}}
+  for(const c of cs){for(const k of (S.ctrs?ctrUltimas():[]).filter(x=>x.cliente_id===c.id&&x.status!=="cancelado")){let its=k.opcoes&&k.opcoes.cond?k.opcoes.cond.itens:null;if(!its&&k.orcamento_id){const o=S.orcs.find(x=>x.id===k.orcamento_id);its=o?(o.itens||[]).filter(i=>i.on!==false):null}
+      const p=(its||[]).map(i=>Number(i.perc)).find(x=>x>0);if(p)return {perc:p,marca:c.marca,fonte:"contrato "+ctn(k.numero)}}
+    const os=(S.orcs||[]).filter(o=>o.cliente_id===c.id&&o.status!=="cancelado").sort((a,b)=>String(b.elaborado_em||b.created_at||"").localeCompare(String(a.elaborado_em||a.created_at||"")));
+    for(const o of os){const p=(o.itens||[]).filter(i=>i.on!==false).map(i=>Number(i.perc)).find(x=>x>0);if(p)return {perc:p,marca:c.marca,fonte:"proposta "+on(o.numero)}}}
+  return {perc:null,marca:cs[0].marca}}
+async function cdPos(r){const C=S.cd;if(!C)return;const av=C.aviso?[C.aviso]:[];C.cliTxt=r.cliTxt||"";
+  if(r.percRef){const p=await cdPercDe(r.percRef);const it=C.itens.find(i=>i.grupo==="hora")||C.itens[0];
+    if(p&&p.perc&&it){it.perc=p.perc;av.push(`Comissão igual à da ${p.marca}: ${numIn(p.perc)}% (do ${p.fonte}).`)}
+    else av.push(p?`O texto pede comissão igual à da ${p.marca}, mas ela ainda não tem contrato ou proposta com %. Preencha o % sobre vendas.`:`O texto pede comissão igual à da “${r.percRef}”, mas não achei esse cliente. Preencha o % sobre vendas.`)}
+  const s=cliParse(C.cliTxt);C.cliSug=null;
+  if(s.cnpj||s.rep_nome||(s.empresa&&/\b(LTDA|EIRELI|S\.?\/?A)\b/i.test(s.empresa))){const dup=s.cnpj?S.clientes.find(c=>soD(c.cnpj)===soD(s.cnpj)):null;
+    if(dup){C.cliente_id=dup.id;const novo=["empresa","endereco","rep_nome","rep_email","fin_nome","fin_email"].some(k=>s[k]&&!dup[k]);if(novo)C.cliSug=s;av.push(`Cliente reconhecido pelo CNPJ: ${dup.marca}.`)}
+    else C.cliSug=s}
+  if(r.testemunha){C.testemunha=r.testemunha;av.push(`Testemunha do nosso lado: ${r.testemunha}.`)}else if(r.testemunhaPedida)av.push("Pediram testemunha do nosso lado: escolha na próxima tela.");
+  C.aviso=av.join(" ")}
+const _cliParse0=cliParse;
+cliParse=function(txt){const L=cdLimpa(txt);const o=_cliParse0(L);const ls=L.split("\n").map(x=>x.trim()).filter(Boolean);const flat=ls.join("\n");
+  if(!o.empresa){const l=ls.find(x=>/\b(LTDA|LIMITADA|EIRELI|S\.?\/?A)\b/i.test(x));if(l)o.empresa=l}
+  if(o.empresa){const m=o.empresa.match(/^(.*?\b(?:LTDA|LIMITADA|EIRELI|EPP|S\.?\/?A)\b\.?)/i);if(m)o.empresa=m[1].trim()}
+  if(o.empresa&&(!o.marca||o.marca===o.empresa.split(/\s+/)[0])){const m=o.empresa.match(/^(.+?)\s+(?:COM[EÉ]RCIO|IND[UÚ]STRIA|SERVI[CÇ]OS|DISTRIBUI|IMPORTA|EXPORTA|PRODUTOS|COSM[EÉ]TICOS|CONFEC|LTDA|EIRELI|LIMITADA|S\.?\/?A\b)/i);if(m)o.marca=titulo(m[1])}
+  const sd=flat.match(/sede\s+(?:na|no|em|à|a)\s+([^\n]+)/i);
+  if(sd){let a=sd[1].replace(/[.;]\s*$/,"");const cp=a.match(/CEP\s*:?\s*(\d{2}\.?\d{3}-?\d{3})/i);a=a.replace(/,?\s*CEP\s*:?\s*\d{2}\.?\d{3}-?\d{3}\s*,?/i,", ").replace(/\s*[-–]\s*([A-Z]{2})\.?\s*$/,"/$1").replace(/\s+,/g,",").replace(/,\s*,/g,",").replace(/[,\s]+$/,"").replace(/\s{2,}/g," ").trim();
+    if(cp){o.cep=soD(cp[1]).replace(/(\d{5})(\d{3})/,"$1-$2");a+=", CEP "+o.cep}o.endereco=a}
+  else if(!o.cep){const cp=(o.endereco||"").match(/CEP\s*(\d{5}-?\d{3})/i);if(cp)o.cep=cp[1]}
+  const P={rep:[],fin:[],ct:[]};let sec=null;
+  for(const l of ls){
+    if(/^(?:respons[áa]ve(?:l|is)\s+lega(?:l|is)|representantes?(?:\s+lega(?:l|is))?|quem\s+assina|s[óo]cios?(?:[\s-]+administrador(?:es|as?)?)?|signat[áa]rios?)\s*:?$/i.test(l)){sec="rep";continue}
+    if(/^(?:respons[áa]vel\s+)?financeiro\s*:?$|^contas?\s+a\s+pagar\s*:?$|^cobran[çc]a\s*:?$/i.test(l)){sec="fin";continue}
+    if(/^(?:contato(?:\s+do\s+dia\s+a\s+dia)?|respons[áa]vel\s+(?:comercial|marketing|opera[çc][ãa]o))\s*:?$/i.test(l)){sec="ct";continue}
+    if(/^(?:contratante|contratada)\s*:?$/i.test(l)){sec=null;continue}
+    if(!sec)continue;let m;
+    if((m=l.match(/^nome(?:\s+completo)?\s*:\s*(.+)$/i))){P[sec].push({nome:m[1].trim()});continue}
+    if(!P[sec].length)P[sec].push({});const cur=P[sec][P[sec].length-1];
+    if((m=l.match(/^e-?mails?\s*:\s*(.+)$/i)))cur.email=m[1].replace(/\s*[;,]\s*/g,"; ").trim();
+    else if((m=l.match(/^(?:telefone|tel\.?|celular|whats(?:app)?|fone)\s*:?\s*(.+)$/i)))cur.tel=m[1].trim();
+    else if((m=l.match(/^cpf\s*:?\s*(.+)$/i)))cur.cpf=m[1].trim();
+    else if((m=l.match(/^cargo\s*:?\s*(.+)$/i)))cur.cargo=m[1].trim()}
+  const R=P.rep.filter(x=>x.nome);if(R.length){o.rep_nome=R.map(x=>x.nome).join(" e ");o.rep_email=R.map(x=>x.email).filter(Boolean).join(", ");if(R.length===1){if(R[0].cpf)o.rep_cpf=R[0].cpf;if(R[0].cargo)o.rep_cargo=R[0].cargo}
+    o.contato_nome=R[0].nome;if(R[0].email)o.contato_email=R[0].email.split(";")[0].trim();if(R[0].tel)o.contato_tel=R[0].tel}
+  else if(/^(legal|financeiro)$/i.test(o.contato_nome||""))o.contato_nome="";
+  const F=P.fin[0];if(F){if(F.nome)o.fin_nome=F.nome;if(F.email)o.fin_email=F.email;if(F.tel&&soD(o.contato_tel)===soD(F.tel))o.contato_tel="";if(F.tel)o.obs=[o.obs,"Telefone do financeiro: "+F.tel].filter(Boolean).join(" · ")}
+  const K=P.ct[0];if(K){if(K.nome)o.contato_nome=K.nome;if(K.email)o.contato_email=K.email;if(K.tel)o.contato_tel=K.tel}
+  return o};
+const _cdRender0=cdRender;
+cdRender=function(){_cdRender0();const C=S.cd,sel=$("#cdCli");if(!C||!sel)return;const s=C.cliSug;if(!s)return;const dup=s.cnpj?S.clientes.find(c=>soD(c.cnpj)===soD(s.cnpj)):null;
+  sel.closest(".fld").insertAdjacentHTML("beforeend",`<div class="hint" style="margin-top:8px">Achei no texto: <b>${esc(s.empresa||s.marca||"")}</b>${s.cnpj?` · CNPJ ${esc(s.cnpj)}`:""}${s.rep_nome?` · assina: ${esc(s.rep_nome)}`:""}${dup?"":" · <b>ainda não cadastrado</b>"}
+   <div style="margin-top:6px"><button type="button" class="btn p sm" data-act="cdCliSug">${dup?"Completar o cadastro de "+esc(dup.marca)+" com esses dados":"Conferir e cadastrar este cliente"}</button></div></div>`)};
+document.addEventListener("click",async e=>{const a=e.target.closest("[data-act=cdCliSug]");if(!a)return;e.preventDefault();e.stopImmediatePropagation();if(!S.cd)return;cdLerForm();S.cdAguarda=true;openCliImport();await ciProcessa(S.cd.cliTxt||"","lido do texto do contrato")},true);
+function cdTestOp(){const n=[...(S.socios||[]).map(s=>s.nome_completo||s.nome),...(S.membros||[]).filter(m=>m.status==="ativo"&&m.papel!=="seller").map(m=>m.nome)].filter(Boolean);const u=[];n.forEach(x=>{if(!u.some(y=>cdNorm(y).startsWith(cdNorm(x))||cdNorm(x).startsWith(cdNorm(y))))u.push(x)});return [["","Em branco"],...u]}
 
 if(!orcPreviewBoot())boot();
 </script>
