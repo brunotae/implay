@@ -759,7 +759,7 @@ function jobItem(j){const open=!j.principal_id&&j.status==="aberto";
   <div>${j.status==="realizado"?`<span class="tag o">realizado</span>`:j.status==="cancelado"?`<span class="tag x">cancelado</span>`:open?`<span class="tag f">vaga aberta</span>`:`<span class="tag">A: ${esc(nome(j.principal_id))}</span>`}${j.substituto_id?`<span class="tag">B: ${esc(nome(j.substituto_id))}</span>`:j.status==="aberto"?`<span class="tag">B: livre</span>`:""}${j.modalidade==="aluguel"?`<span class="tag c">aluguel</span>`:""}${j.publicado&&j.status==="aberto"?"":j.status==="aberto"?`<span class="tag w">fora do mural</span>`:""}</div></div>
   <div class="r">${j.valor_seller?brl(j.valor_seller):""}</div></div>`}
 function cliOpts(sel){return `<option value="">— escolher —</option><option value="__novo__">+ Cadastrar novo cliente…</option>${S.clientes.filter(c=>c.status!=="cancelado").map(c=>`<option value="${c.id}" ${c.id===sel?"selected":""}>${esc(c.marca)}${c.empresa?" · "+esc(c.empresa):""}</option>`).join("")}`}
-function cliSel(sel,label){return `<div class="fld"><label style="display:flex;justify-content:space-between;align-items:center">${label}<button type="button" class="btn sm" style="min-height:28px;padding:4px 10px;font-size:11.5px;letter-spacing:0;text-transform:none" data-act="ncAbrir">+ Novo cliente</button></label><select name="cliente_id">${cliOpts(sel)}</select>
+function cliSel(sel,label){return `<div class="fld"><label style="display:flex;justify-content:space-between;align-items:center">${label}<button type="button" class="btn sm" style="min-height:28px;padding:4px 10px;font-size:11.5px;letter-spacing:0;text-transform:none" data-act="ncAbrir">+ Novo cliente</button></label><select name="cliente_id" data-1c="lista">${cliOpts(sel)}</select>
  <div class="newcli card" hidden style="margin-top:8px;background:var(--card2)"><div class="lab">Novo cliente</div>
  <div class="cols2 t2"><div class="fld" style="margin-top:6px"><label>Marca *</label><input id="nc_marca" placeholder="ex.: Doritos"></div><div class="fld" style="margin-top:6px"><label>Empresa</label><input id="nc_empresa" placeholder="ex.: PepsiCo"></div></div>
  <div class="cols2 t2"><div class="fld"><label>Contato</label><input id="nc_contato"></div><div class="fld"><label>Telefone</label><input id="nc_tel" type="tel"></div></div>
@@ -791,13 +791,13 @@ function openJob(id,preset={}){
   const contratos=S.propostas.filter(p=>p.status==="aceita");
   openSheet(`<form onsubmit="return false"><h3>${id?esc(j.marca||"Live")+" · "+jn(j.numero):"Nova live"}</h3>
    ${id?`<div>${j.status==="realizado"?`<span class="tag o">realizado</span>`:j.status==="cancelado"?`<span class="tag x">cancelado</span>`:`<span class="tag v">aberto</span>`}</div>`:""}
-   <div class="fld"><label>Contrato</label><select name="proposta_id" data-act-change="jobContrato"><option value="">— sem contrato —</option>${contratos.map(p=>`<option value="${p.id}" ${p.id===j.proposta_id?"selected":""}>${esc(p.contrato_numero||pn(p.numero))} · ${esc(p.marca)}</option>`).join("")}</select><div class="hint">Liga a live às condições de venda da proposta aceita.</div></div>
+   <div class="fld"><label>Contrato</label><select name="proposta_id" data-act-change="jobContrato" data-1c="lista"><option value="">— sem contrato —</option>${contratos.map(p=>`<option value="${p.id}" ${p.id===j.proposta_id?"selected":""}>${esc(p.contrato_numero||pn(p.numero))} · ${esc(p.marca)}</option>`).join("")}</select><div class="hint">Liga a live às condições de venda da proposta aceita.</div></div>
    ${cliSel(j.cliente_id,"Cliente")}${fld("marca","Marca",j.marca)}
    <div class="fld"><label>Modalidade</label>${seg("modalidade",[["servico","Serviço completo"],["aluguel","Só aluguel do espaço"]],j.modalidade)}</div>
    <div data-show="modalidade=servico" class="sbox">${pickM("equipamento","Equipamento (pode marcar mais de um)",j.equipamento||"",["Celular","Câmera profissional","2 câmeras","Iluminação extra","Microfone de lapela","Cenário da marca"],{ph:"Outro equipamento: escreva aqui"})}</div>
    <div class="sec"><h2>Local</h2></div>
    <div class="fld">${seg("local_tipo",[["estudio","Nosso estúdio"],["cliente","Terceiros"]],j.local_tipo==="online"?"cliente":j.local_tipo)}</div>
-   <div class="fld" data-show="local_tipo=estudio"><label>Sala</label><select name="espaco" data-self="${id||""}">${espOpts(j.espaco,ini,fim,id)}</select><div class="hint">As salas ocupadas no mesmo horário aparecem marcadas.</div></div>
+   <div class="fld" data-show="local_tipo=estudio"><label>Sala</label><select name="espaco" data-1c="lista" data-self="${id||""}">${espOpts(j.espaco,ini,fim,id)}</select><div class="hint">As salas ocupadas no mesmo horário aparecem marcadas.</div></div>
    <div data-show="local_tipo=cliente">${fld("local_endereco","Onde é a live",j.local_endereco,"text",'placeholder="Ex.: loja da marca, Shopping X, endereço…"')}</div>
    <div class="sec"><h2>Quando</h2></div>
    <div class="jqt"><div class="fld"><label>Data</label><input type="date" name="data" value="${ini?ymd(ini):""}"></div>
@@ -812,7 +812,7 @@ function openJob(id,preset={}){
    <div data-show="seller_app=1" class="sbox"><label class="lb">Vaga no app · aparece para os sellers cadastrados escolherem</label>
     <div class="cols2">${moneyFld("valor_seller","Cachê do seller (R$)",j.valor_seller)}<div class="fld"><label>Quem paga o seller</label>${seg("seller_pago_por",[["cliente","Cliente direto"],["implay","IMPlay"]],j.seller_pago_por)}</div></div>
     ${area("requisitos","Requisitos / observações para o seller",j.requisitos)}
-    <details class="adv"><summary>Já sabe quem vai? Definir seller agora (opcional)</summary><div class="cols2"><div class="fld"><label>Seller principal (A)</label><select name="principal_id">${sellerOpts(j.principal_id)}</select></div><div class="fld"><label>Substituto (B)</label><select name="substituto_id">${sellerOpts(j.substituto_id)}</select></div></div></details>
+    <details class="adv"><summary>Já sabe quem vai? Definir seller agora (opcional)</summary><div class="cols2"><div class="fld"><label>Seller principal (A)</label><select name="principal_id" data-1c="lista">${sellerOpts(j.principal_id)}</select></div><div class="fld"><label>Substituto (B)</label><select name="substituto_id" data-1c="lista">${sellerOpts(j.substituto_id)}</select></div></div></details>
     <div class="hint">"Cliente direto": o seller emite a nota para o cliente e o valor não passa pelo caixa da IMPlay.</div></div>
    <div data-show="seller_conv=1" class="sbox">${fld("convidados","Convidados / influenciadores (fora do sistema)",j.convidados,"text",'placeholder="Ex.: Mari Menezes (influenciadora)"')}</div>
    </div>
@@ -1004,8 +1004,8 @@ function openFin(id,preset={}){
    ${fld("contraparte","Quem recebeu / quem pagou",f.contraparte)}
    <div class="cols2 t2">${dateFld("vencimento","Vencimento",f.vencimento)}${dateFld("pago_em","Pago / recebido em (vazio = pendente)",f.pago_em)}</div>
    <div class="fld"><label>Forma</label>${seg("forma",["Pix","Boleto","Cartão","Transferência","Débito automático","Dinheiro"],f.forma)}</div>
-   <div class="cols2"><div class="fld"><label>Live</label><select name="job_id"><option value="">—</option>${S.jobs.slice().reverse().slice(0,200).map(j=>`<option value="${j.id}" ${j.id===f.job_id?"selected":""}>${jn(j.numero)} · ${esc(j.marca||"")} · ${dCurta(j.inicio)}</option>`).join("")}</select></div>
-   <div class="fld"><label>Contrato</label><select name="proposta_id"><option value="">—</option>${S.propostas.filter(p=>p.status==="aceita").map(p=>`<option value="${p.id}" ${p.id===f.proposta_id?"selected":""}>${esc(p.contrato_numero)} · ${esc(p.marca)}</option>`).join("")}</select></div></div>
+   <div class="cols2"><div class="fld"><label>Live</label><select name="job_id" data-1c="lista"><option value="">—</option>${S.jobs.slice().reverse().slice(0,200).map(j=>`<option value="${j.id}" ${j.id===f.job_id?"selected":""}>${jn(j.numero)} · ${esc(j.marca||"")} · ${dCurta(j.inicio)}</option>`).join("")}</select></div>
+   <div class="fld"><label>Contrato</label><select name="proposta_id" data-1c="lista"><option value="">—</option>${S.propostas.filter(p=>p.status==="aceita").map(p=>`<option value="${p.id}" ${p.id===f.proposta_id?"selected":""}>${esc(p.contrato_numero)} · ${esc(p.marca)}</option>`).join("")}</select></div></div>
    ${fld("nf_numero","Nº da nota fiscal",f.nf_numero)}
    <div data-show="tipo=saida"><div class="fld"><label>Pago com</label>${seg("pago_por",[["empresa","Dinheiro da empresa"],["proprio","Meu dinheiro (recurso próprio)"]],f.pago_por)}</div>
     <div data-show="pago_por=proprio"><div class="fld"><label>Reembolso</label>${seg("reembolso",[["solicitado","Solicitar reembolso"],["nao","Não precisa"]],f.reembolso==="nao"&&!id?"solicitado":f.reembolso)}</div>
@@ -2094,7 +2094,7 @@ function openEq(id){const e=id?S.equip.find(x=>x.id===id):{categoria:"Celular",q
    <div class="cols2">${fld("serie","Nº de série / IMEI / patrimônio",e.serie)}${pick("quantidade","Quantidade",String(e.quantidade||1),["1","2","3","4","5","10"],{num:1,ph:"Outro número"})}</div>
    <div class="sec"><h2>Onde e com quem</h2></div>
    ${pick("local","Onde está",e.local||"",EQ_LOCAIS,{ph:"Outro lugar: sala E1, loja do cliente…"})}
-   <div class="cols2"><div class="fld"><label>Responsável</label><select name="responsavel_id"><option value="">— ninguém —</option>${membros.map(m=>`<option value="${m.id}" ${m.id===e.responsavel_id?"selected":""}>${esc(m.nome)}</option>`).join("")}</select></div>${fld("com_quem","Emprestado para / está com",e.com_quem,"text",'placeholder="Ex.: Mari Menezes, cliente Haoma"')}</div>
+   <div class="cols2"><div class="fld"><label>Responsável</label><select name="responsavel_id" data-1c="lista"><option value="">— ninguém —</option>${membros.map(m=>`<option value="${m.id}" ${m.id===e.responsavel_id?"selected":""}>${esc(m.nome)}</option>`).join("")}</select></div>${fld("com_quem","Emprestado para / está com",e.com_quem,"text",'placeholder="Ex.: Mari Menezes, cliente Haoma"')}</div>
    <div class="fld"><label>Situação</label>${seg("status",EQ_STATUS.map(x=>[x[0],x[0]]),e.status)}</div>
    <div class="fld"><label>Estado</label>${seg("estado",EQ_ESTADOS.map(x=>[x,x]),e.estado)}</div>
    <div class="sec"><h2>Compra</h2></div>
@@ -2513,8 +2513,9 @@ document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.cl
 
 VIEWS.pessoa=VPessoa;
 /* ================= v13 · VERSÃO DO SISTEMA + LER CONDIÇÕES DE ARQUIVOS ================= */
-const APP_VERSAO="31";const APP_DATA="26/10/2026";
+const APP_VERSAO="32";const APP_DATA="29/10/2026";
 const NOVIDADES=[
+ ["32","29/10","Um clique: listas com poucas opções viraram botões (ex.: minutos da live, estrutura GO/BOOST/ICON). Campos de % sobre vendas ganharam botões favoritos: digite o valor e toque em + favorito; ✎ para tirar. Os favoritos ficam por pessoa e por aparelho."],
  ["31","29/10","Login: 'Criar conta' virou 'Pedir acesso', com aviso de que só entra quem um sócio liberar."],
  ["30","29/10","Proposta no modelo V3: páginas novas de Afiliados, UGC, Base de creators e Proposta de gestão; numeração de páginas corrigida e contínua."],
  ["29","29/10","Empresa: bloco 'Sócios e representantes legais' (só sócios veem) com CPF, e-mail, telefone, documento, endereço e botão Copiar tudo."],
@@ -2615,7 +2616,7 @@ function cdParse(t){const out={itens:[]};const T=String(t||"").replace(/\r/g,"")
     out.inclui=bl.map(x=>x.replace(/\s+/g," ").replace(/\(([^)]*)$/,"($1)").trim()).filter(x=>x.length>3&&!/^m[ií]nimo de \d+\s*h/i.test(x))}
   return out}
 function cdNum(v){return v===""||v===null||v===undefined?"":numIn(v)}
-function cdF(i,f,label,v,o={}){return `<div class="fld"><label>${label}</label><input data-cd="${i}" data-f="${f}" inputmode="${o.int?"numeric":"decimal"}" value="${o.txt?esc(v??""):cdNum(v)}" placeholder="${o.ph||""}"></div>`}
+function cdF(i,f,label,v,o={}){return `<div class="fld"><label>${label}</label><input data-cd="${i}" data-f="${f}"${f==="perc"?' data-fav="" data-fav-key="perc-vendas" data-fav-un="%"':""} inputmode="${o.int?"numeric":"decimal"}" value="${o.txt?esc(v??""):cdNum(v)}" placeholder="${o.ph||""}"></div>`}
 function cdCalc(it){const v=Number(it.valor)||0,pc=Number(it.perc)||0;const fx=v=>brl(v).replace(",00","");const pcT=pc?` + <b>${numIn(pc)}%</b> das vendas feitas nas lives`:"";
   if(it.grupo==="hora"){const h=Number(it.hmin)||0;if(!v||!h)return `<span class="muted">Preencha o valor da hora e o mínimo de horas para ver o fixo mensal.</span>${pcT}`;
     return `Fixo mensal: <b>${fx(v)}</b> × <b>${numIn(h)} h</b> = <b class="cdv">${fx(v*h)}/mês</b>${pcT}<div class="small muted" style="margin-top:3px">Hora extra além do mínimo: ${fx(v)} cada${Number(it.lsem)?` · pelo menos ${it.lsem} lives por semana`:""}</div>${(()=>{const est=Math.round(Number(it.lsem)*Number(it.horas)*4.33);return Number(it.lsem)&&Number(it.horas)&&est<h?`<div class="small" style="margin-top:4px;color:#ffb648">⚠ ${it.lsem} lives × ${numIn(it.horas)} h por semana dá ≈ ${est} h no mês, abaixo do mínimo de ${numIn(h)} h. Aumente as lives ou as horas.</div>`:""})()}`}
@@ -2653,7 +2654,7 @@ function cdResumo(C){const it=C.itens.filter(x=>Number(x.valor)>0||Number(x.perc
 function cdRender(){const C=S.cd;const cli=S.clientes.filter(c=>c.status!=="cancelado").sort((a,b)=>a.marca.localeCompare(b.marca));let n=0;
   const html=`<form onsubmit="return false" id="cdForm" class="cdform"><h3>${C.antId?"Nova versão · condições":"Novo contrato"}</h3>
    <p class="small muted" style="margin-top:0">Preencha por partes. O que você puser aqui vira o <b>Anexo I</b> do contrato. Não precisa de proposta.</p>
-   ${cdSec(++n,"Cliente","Quem contrata",`<div class="fld" style="margin-top:0"><div class="row" style="gap:6px;flex-wrap:nowrap"><select id="cdCli" style="flex:1"><option value="">Escolha…</option>${cli.map(c=>`<option value="${c.id}" ${c.id===C.cliente_id?"selected":""}>${esc(c.marca)}${c.empresa?" · "+esc(c.empresa):""}</option>`).join("")}</select><button type="button" class="btn sm" data-act="ciAbrir" title="Cadastrar cliente com print/PDF">+ Cliente</button></div></div>`)}
+   ${cdSec(++n,"Cliente","Quem contrata",`<div class="fld" style="margin-top:0"><div class="row" style="gap:6px;flex-wrap:nowrap"><select id="cdCli" data-1c="lista" style="flex:1"><option value="">Escolha…</option>${cli.map(c=>`<option value="${c.id}" ${c.id===C.cliente_id?"selected":""}>${esc(c.marca)}${c.empresa?" · "+esc(c.empresa):""}</option>`).join("")}</select><button type="button" class="btn sm" data-act="ciAbrir" title="Cadastrar cliente com print/PDF">+ Cliente</button></div></div>`)}
    ${cdSec(++n,"Ler o que já foi combinado","Opcional: o sistema preenche as partes abaixo para você conferir",`<label class="dropz" id="cdDrop" for="cdFile" style="display:block;border:1.5px dashed var(--linha);border-radius:14px;padding:14px;text-align:center;cursor:pointer"><b>Arraste aqui proposta, print ou PDF</b><div class="small muted">PDF, imagem, Word (.docx), conversa do WhatsApp (.txt) · pode ser mais de um · ou toque para escolher</div><input type="file" id="cdFile" multiple accept="application/pdf,image/*,.docx,.txt,.csv,.eml,text/plain" hidden></label>
      <div class="okbox" id="cdLendo" hidden style="margin-top:8px"></div>${C.fontes&&C.fontes.length?`<div class="small muted" style="margin-top:6px">Lido de: ${C.fontes.map(esc).join(", ")}</div>`:""}
      <details style="margin-top:8px"><summary class="small" style="cursor:pointer;font-weight:700">📋 Ou cole o texto</summary><textarea id="cdTxt" rows="4" style="width:100%;margin-top:6px" placeholder="ex.: 150 reais a hora, mínimo 40h por mês, 3 lives por semana, 9% das vendas. Contrato de 3 meses, início 26/10."></textarea><button type="button" class="btn sm" data-act="cdLer" style="margin-top:6px">Ler e preencher</button></details>
@@ -2841,7 +2842,7 @@ function cpRender(){const C=S.cp;const sel=C.items.filter(x=>x.on&&x.valor);cons
      <div class="cpf"><input data-cp="${i}" data-f="descricao" value="${esc(x.descricao)}" placeholder="Descrição">
       <div class="cpr"><input data-cp="${i}" data-f="valor" inputmode="decimal" value="${x.valor?numIn(x.valor):""}" placeholder="Valor R$" class="${x.valor?"":"falta"}"><input type="date" data-cp="${i}" data-f="data" value="${x.data||""}">
        <select data-cp="${i}" data-f="categoria">${CAT_SAI.map(c=>`<option value="${c[0]}" ${c[0]===x.categoria?"selected":""}>${esc(c[1])}</option>`).join("")}</select></div>
-      <div class="cpr c2"><input data-cp="${i}" data-f="contraparte" value="${esc(x.contraparte)}" placeholder="Loja / quem recebeu">${x.planilha?cpPessoaSel(x,i):""}<select data-cp="${i}" data-f="forma"><option value="">Forma</option>${["Pix","Cartão","Boleto","Transferência","Dinheiro"].map(f=>`<option ${f===x.forma?"selected":""}>${f}</option>`).join("")}</select></div>
+      <div class="cpr c2"><input data-cp="${i}" data-f="contraparte" value="${esc(x.contraparte)}" placeholder="Loja / quem recebeu">${x.planilha?cpPessoaSel(x,i):""}<select data-cp="${i}" data-f="forma" data-1c="lista"><option value="">Forma</option>${["Pix","Cartão","Boleto","Transferência","Dinheiro"].map(f=>`<option ${f===x.forma?"selected":""}>${f}</option>`).join("")}</select></div>
       ${!x.valor?`<div class="small neg">Não consegui ler o valor: digite.</div>`:""}${x.dataTipo==="arquivo"?`<div class="small" style="color:var(--warn)">Data da compra não aparece no print: usei a data do arquivo, confira.</div>`:x.dataTipo==="entrega"?`<div class="small muted">Data é a da entrega (o print não mostra a da compra).</div>`:""}
       ${x.flags.map(f=>`<div class="small" style="color:var(--warn)">⚠ ${esc(f)}</div>`).join("")}</div></div>`).join("")}</div>`:""}
    <div class="acts"><button type="button" class="btn p" data-act="cpLancar" ${sel.length&&sel.every(x=>x.pessoa||C.pessoa)&&!C.lendo?"":"disabled"}>${!sel.every(x=>x.pessoa||C.pessoa)?"Escolha quem pagou":sel.length?`Lançar ${sel.length} ${sel.length===1?"despesa":"despesas"} · ${brl(tot)}${C.reemb==="sim"&&pes?" · reembolso para "+esc(pes.nome):""}`:"Adicione os comprovantes"}</button><button type="button" class="btn" data-act="cpFechar">Fechar</button>${C.items.length?`<button type="button" class="btn d" data-act="cpLimpar">Limpar lista</button>`:""}</div></form>`;
@@ -3109,7 +3110,7 @@ function freqLivesMes(f){f=String(f||"").toLowerCase();if(/todo/.test(f))return 
 function hrTxt(h){return [h.hmin?`mínimo de ${numIn(h.hmin)} h de live por mês`:"",h.hl?`pelo menos ${numIn(h.hl)} h por live`:"",h.freq?h.freq:h.lsem?`pelo menos ${h.lsem} lives por semana`:""].filter(Boolean).join(" · ")}
 function cxFind(k){const ls=[S.oe&&S.oe.itens,S._docO&&S._docO.itens,...(S.orcs||[]).map(o=>o.itens)].filter(Boolean);for(const l of ls){const i=l.find(x=>x.k===k);if(i&&i.p)return i.p}return null}
 function cxNovo(){const h=preco("hora.PADRAO")||{};return {k:"cx:"+Math.random().toString(36).slice(2,9),on:true,valor:Number(h.valor)||150,perc:Number(h.perc)||9,qtd:1,hmin:Number(h.horas)||40,hlive:3,freq:"a cada 3 dias",p:{grupo:"hora",nome:"Gestão de lives por hora",categoria:"",descricao:""}}}
-function oeF(k,f,label,v,o={}){return `<div class="fld"><label>${label}</label><input data-oe="${f}" data-k="${k}" ${o.txt?"":`inputmode="${o.int?"numeric":"decimal"}"`} value="${o.txt?esc(v??""):(v===""||v==null?"":numIn(v))}" placeholder="${o.ph||""}"></div>`}
+function oeF(k,f,label,v,o={}){return `<div class="fld"><label>${label}</label><input data-oe="${f}" data-k="${k}"${f==="perc"?' data-fav="" data-fav-key="perc-vendas" data-fav-un="%"':""} ${o.txt?"":`inputmode="${o.int?"numeric":"decimal"}"`} value="${o.txt?esc(v??""):(v===""||v==null?"":numIn(v))}" placeholder="${o.ph||""}"></div>`}
 function oeCalc(k){const p=preco(k),it=oeItem(k);const fx=v=>brl(v).replace(",00","");const pc=Number(it.perc)?` + <b>${numIn(it.perc)}%</b> das vendas nas lives`:"";
   if(p.grupo==="hora"){const h=hrDe(it,p);if(!h.vh||!h.hmin)return `<span class="muted">Preencha valor da hora e mínimo de horas.</span>`;
     const lm=freqLivesMes(h.freq),est=Math.round(lm*h.hl);const tab=p.chave&&Number(p.valor);
@@ -3342,7 +3343,7 @@ const _cpAdd28=cpAdd;cpAdd=async function(files){const xl=files.filter(ehPlanilh
   if(xl.length){S.cp.lendo=1;S.cp.total=1;cpRender();for(const f of xl){const its=await xlLer(f);its.forEach(x=>S.cp.items.push(x));toast(`${its.length} ${its.length===1?"linha lida":"linhas lidas"} de ${f.name}`)}S.cp.lendo=0;cpMarcarDup();cpRender()}
   if(resto.length)return _cpAdd28(resto)};
 function cpPessoaSel(x,i){const nm=x.pessoaNome?`<option value="" selected>${esc(x.pessoaNome.charAt(0).toUpperCase()+x.pessoaNome.slice(1))}? Escolha a pessoa</option>`:`<option value="">Quem pagou (do topo)</option>`;
-  return `<select data-cp="${i}" data-f="pessoa" class="${x.pessoa||S.cp.pessoa?"":"falta"}">${x.pessoaNome?nm:`<option value="">${S.cp.pessoa?"Igual ao topo":"Quem pagou?"}</option>`}${cpPessoas().map(m=>`<option value="${m.id}" ${m.id===x.pessoa?"selected":""}>${esc(m.nome)}</option>`).join("")}<option value="empresa" ${x.pessoa==="empresa"?"selected":""}>Empresa pagou (sem reembolso)</option></select>`}
+  return `<select data-cp="${i}" data-f="pessoa" data-1c="lista" class="${x.pessoa||S.cp.pessoa?"":"falta"}">${x.pessoaNome?nm:`<option value="">${S.cp.pessoa?"Igual ao topo":"Quem pagou?"}</option>`}${cpPessoas().map(m=>`<option value="${m.id}" ${m.id===x.pessoa?"selected":""}>${esc(m.nome)}</option>`).join("")}<option value="empresa" ${x.pessoa==="empresa"?"selected":""}>Empresa pagou (sem reembolso)</option></select>`}
 
 /* ================= v29 · DADOS DOS SÓCIOS (só sócios) ================= */
 S.socPriv=[];
@@ -3376,6 +3377,127 @@ document.addEventListener("click",async e=>{const a=e.target.closest("[data-act=
   const i=S.socPriv.findIndex(x=>x.socio_id===id);if(i>=0)S.socPriv[i]=r1.data;else S.socPriv.push(r1.data);S.socios[S.socios.findIndex(x=>x.id===id)]=r2.data;toast("Dados salvos");closeSheet();render()},true);
 
 if(!orcPreviewBoot())boot();
+</script>
+<script>
+/* ===== Regra 7 · Um clique: opções favoritas + campo livre (Tae · 29/10/2026) =====
+   Módulo genérico, sem dependências. Cole antes de </body> (ou dentro do script principal).
+   O que faz, sozinho, em qualquer tela (MutationObserver):
+   1) <select> com até 6 opções curtas  → vira botões lado a lado (1 clique). O select continua no formulário, escondido.
+   2) <select> maior                      → ganha os favoritos dele em botões acima da lista.
+   3) <input type=number> com rótulo      → ganha a linha de favoritos: [12%] [15%] [20%] [+ favorito] [✎]
+      e campos de texto marcados com data-fav também.
+   Favoritos: "+ favorito" guarda o valor que está no campo; "✎" mostra o × para tirar. Valem por pessoa e por aparelho.
+   Padrões por campo: data-fav="10,15,20" (sugestões iniciais). Unidade nos botões: data-fav-un="%" ou "R$" (ou detecta pelo rótulo).
+   Desligar num campo ou num bloco: data-1c="off". Chave própria: data-fav-key="desconto-valor".
+   Botões do select: data-1c="botoes" força botões; data-1c="lista" força lista. */
+(function () {
+  if (window.__umclique) return; window.__umclique = true;
+  const APP = (document.querySelector('meta[name="app-id"]') || {}).content || location.pathname.replace(/index\.html$/, '');
+  const K = k => 'umclique:' + APP + ':' + k;
+  const ler = k => { try { return JSON.parse(localStorage.getItem(K(k)) || 'null'); } catch (_) { return null; } };
+  const gravar = (k, v) => { try { localStorage.setItem(K(k), JSON.stringify(v)); } catch (_) {} };
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const off = el => !!el.closest('[data-1c="off"]') && el.dataset['1c'] !== 'botoes';
+
+  const css = document.createElement('style');
+  css.textContent =
+    '.uc-hid{position:absolute!important;opacity:0!important;pointer-events:none!important;width:1px!important;height:1px!important;overflow:hidden!important}' +
+    '.uc-seg{display:flex;flex-wrap:wrap;gap:6px}' +
+    '.uc-seg button,.uc-fav button{font:inherit;font-size:13px;line-height:1.2;border:1px solid var(--line,var(--linha,#262626));background:var(--surface,var(--card,#141414));color:inherit;border-radius:999px;padding:7px 12px;min-height:34px;cursor:pointer}' +
+    '.uc-seg button[aria-pressed="true"]{background:var(--accent,var(--volt,#D5FF3F));border-color:var(--accent,var(--volt,#D5FF3F));color:var(--on-accent,#000);font-weight:600}' +
+    '.uc-seg button:disabled,.uc-fav button:disabled{opacity:.5;cursor:default}' +
+    '.uc-fav{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;align-items:center}' +
+    '.uc-fav .uc-v[aria-pressed="true"]{border-color:var(--accent,var(--voltx,#D5FF3F));color:var(--accent,var(--voltx,#D5FF3F));font-weight:600}' +
+    '.uc-fav .uc-add,.uc-fav .uc-ed{border-style:dashed;color:var(--muted,var(--cinza,#A3A3AB))}' +
+    '.uc-fav .uc-x{margin-left:6px;font-weight:700;opacity:.7}' +
+    '.uc-fav.uc-vazio{display:none}' +
+    ':focus-within>.uc-fav.uc-vazio,.uc-fav.uc-vazio:focus-within{display:flex}';
+  document.head.appendChild(css);
+
+  const setVal = (el, v) => {
+    const d = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(el), 'value');
+    d && d.set ? d.set.call(el, v) : (el.value = v);
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+  const rotulo = el => {
+    const l = (el.id && document.querySelector('label[for="' + CSS.escape(el.id) + '"]')) || el.closest('label');
+    return l ? l.textContent.trim() : (el.getAttribute('aria-label') || '');
+  };
+  const chave = el => el.dataset.favKey || el.name || el.id || rotulo(el).toLowerCase().slice(0, 40);
+  const unidade = el => el.dataset.favUn || (/%/.test(rotulo(el)) ? '%' : /R\$/.test(rotulo(el)) ? 'R$' : '');
+  const mostra = (v, un) => un === 'R$' ? 'R$ ' + String(v).replace('.', ',') : un === '%' ? String(v).replace('.', ',') + '%' : String(v);
+
+  // ---------- select → botões ----------
+  function botoes(sel) {
+    const ops = [...sel.options].filter(o => o.value !== '' && !/^outr[ao]…?$/i.test(o.text.trim()) && o.value !== '__outra');
+    const forca = sel.dataset['1c'];
+    if (forca === 'lista') return false;
+    if (forca !== 'botoes' && (ops.length < 2 || ops.length > 6 || ops.some(o => o.text.trim().length > 40) || sel.multiple)) return false;
+    const temOutra = [...sel.options].some(o => o.value === '__outra');
+    const box = document.createElement('div'); box.className = 'uc-seg'; box.setAttribute('role', 'group');
+    const nome = rotulo(sel); if (nome) box.setAttribute('aria-label', nome);
+    const desenha = () => {
+      box.innerHTML = ops.map(o => '<button type="button" data-v="' + esc(o.value) + '" aria-pressed="' + (sel.value === o.value) + '"' + (sel.disabled ? ' disabled' : '') + '>' + esc(o.text.trim()) + '</button>').join('') +
+        (temOutra ? '<button type="button" data-v="__outra" aria-pressed="' + (sel.value === '__outra') + '"' + (sel.disabled ? ' disabled' : '') + '>Outra…</button>' : '');
+    };
+    desenha();
+    box.addEventListener('click', e => { const b = e.target.closest('button'); if (!b || b.disabled) return; setVal(sel, b.dataset.v); desenha(); if (b.dataset.v === '__outra') { const o = sel.parentNode.querySelector('input[type="text"]'); o && o.focus(); } });
+    sel.addEventListener('change', desenha);
+    sel.classList.add('uc-hid'); sel.tabIndex = -1; sel.setAttribute('aria-hidden', 'true');
+    sel.insertAdjacentElement('afterend', box);
+    return true;
+  }
+
+  // ---------- favoritos (select grande, número, texto com data-fav) ----------
+  function favoritos(el) {
+    const k = chave(el); if (!k) return;
+    const un = el.tagName === 'SELECT' ? '' : unidade(el);
+    const padrao = (el.dataset.fav || '').split(',').map(s => s.trim()).filter(Boolean);
+    let editando = false;
+    const box = document.createElement('div'); box.className = 'uc-fav';
+    const lista = () => { const s = ler(k); return Array.isArray(s) ? s : padrao; };
+    const texto = v => el.tagName === 'SELECT' ? ((([...el.options].find(o => o.value === v) || {}).text) || v) : mostra(v, un);
+    const desenha = () => {
+      const L = lista(), cur = String(el.value ?? '');
+      box.classList.toggle('uc-vazio', !L.length && !editando);
+      box.innerHTML = L.map(v => '<button type="button" class="uc-v" data-v="' + esc(v) + '" aria-pressed="' + (cur !== '' && String(v) === cur) + '"' + (el.disabled || el.readOnly ? ' disabled' : '') + '>' + esc(texto(v)) + (editando ? '<span class="uc-x" aria-label="tirar">×</span>' : '') + '</button>').join('') +
+        (el.disabled || el.readOnly ? '' : '<button type="button" class="uc-add" title="Guarda o valor que está no campo como botão">+ favorito</button>' + (L.length ? '<button type="button" class="uc-ed" aria-pressed="' + editando + '" title="Tirar favoritos">' + (editando ? 'Pronto' : '✎') + '</button>' : ''));
+    };
+    box.addEventListener('mousedown', e => e.preventDefault()); // não tira o foco do campo
+    box.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b || b.disabled) return;
+      if (b.classList.contains('uc-add')) {
+        const v = String(el.value ?? '').trim();
+        if (!v || v === '__outra') { el.focus(); el.setAttribute('placeholder', 'Digite ou escolha e toque em + favorito'); return; }
+        const L = lista().filter(x => String(x) !== v); L.push(v);
+        if (el.type === 'number') L.sort((a, b) => Number(a) - Number(b));
+        gravar(k, L.slice(-12)); desenha(); return;
+      }
+      if (b.classList.contains('uc-ed')) { editando = !editando; desenha(); return; }
+      if (editando && e.target.closest('.uc-x')) { gravar(k, lista().filter(x => String(x) !== b.dataset.v)); desenha(); return; }
+      setVal(el, b.dataset.v); desenha();
+    });
+    el.addEventListener('input', desenha); el.addEventListener('change', desenha);
+    el.insertAdjacentElement('afterend', box);
+    desenha();
+  }
+
+  function aplica(raiz) {
+    const Q = 'select:not([data-uc]),input:not([data-uc])';
+    [...(raiz.matches && raiz.matches(Q) ? [raiz] : []), ...raiz.querySelectorAll(Q)].forEach(el => {
+      el.dataset.uc = '1';
+      if (off(el) || el.type === 'hidden' || el.closest('.uc-seg,.uc-fav')) return;
+      // só em formulários e quadros (filtros de barra ficam como estão, a não ser com data-1c="botoes")
+      if (!el.closest('form,[role="dialog"],.modal,[data-1c="on"]') && el.dataset['1c'] !== 'botoes' && el.dataset.fav === undefined) return;
+      if (el.tagName === 'SELECT') { if (!botoes(el) && el.dataset.fav !== undefined) favoritos(el); return; }
+      const temRotulo = !!rotulo(el) && !!((el.id && document.querySelector('label[for="' + CSS.escape(el.id) + '"]')) || el.closest('label'));
+      if ((el.type === 'number' && temRotulo) || el.dataset.fav !== undefined) favoritos(el);
+    });
+  }
+  const go = () => { aplica(document); new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => { if (n.nodeType === 1) aplica(n); }))).observe(document.body, { childList: true, subtree: true }); };
+  document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', go) : go();
+})();
 </script>
 </body>
 </html>
