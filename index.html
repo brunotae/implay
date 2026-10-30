@@ -1845,7 +1845,7 @@ function orcDoc(o){S._docO=o;const P=[];const M=esc(o.marca||"Marca");const fina
    <div class="vcond"><div><b>Condições</b><ul><li>Pagamento: ${esc(o.pagamento||"a combinar")}</li><li>Vigência dos pacotes: ${o.vigencia_meses||3} meses, renovável</li><li>Percentual calculado sobre as vendas das lives, sem pedidos cancelados ou devolvidos</li><li>Início conforme agenda do estúdio</li></ul></div><div><b>Fica por conta da marca</b><ul><li>Verba de mídia (GMV Max) e comissão dos afiliados</li><li>Produtos, fretes, envios, atendimento e logística</li><li>Cenário com a identidade visual da marca, orçado à parte</li><li>Lives de 12 horas ou mais, orçadas como lançamento</li></ul></div></div>
    ${orcObs(o)?`<p class="vnote dk"><b>Observações:</b> ${esc(orcObs(o))}</p>`:""}<div class="vsrc dk">${EMPRESA.razao} · CNPJ ${EMPRESA.cnpj} · Proposta válida por ${o.validade_dias||10} dias corridos, até ${dBR(venc)}. Depois disso, valores e disponibilidade podem mudar.</div>`));
   P.push(dimg(29));
-  return P.map((p,i)=>`<div class="pgw"><div class="pg v1 ${p.cls}">${i?`<div class="vnum">${String(i+1).padStart(2,"0")}</div>`:""}${p.html}${!final&&i?`<div class="vdraft">RASCUNHO</div>`:""}</div></div>`).join("")}
+  return P.map((p,i)=>`<div class="pgw" data-pk="${esc(pgKey(p,i))}"><div class="pg v1 ${p.cls}">${i?`<div class="vnum">${String(i+1).padStart(2,"0")}</div>`:""}${p.html}${!final&&i?`<div class="vdraft">RASCUNHO</div>`:""}</div></div>`).join("")}
 function deckFb(el){el.onerror=null;S.semImg=true;const w=$("#docImgWarn");if(w){w.hidden=false;w.innerHTML="⚠ Faltam as imagens da proposta: suba a pasta <b>deck3</b> no GitHub, ao lado do index.html"}}
 function imgFb(el){const f=el.dataset.f;const alt=["prop/"+f,f,"../prop/"+f,"/prop/"+f];const n=(+el.dataset.t||0)+1;el.dataset.t=n;if(n<alt.length)el.src=alt[n];else{const ph=el.closest(".vphone");if(ph)ph.style.display="none";el.classList.add("semimg");el.onerror=null;S.semImg=true;const w=$("#docImgWarn");if(w)w.hidden=false}}
 /* abre o orçamento numa aba nova (o quadro de edição continua aberto na aba do ERP) */
@@ -2513,8 +2513,9 @@ document.addEventListener("drop",async e=>{const d=e.target.closest&&e.target.cl
 
 VIEWS.pessoa=VPessoa;
 /* ================= v13 · VERSÃO DO SISTEMA + LER CONDIÇÕES DE ARQUIVOS ================= */
-const APP_VERSAO="34";const APP_DATA="29/10/2026";
+const APP_VERSAO="35";const APP_DATA="29/10/2026";
 const NOVIDADES=[
+ ["35","30/10","Proposta: botão ✂ Escolher páginas na tela do PDF. Mostra todas as páginas em miniatura; toque em 'Tirar esta página' nas que não quer. Atalho 'Curta' deixa só capa, valores, resumo e contato. A numeração se ajusta e a escolha fica guardada para aquela proposta neste aparelho."],
  ["34","29/10","Um clique: listas com até 10 opções curtas também viram botões, e listas maiores ganham botões favoritos. Os botões acompanham quando o sistema muda o valor sozinho."],
  ["33","29/10","Contrato: o leitor entende conversa de WhatsApp. Reconhece a empresa pelo CNPJ (ou oferece cadastrar com razão social, endereço, quem assina e financeiro), '3 meses', '3 vezes semana', '40 horas' + '150 horas' (valor da hora), comissão 'igual à da Welz' (busca o % do contrato dela) e testemunha do nosso lado. Contrato ganhou campos de testemunhas."],
  ["32","29/10","Um clique: listas com poucas opções viraram botões (ex.: minutos da live, estrutura GO/BOOST/ICON). Campos de % sobre vendas ganharam botões favoritos: digite o valor e toque em + favorito; ✎ para tirar. Os favoritos ficam por pessoa e por aparelho."],
@@ -3459,6 +3460,40 @@ cdRender=function(){_cdRender0();const C=S.cd,sel=$("#cdCli");if(!C||!sel)return
    <div style="margin-top:6px"><button type="button" class="btn p sm" data-act="cdCliSug">${dup?"Completar o cadastro de "+esc(dup.marca)+" com esses dados":"Conferir e cadastrar este cliente"}</button></div></div>`)};
 document.addEventListener("click",async e=>{const a=e.target.closest("[data-act=cdCliSug]");if(!a)return;e.preventDefault();e.stopImmediatePropagation();if(!S.cd)return;cdLerForm();S.cdAguarda=true;openCliImport();await ciProcessa(S.cd.cliTxt||"","lido do texto do contrato")},true);
 function cdTestOp(){const n=[...(S.socios||[]).map(s=>s.nome_completo||s.nome),...(S.membros||[]).filter(m=>m.status==="ativo"&&m.papel!=="seller").map(m=>m.nome)].filter(Boolean);const u=[];n.forEach(x=>{if(!u.some(y=>cdNorm(y).startsWith(cdNorm(x))||cdNorm(x).startsWith(cdNorm(y))))u.push(x)});return [["","Em branco"],...u]}
+
+
+/* ================= v35 · PROPOSTA: ESCOLHER PÁGINAS (tirar páginas do PDF) ================= */
+(function(){const st=document.createElement("style");st.textContent=`
+.pgw{position:relative}.pgx{display:none;position:absolute;left:8px;top:8px;z-index:3;border:0;border-radius:999px;padding:6px 12px;font:700 12px/1.2 inherit;cursor:pointer;background:#fff;color:#111;box-shadow:0 2px 8px #0006}
+.pgw.off .pgx{background:var(--volt,#c8ff3d);color:#111}
+#doc.sel{text-align:center}#doc.sel .bar{text-align:left}#doc.sel .pgw{display:inline-block;margin:6px;vertical-align:top}#doc.sel .pgx{display:block}
+#doc.sel .pgw.off .pg{opacity:.22;filter:grayscale(1)}#doc.sel .pgn{display:block}
+.pgn{display:none;position:absolute;right:8px;top:8px;z-index:3;background:#000a;color:#fff;border-radius:999px;padding:4px 9px;font:700 11px/1.2 inherit}
+#doc:not(.sel) .pgw.off{display:none}
+#doc .bar{flex-wrap:wrap}#pgCnt{color:#bbb;font-size:12px;align-self:center}
+@media print{.pgw.off{display:none!important}.pgx,.pgn{display:none!important}#doc.sel .pgw{display:block!important;margin:0 auto!important}.pgw.lastv .pg{break-after:auto!important;page-break-after:auto!important}}`;document.head.appendChild(st)})();
+function pgKey(p,i){if(i===0)return "capa";const m=p.html.match(/deck\d*\/s(\d+)\.jpg/);if(m)return "s"+m[1];if(/Resumo da proposta/.test(p.html))return "resumo";const h=(p.html.match(/<h2>([^<]+)/)||[])[1]||String(i);return "inv:"+h.slice(0,40)}
+function pgChave(){const o=S._docO||{};return "implay-pgoff-"+(o.id||(o.numero?"n"+o.numero:"prev"))}
+function pgOff(){try{return new Set(JSON.parse(localStorage.getItem(pgChave())||"[]"))}catch(e){return new Set()}}
+function pgSalva(s){try{localStorage.setItem(pgChave(),JSON.stringify([...s]))}catch(e){}}
+function pgApply(){const off=pgOff();const ws=[...document.querySelectorAll("#doc .pgw[data-pk]")];if(!ws.length)return;let n=0,last=null;
+  ws.forEach((w,ix)=>{const o=off.has(w.dataset.pk);w.classList.toggle("off",o);w.classList.remove("lastv");if(!o){n++;last=w;const v=w.querySelector(".vnum");if(v)v.textContent=String(n).padStart(2,"0")}
+    if(!w.querySelector(".pgx"))w.insertAdjacentHTML("beforeend",`<button type="button" class="pgx" data-act="pgTog"></button><span class="pgn"></span>`);
+    w.querySelector(".pgx").textContent=o?"↩ Voltar com esta página":"✕ Tirar esta página";w.querySelector(".pgn").textContent=o?"fora":"pág. "+n});
+  if(last)last.classList.add("lastv");const c=$("#pgCnt");if(c)c.textContent=off.size?`${n} de ${ws.length} páginas no PDF`:`${ws.length} páginas`}
+const _fitDoc0=fitDoc;
+fitDoc=function(){const d=$("#doc");if(!d||!d.classList.contains("sel"))return _fitDoc0();const cols=window.innerWidth>900?4:window.innerWidth>560?3:2;
+  document.querySelectorAll("#doc .pgw").forEach(x=>{const pg=x.firstChild;const W=pg.classList.contains("v1")?1280:1123,H=pg.classList.contains("v1")?720:794;const w=Math.floor((Math.min(window.innerWidth,1400)-24-cols*12)/cols),k=w/W;x.style.width=w+"px";x.style.height=(H*k)+"px";pg.style.transform=`scale(${k})`})};
+const _showOrcDoc0=showOrcDoc;
+showOrcDoc=function(o){_showOrcDoc0(o);const bar=$("#doc .bar");if(bar&&!$("#pgSelB")){bar.querySelector("[data-act=docPrint]").insertAdjacentHTML("afterend",`<button class="btn" id="pgSelB" data-act="pgSel">✂ Escolher páginas</button><span id="pgPre" hidden><button class="btn sm" data-act="pgTodas">Todas</button> <button class="btn sm" data-act="pgCurta">Curta: capa, valores, resumo e contato</button> <button class="btn p sm" data-act="pgOk">Pronto</button></span><span id="pgCnt"></span>`)}pgApply()};
+document.addEventListener("click",e=>{const a=e.target.closest("[data-act]");if(!a||!a.closest("#doc"))return;const act=a.dataset.act;if(!/^pg(Sel|Tog|Todas|Curta|Ok)$/.test(act))return;e.preventDefault();e.stopImmediatePropagation();
+  const d=$("#doc"),ws=[...document.querySelectorAll("#doc .pgw[data-pk]")];let off=pgOff();
+  const modo=on=>{d.classList.toggle("sel",on);$("#pgPre").hidden=!on;$("#pgSelB").hidden=on;fitDoc();if(on)d.scrollTop=0};
+  if(act==="pgSel")return modo(true);if(act==="pgOk"){modo(false);return toast(off.size?`Pronto: o PDF sai com ${ws.length-off.size} páginas`:"Pronto: o PDF sai completo")}
+  if(act==="pgTodas")off=new Set();
+  if(act==="pgCurta")off=new Set(ws.map(w=>w.dataset.pk).filter(k=>!(k==="capa"||k==="resumo"||k==="s29"||k.startsWith("inv:"))));
+  if(act==="pgTog"){const k=a.closest(".pgw").dataset.pk;if(off.has(k))off.delete(k);else{if(ws.length-off.size<=1)return toast("Precisa ficar pelo menos 1 página",true);off.add(k)}}
+  pgSalva(off);pgApply()},true);
 
 if(!orcPreviewBoot())boot();
 </script>
